@@ -13,9 +13,9 @@
 
 <!-- ═══ TOP MODE TABS ═══ -->
 <div class="mode-tabs">
-  <div style="display:flex;align-items:center;gap:8px;margin-right:20px;padding-right:20px;border-right:1px solid var(--border)">
-    <div style="width:26px;height:26px;background:linear-gradient(135deg,var(--blue),var(--green));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px">📚</div>
-    <span style="font-size:14px;font-weight:700;letter-spacing:-0.01em">Study<span style="color:var(--blue2)">OS</span></span>
+  <div style="display:flex;align-items:center;gap:10px;margin-right:24px;padding-right:24px;border-right:1px solid var(--border)">
+    <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--green));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px">📚</div>
+    <span style="font-size:17px;font-weight:700;letter-spacing:-0.01em">Study<span style="color:var(--blue2)">OS</span></span>
   </div>
   <button class="mode-tab" data-panel="dash" onclick="switchPanel('dash')">
     <span>⊞</span> Dashboard
@@ -483,7 +483,7 @@
             <span class="st">Todas las Materias</span>
             <span class="chip blue" x-text="overallPct+'% promedio'"></span>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+          <div :style="'display:grid;grid-template-columns:repeat('+Math.min(subjects.length,4)+',1fr);gap:14px'">
             <template x-for="s in subjects" :key="s.id">
               <div class="card" style="cursor:pointer" @click="navigate('subject-'+s.id)">
                 <div class="flex aic jbs" style="margin-bottom:12px">

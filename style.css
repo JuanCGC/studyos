@@ -679,12 +679,12 @@ textarea.note:focus { border-color:var(--blue); }
 .mode-tabs {
   display: flex; align-items: center; gap: 0;
   background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 20px; height: 48px; flex-shrink: 0; z-index: 200;
+  padding: 0 24px; height: 60px; flex-shrink: 0; z-index: 200;
   position: sticky; top: 0;
 }
 .mode-tab {
   display: flex; align-items: center; gap: 8px;
-  padding: 0 20px; height: 48px; font-size: 13px; font-weight: 500;
+  padding: 0 24px; height: 60px; font-size: 15px; font-weight: 500;
   color: var(--t3); cursor: pointer; border-bottom: 2px solid transparent;
   transition: all .15s; white-space: nowrap; background: none; border-left: none; border-right: none; border-top: none;
   font-family: var(--font);
@@ -692,7 +692,7 @@ textarea.note:focus { border-color:var(--blue); }
 .mode-tab:hover { color: var(--t1); }
 .mode-tab.active { color: var(--blue2); border-bottom-color: var(--blue); }
 .mode-badge {
-  font-size: 10px; font-family: var(--mono); padding: 1px 6px;
+  font-size: 12px; font-family: var(--mono); padding: 2px 8px;
   border-radius: 20px; background: rgba(59,130,246,.15); color: var(--blue2);
 }
 .app-panels { display: flex; flex: 1; overflow: hidden; }
@@ -802,7 +802,7 @@ textarea.note:focus { border-color:var(--blue); }
 /* Guide back bar — fixed so it persists during scroll */
 #panel-guide .guide-back-bar {
   position: fixed !important;
-  top: 48px;
+  top: 60px;
   left: 0; right: 0;
   z-index: 150;
   background: var(--bg) !important;
