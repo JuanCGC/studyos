@@ -72,6 +72,7 @@ window._user = null;
       return;
     }
     window._user = session.user;
+    window.dispatchEvent(new CustomEvent('supabase-ready'));
   } catch (e) {
     console.warn('Supabase init failed (local dev?):', e.message);
   }
@@ -583,11 +584,43 @@ function app() {
     pomoSettings: {work:25,short:5,long:15},
     settings: {alarmOn:true,focusMode:false},
 
+    // ── Settings persistence (localStorage) ──
+    loadSettings() {
+      try {
+        const s = JSON.parse(localStorage.getItem('studyos_settings') || '{}');
+        if (s.settings) Object.assign(this.settings, s.settings);
+        if (s.pomoSettings) { Object.assign(this.pomoSettings, s.pomoSettings); this.applyPomoSettings(); }
+        if (s.weekGoal != null) this.weekGoal = s.weekGoal;
+        if (s.pomosGoal != null) this.pomosGoal = s.pomosGoal;
+      } catch(e) {}
+    },
+    _saveSettings() {
+      try {
+        localStorage.setItem('studyos_settings', JSON.stringify({
+          settings: this.settings,
+          pomoSettings: this.pomoSettings,
+          weekGoal: this.weekGoal,
+          pomosGoal: this.pomosGoal,
+        }));
+      } catch(e) {}
+    },
+
     async init() {
-      await this.loadProgress();
-      // auto-save on any chapter/task change (debounced)
+      this.loadSettings();
+      // Wait for Supabase auth before loading progress (auth init is async)
+      if (window._sb) {
+        await this.loadProgress();
+      } else {
+        window.addEventListener('supabase-ready', async () => {
+          await this.loadProgress();
+        }, { once: true });
+      }
       this.$watch('subjects', () => this._debounceSave());
       this.$watch('tasks', () => this._debounceSave());
+      this.$watch('settings', () => this._saveSettings(), { deep: true });
+      this.$watch('pomoSettings', () => this._saveSettings(), { deep: true });
+      this.$watch('weekGoal', () => this._saveSettings());
+      this.$watch('pomosGoal', () => this._saveSettings());
     },
 
     _saveTimer: null,
