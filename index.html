@@ -3778,6 +3778,150 @@ jobs:
 
 <script src="./main.js"></script>
 
+<script>
+// ── Static guide quiz injection ──
+(function () {
+  const SKIP = ['s-dashboard', 's-notes', 's-tracker', 's-cheatsheet', 's-study'];
+
+  function buildBlock(sectionId, chapterName) {
+    const d = document.createElement('div');
+    d.id = 'quiz-block-' + sectionId;
+    d.style.cssText = 'border-top:2px solid #e0e0e0;margin-top:40px;padding-top:36px';
+    d.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+        '<strong style="font-size:20px;color:#16325c">Prueba</strong>' +
+        '<span style="color:#0070d2;font-weight:700;font-size:14px">+100 puntos</span>' +
+      '</div>' +
+      '<p style="color:#555;font-size:14px;margin:0 0 20px;line-height:1.6">Para completar esta unidad, debes responder correctamente las preguntas.</p>' +
+      '<button onclick="loadStaticQuiz(\'' + sectionId + '\',\'' + chapterName.replace(/'/g,"\\'") + '\')"' +
+        ' style="background:#0070d2;color:#fff;border:none;padding:11px 26px;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600">Iniciar prueba →</button>' +
+      '<div id="quiz-content-' + sectionId + '"></div>';
+    return d;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.section').forEach(function (sec) {
+      if (SKIP.includes(sec.id)) return;
+      const h2 = sec.querySelector('.top-bar h2');
+      const page = sec.querySelector('.page');
+      if (!h2 || !page) return;
+      page.appendChild(buildBlock(sec.id, h2.textContent.trim()));
+    });
+  });
+})();
+
+async function loadStaticQuiz(sectionId, chapterName) {
+  const container = document.getElementById('quiz-content-' + sectionId);
+  const btn = container.previousElementSibling;
+  btn.style.display = 'none';
+  container.innerHTML = '<div style="padding:32px;text-align:center;color:#888;font-size:15px">⏳ Generando preguntas con IA...</div>';
+  try {
+    const res = await fetch('/api/quiz', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subjectName: 'SDET', chapterName })
+    });
+    const data = await res.json();
+    if (!data.questions) throw new Error('no questions');
+    renderStaticQuiz(container, sectionId, data.questions);
+  } catch (e) {
+    container.innerHTML = '<div style="color:#e74c3c;padding:16px;font-size:14px">Error generando preguntas. Intenta de nuevo.</div>';
+    btn.style.display = '';
+  }
+}
+
+function renderStaticQuiz(container, sectionId, questions) {
+  window._sqd = window._sqd || {};
+  window._sqd[sectionId] = { questions, answers: new Array(questions.length).fill(null) };
+
+  let html = '';
+  questions.forEach(function (q, qi) {
+    html += '<div style="margin-top:' + (qi > 0 ? '28px' : '24px') + ';padding-top:' + (qi > 0 ? '28px' : '0') + ';border-top:' + (qi > 0 ? '1px solid #e8e8e8' : 'none') + '">';
+    html += '<div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:18px">';
+    html += '<div style="min-width:38px;height:38px;border-radius:50%;background:#e8f4fd;border:2px solid #0070d2;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#0070d2;flex-shrink:0">' + (qi + 1) + '</div>';
+    html += '<div style="font-size:17px;font-weight:500;color:#16325c;line-height:1.55;padding-top:6px">' + q.q + '</div></div>';
+    html += '<div style="display:flex;flex-direction:column;gap:9px;padding-left:54px">';
+    q.options.forEach(function (opt, oi) {
+      html += '<div id="opt-' + sectionId + '-' + qi + '-' + oi + '" onclick="selectSQ(\'' + sectionId + '\',' + qi + ',' + oi + ')"' +
+        ' style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-radius:8px;border:2px solid #d8d8d8;cursor:pointer;transition:all .15s">';
+      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" style="width:34px;height:34px;border-radius:50%;border:2px solid #d8d8d8;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#999;flex-shrink:0">' + ['A','B','C','D'][oi] + '</div>';
+      html += '<span style="font-size:15px;color:#333;line-height:1.4">' + opt + '</span></div>';
+    });
+    html += '</div></div>';
+  });
+
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid #e8e8e8">';
+  html += '<div style="display:flex;gap:6px;flex:1">';
+  questions.forEach(function (_, i) {
+    html += '<div id="dot-' + sectionId + '-' + i + '" style="width:11px;height:11px;border-radius:50%;background:#d8d8d8"></div>';
+  });
+  html += '</div>';
+  html += '<button id="sqbtn-' + sectionId + '" onclick="submitSQ(\'' + sectionId + '\')"' +
+    ' style="background:#0070d2;color:#fff;border:none;padding:12px 30px;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600;opacity:.35;pointer-events:none">Verificar →</button>';
+  html += '</div>';
+  html += '<div id="sqres-' + sectionId + '" style="display:none;margin-top:28px"></div>';
+
+  container.innerHTML = html;
+}
+
+function selectSQ(sectionId, qi, oi) {
+  const d = window._sqd[sectionId];
+  d.answers[qi] = oi;
+  d.questions[qi].options.forEach(function (_, idx) {
+    const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + idx);
+    const cir = document.getElementById('cir-' + sectionId + '-' + qi + '-' + idx);
+    if (idx === oi) {
+      lbl.style.borderColor = '#0070d2'; lbl.style.background = 'rgba(0,112,210,.07)';
+      cir.style.borderColor = '#0070d2'; cir.style.background = '#0070d2'; cir.style.color = '#fff';
+    } else {
+      lbl.style.borderColor = '#d8d8d8'; lbl.style.background = '';
+      cir.style.borderColor = '#d8d8d8'; cir.style.background = ''; cir.style.color = '#999';
+    }
+  });
+  document.getElementById('dot-' + sectionId + '-' + qi).style.background = '#0070d2';
+  if (d.answers.every(function (a) { return a !== null; })) {
+    const btn = document.getElementById('sqbtn-' + sectionId);
+    btn.style.opacity = '1'; btn.style.pointerEvents = '';
+  }
+}
+
+function submitSQ(sectionId) {
+  const d = window._sqd[sectionId];
+  let score = 0;
+  d.questions.forEach(function (q, i) { if (d.answers[i] === q.correct) score++; });
+
+  d.questions.forEach(function (q, qi) {
+    const correct = d.answers[qi] === q.correct;
+    const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + d.answers[qi]);
+    if (lbl) {
+      lbl.style.borderColor = correct ? '#27ae60' : '#e74c3c';
+      lbl.style.background = correct ? 'rgba(39,174,96,.07)' : 'rgba(231,76,60,.07)';
+    }
+    // Show correct answer if wrong
+    if (!correct) {
+      const cLbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + q.correct);
+      if (cLbl) { cLbl.style.borderColor = '#27ae60'; cLbl.style.background = 'rgba(39,174,96,.07)'; }
+    }
+  });
+
+  document.getElementById('sqbtn-' + sectionId).style.display = 'none';
+  const passed = score >= Math.ceil(d.questions.length * 0.67);
+  const res = document.getElementById('sqres-' + sectionId);
+  res.style.display = '';
+  res.innerHTML =
+    '<div style="text-align:center;padding:32px 24px;border:2px solid ' + (passed ? '#27ae60' : '#e74c3c') + ';border-radius:10px;background:' + (passed ? 'rgba(39,174,96,.05)' : 'rgba(231,76,60,.05)') + '">' +
+      '<div style="font-size:44px;margin-bottom:12px">' + (passed ? '🎉' : '📚') + '</div>' +
+      '<div style="font-size:20px;font-weight:700;color:' + (passed ? '#27ae60' : '#e74c3c') + ';margin-bottom:8px">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
+      '<div style="font-size:15px;color:#666">' + score + ' de ' + d.questions.length + ' correctas</div>' +
+      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" style="margin-top:18px;background:#0070d2;color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600">Intentar de nuevo</button>' : '') +
+    '</div>';
+}
+
+function retrySQ(sectionId) {
+  const d = window._sqd[sectionId];
+  d.answers = new Array(d.questions.length).fill(null);
+  renderStaticQuiz(document.getElementById('quiz-content-' + sectionId), sectionId, d.questions);
+}
+</script>
 
 </body>
 </html>
