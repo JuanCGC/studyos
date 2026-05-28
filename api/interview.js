@@ -59,7 +59,8 @@ Empieza la sesión con una pregunta de introducción sobre el tema.`;
     }
 
     const data = await geminiRes.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const reply = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     res.status(200).json({ reply });
   } catch (err) {
     res.status(500).json({ error: err.message });
