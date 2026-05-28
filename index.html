@@ -956,6 +956,11 @@
                 <div style="color:var(--t3);font-size:15px">Generando preguntas con IA...</div>
               </div>
 
+              <!-- Quiz error -->
+              <div x-show="aiGuide.quiz&&!aiGuide.quiz.loading&&aiGuide.quiz.error&&!aiGuide.quiz.questions.length" style="padding:28px;text-align:center;background:rgba(239,68,68,.06);border-radius:16px;border:1px solid rgba(239,68,68,.2)">
+                <div style="color:#f87171;font-size:14px;font-family:var(--mono)">No se pudo generar el quiz. Verifica tu conexión e intenta de nuevo.</div>
+              </div>
+
               <!-- Questions -->
               <div x-show="aiGuide.quiz&&!aiGuide.quiz.loading&&!aiGuide.quiz.submitted">
                 <template x-for="(q, qi) in (aiGuide.quiz?.questions||[])" :key="qi">

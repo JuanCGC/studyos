@@ -82,7 +82,7 @@ window._user = null;
 function app() {
   return {
     // ── Routing ──
-    view: localStorage.getItem('stos_view') || 'dashboard',
+    view: (() => { const v = localStorage.getItem('stos_view'); return (v && (v === 'dashboard' || v === 'subjects' || v === 'pomodoro' || v === 'interview' || v === 'settings' || v.startsWith('subject-'))) ? v : 'dashboard'; })(),
     navigate(v) {
       this.view = v;
       localStorage.setItem('stos_view', v);
@@ -588,7 +588,7 @@ function app() {
     async openAIGuide(subject, chapter, chapterIndex, quizOnly = false) {
       this.aiGuide = {
         subject, chapter, chapterIndex, loading: !quizOnly, quizOnly, error: '', content: null,
-        quiz: { questions: [], answers: [null, null, null], loading: true, submitted: false, score: 0 },
+        quiz: { questions: [], answers: [null, null, null], loading: true, submitted: false, score: 0, error: false },
       };
       this.navigate('ai-guide');
 
@@ -638,7 +638,7 @@ function app() {
               try { localStorage.setItem(quizKey, JSON.stringify(data.questions)); } catch(e) {}
             }
           })
-          .catch(() => {})
+          .catch(() => { this.aiGuide.quiz.error = true; })
           .finally(() => { this.aiGuide.quiz.loading = false; })
         );
       }
