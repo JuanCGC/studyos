@@ -492,17 +492,18 @@ function app() {
     confirmReset(s){ this.resetTarget=this.resetTarget===s.id?null:s.id; },
     doReset(s){ s.chapList.forEach(ch=>ch.done=false); s.pct=0; this.resetTarget=null; },
 
-    // ── AI Guide Modal ──
-    guideModal: { open: false, loading: false, error: '', content: null, chapterName: '' },
+    // ── AI Guide View ──
+    aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, error: '', content: null },
 
-    async openGuideModal(subject, chapter, chapterIndex) {
-      this.guideModal = { open: true, loading: false, error: '', content: null, chapterName: chapter.name };
+    async openAIGuide(subject, chapter, chapterIndex) {
+      this.aiGuide = { subject, chapter, chapterIndex, loading: false, error: '', content: null };
+      this.navigate('ai-guide');
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
       try {
         const cached = localStorage.getItem(cacheKey);
-        if (cached) { this.guideModal.content = JSON.parse(cached); return; }
+        if (cached) { this.aiGuide.content = JSON.parse(cached); return; }
       } catch(e) {}
-      this.guideModal.loading = true;
+      this.aiGuide.loading = true;
       try {
         const res = await fetch('/api/generate-guide', {
           method: 'POST',
@@ -511,12 +512,12 @@ function app() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error');
-        this.guideModal.content = data.guide;
+        this.aiGuide.content = data.guide;
         try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch(e) {}
       } catch(e) {
-        this.guideModal.error = e.message;
+        this.aiGuide.error = e.message;
       } finally {
-        this.guideModal.loading = false;
+        this.aiGuide.loading = false;
       }
     },
 

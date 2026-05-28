@@ -624,9 +624,9 @@
                     <span x-show="ch.done">✓</span>
                   </div>
                   <span class="chap-num" x-text="String(i+1).padStart(2,'0')"></span>
-                  <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" :style="(CHAP_MAP[ch.name]||s.aiSuggested)?'cursor:pointer':''" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):(s.aiSuggested?openGuideModal(s,ch,i):null)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':(s.aiSuggested?'Generar guía con IA':'')"></span>
+                  <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" :style="(CHAP_MAP[ch.name]||s.aiSuggested)?'cursor:pointer':''" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):(s.aiSuggested?openAIGuide(s,ch,i):null)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':(s.aiSuggested?'Generar guía con IA':'')"></span>
                   <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="Ver instrucciones">📖</span>
-                  <span x-show="s.aiSuggested&&!CHAP_MAP[ch.name]" @click.stop="openGuideModal(s,ch,i)" title="Generar guía con IA" style="font-size:14px;color:var(--blue2);margin-left:4px;flex-shrink:0;cursor:pointer;">✨</span>
+                  <span x-show="s.aiSuggested&&!CHAP_MAP[ch.name]" @click.stop="openAIGuide(s,ch,i)" title="Generar guía con IA" style="font-size:14px;color:var(--blue2);margin-left:4px;flex-shrink:0;cursor:pointer;">✨</span>
                   <span class="chap-status mono txt-xs"
                     :style="ch.done?'color:var(--green2)':'color:var(--t4)'"
                     x-text="ch.done?'✓ Completado':'Pendiente'">
@@ -817,85 +817,95 @@
     </template>
   </nav>
 
-  <!-- ── AI GUIDE MODAL ── -->
-  <div
-    x-show="guideModal.open"
-    x-cloak
-    @keydown.escape.window="guideModal.open=false"
-    style="position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;background:rgba(0,0,0,.7);overflow-y:auto;"
-    @click.self="guideModal.open=false"
-  >
-    <div style="width:100%;max-width:780px;background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden;position:relative;">
+  <!-- ── AI GUIDE VIEW ── -->
+  <div x-show="view==='ai-guide'" x-cloak>
+    <div class="view">
 
-      <!-- Modal header -->
-      <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <div>
-          <div style="font-size:11px;font-family:var(--mono);color:var(--blue2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">✨ Guía generada por IA</div>
-          <div style="font-size:18px;font-weight:700;color:var(--t1)" x-text="guideModal.chapterName"></div>
+      <!-- Header -->
+      <div class="detail-header" style="flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+        <button class="back-btn" @click="navigate('subject-'+(aiGuide.subject?.id||''))">← Volver</button>
+        <div class="flex aic g8" style="flex:1;min-width:0;">
+          <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;">✨ Guía IA</span>
+          <div class="detail-title" style="font-size:18px;" x-text="aiGuide.chapter?.name"></div>
         </div>
-        <button @click="guideModal.open=false" style="background:var(--layer);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--t3);cursor:pointer;font-size:13px;font-family:var(--font);">✕ Cerrar</button>
+        <span style="font-size:12px;font-family:var(--mono);color:var(--t4)" x-text="aiGuide.subject?.name"></span>
       </div>
 
       <!-- Loading -->
-      <div x-show="guideModal.loading" style="padding:60px;text-align:center;color:var(--t4);">
-        <div style="font-size:32px;margin-bottom:12px;">⏳</div>
+      <div x-show="aiGuide.loading" style="padding:60px 0;text-align:center;color:var(--t4);">
+        <div style="font-size:36px;margin-bottom:14px;">⏳</div>
         <div style="font-size:14px;font-family:var(--mono)">Generando guía con Gemini...</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--t4);margin-top:6px;">Esto puede tomar 2-5 segundos</div>
       </div>
 
       <!-- Error -->
-      <div x-show="guideModal.error&&!guideModal.loading" style="padding:24px;">
-        <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:14px 16px;color:#f87171;font-size:13px;font-family:var(--mono)" x-text="'Error: '+guideModal.error"></div>
+      <div x-show="aiGuide.error&&!aiGuide.loading">
+        <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:14px 16px;color:#f87171;font-size:13px;font-family:var(--mono)" x-text="'Error: '+aiGuide.error"></div>
       </div>
 
       <!-- Content -->
-      <div x-show="guideModal.content&&!guideModal.loading" style="padding:24px;display:flex;flex-direction:column;gap:20px;">
+      <div x-show="aiGuide.content&&!aiGuide.loading">
 
-        <!-- Summary -->
-        <div style="padding:14px 16px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;font-size:14px;color:var(--t2);line-height:1.6" x-text="guideModal.content?.summary"></div>
+        <!-- Summary callout -->
+        <div style="margin-bottom:24px;padding:16px 20px;background:rgba(59,130,246,.07);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;font-size:14px;color:var(--t2);line-height:1.7" x-text="aiGuide.content?.summary"></div>
 
         <!-- Sections -->
-        <template x-for="(sec,si) in (guideModal.content?.sections||[])" :key="si">
-          <div>
+        <template x-for="(sec,si) in (aiGuide.content?.sections||[])" :key="si">
+          <div style="margin-bottom:24px;">
+
             <!-- text section -->
             <template x-if="sec.type==='text'">
-              <div>
-                <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></div>
-                <div style="font-size:14px;color:var(--t2);line-height:1.7;white-space:pre-wrap" x-text="sec.content"></div>
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                  <span style="color:var(--blue2);font-size:16px;">◈</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></span>
+                </div>
+                <div style="font-size:14px;color:var(--t2);line-height:1.8;white-space:pre-wrap" x-text="sec.content"></div>
               </div>
             </template>
 
             <!-- code section -->
             <template x-if="sec.type==='code'">
-              <div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                  <div style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></div>
-                  <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:2px 8px;border-radius:4px;" x-text="sec.language"></span>
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+                <div style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="color:var(--green2);font-size:14px;">{ }</span>
+                    <span style="font-size:13px;font-weight:700;color:var(--t1);font-family:var(--mono)" x-text="sec.title"></span>
+                  </div>
+                  <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.12);padding:2px 10px;border-radius:20px;" x-text="sec.language"></span>
                 </div>
-                <pre style="background:var(--layer);border:1px solid var(--border);border-radius:10px;padding:16px;overflow-x:auto;font-size:13px;color:var(--t2);line-height:1.6;font-family:var(--mono);margin:0"><code x-text="sec.content"></code></pre>
+                <pre style="margin:0;padding:20px;overflow-x:auto;font-size:13px;color:var(--t2);line-height:1.7;font-family:var(--mono);background:var(--layer);"><code x-text="sec.content"></code></pre>
               </div>
             </template>
 
             <!-- list section -->
             <template x-if="sec.type==='list'">
-              <div>
-                <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></div>
-                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                  <span style="color:var(--green2);font-size:16px;">✓</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
                   <template x-for="(item,ii) in (sec.items||[])" :key="ii">
-                    <li style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--t2);line-height:1.5">
-                      <span style="color:var(--green2);font-weight:700;flex-shrink:0">✓</span>
-                      <span x-text="item"></span>
-                    </li>
+                    <div style="display:flex;align-items:flex-start;gap:12px;">
+                      <span style="min-width:22px;height:22px;background:var(--blue3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;" x-text="ii+1"></span>
+                      <span style="font-size:14px;color:var(--t2);line-height:1.6;padding-top:2px" x-text="item"></span>
+                    </div>
                   </template>
-                </ul>
+                </div>
               </div>
             </template>
+
           </div>
         </template>
 
         <!-- Exercise -->
-        <div x-show="guideModal.content?.exercise" style="padding:16px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;">
-          <div style="font-size:12px;font-family:var(--mono);color:var(--green2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">🛠 Ejercicio práctico</div>
-          <div style="font-size:14px;color:var(--t2);line-height:1.6" x-text="guideModal.content?.exercise"></div>
+        <div x-show="aiGuide.content?.exercise" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:20px 24px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <span style="font-size:16px;">🛠</span>
+            <span style="font-size:13px;font-weight:700;color:var(--green2);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);">Ejercicio práctico</span>
+          </div>
+          <div style="font-size:14px;color:var(--t2);line-height:1.7" x-text="aiGuide.content?.exercise"></div>
         </div>
 
       </div>
