@@ -897,6 +897,62 @@ textarea.note:focus { border-color:var(--blue); }
 #panel-guide .sb-prog-pct { font-size: 28px; }
 #panel-guide .sb-section-lbl { font-size: 11px; }
 
+/* ═══════════════════════════════════════════════════════
+   GUIDE PANEL — TRAILHEAD-LEVEL READABILITY BOOST
+   ═══════════════════════════════════════════════════════ */
+
+/* Core body text */
+#panel-guide .card-title { font-size: 20px !important; margin-bottom: 24px !important; }
+#panel-guide .card-title .icon { font-size: 24px !important; }
+#panel-guide .card { padding: 36px !important; margin-bottom: 26px !important; }
+
+/* Code blocks — main reading element */
+#panel-guide pre,
+#panel-guide code.block { font-size: 15px !important; padding: 26px !important; line-height: 1.9 !important; }
+#panel-guide .code-label { font-size: 13px !important; padding: 10px 20px !important; }
+
+/* Tables */
+#panel-guide .tbl { font-size: 16px !important; }
+#panel-guide .tbl th { font-size: 13px !important; padding: 14px 20px !important; }
+#panel-guide .tbl td { font-size: 16px !important; padding: 16px 20px !important; line-height: 1.65 !important; }
+
+/* Callouts */
+#panel-guide .callout { font-size: 16px !important; padding: 18px 24px !important; margin: 20px 0 !important; line-height: 1.7; }
+
+/* Steps */
+#panel-guide .steps li { font-size: 16px !important; padding: 12px 0 12px 54px !important; line-height: 1.7; }
+#panel-guide .steps li::before { width: 30px !important; height: 30px !important; font-size: 13px !important; }
+
+/* Mini grid cells */
+#panel-guide .mini { padding: 24px !important; }
+#panel-guide .mini h4 { font-size: 17px !important; margin-bottom: 12px !important; }
+#panel-guide .mini li { font-size: 15px !important; padding: 5px 0 !important; line-height: 1.6; }
+#panel-guide .mini p { font-size: 15px !important; line-height: 1.6; }
+
+/* Tags */
+#panel-guide .tag { font-size: 14px !important; padding: 4px 13px !important; }
+
+/* Definitions */
+#panel-guide .def-t { font-size: 16px !important; margin-bottom: 8px !important; }
+#panel-guide .def-b { font-size: 15px !important; line-height: 1.7 !important; }
+
+/* Week plan rows */
+#panel-guide .week-t { font-size: 16px !important; line-height: 1.7 !important; }
+
+/* Tracker tasks */
+#panel-guide .task-lbl { font-size: 16px !important; }
+#panel-guide .task-item { padding: 16px 18px !important; }
+
+/* Grids spacing */
+#panel-guide .g2 { gap: 22px !important; margin: 20px 0 !important; }
+#panel-guide .g3 { gap: 22px !important; margin: 20px 0 !important; }
+
+/* Generic paragraphs and list items inside guide cards */
+#panel-guide .card p,
+#panel-guide .card li { font-size: 15px; line-height: 1.75; }
+#panel-guide .card ul,
+#panel-guide .card ol { padding-left: 20px; display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+
 /* Dashboard page padding — keep original horizontal padding to not shrink content */
 .topbar { height: 64px; }
 .topbar h1 { font-size: 18px; }
