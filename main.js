@@ -472,7 +472,8 @@ function app() {
             const now=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
             this.pomoLog.unshift({id:Date.now(),
               label:this.pomoPhase==='work'?`Sesión #${this.donePomos+1}`:'Descanso',
-              type:this.pomoPhase,time:now});
+              type:this.pomoPhase, time:now,
+              focus: this.pomoPhase==='work' ? this.pomoFocusLabel : ''});
             if(this.pomoPhase==='work'){
               this.donePomos=Math.min(4,this.donePomos+1); this.pomosToday++;
               this.setPhase(this.donePomos%4===0?'long':'short');
@@ -488,6 +489,78 @@ function app() {
     applyPomoSettings(){
       this.phaseDur={work:this.pomoSettings.work*60,short:this.pomoSettings.short*60,long:this.pomoSettings.long*60};
       this.resetTimer();
+    },
+
+    // ── Chapter Notes ──
+    notesOpen: {},
+    toggleNotes(s, idx) {
+      const key = s.id + '_' + idx;
+      this.notesOpen = { ...this.notesOpen, [key]: !this.notesOpen[key] };
+    },
+    isNotesOpen(s, idx) {
+      return !!this.notesOpen[s.id + '_' + idx];
+    },
+
+    // ── Quiz on chapter completion ──
+    quiz: { active: false, questions: [], answers: [null, null, null], loading: false, subjectRef: null, chapIdx: null, submitted: false, score: 0, ch: null },
+
+    async toggleChapDone(s, ch, i) {
+      if (!ch.done) {
+        this.quiz = { active: true, questions: [], answers: [null, null, null], loading: true, subjectRef: s, chapIdx: i, submitted: false, score: 0, ch };
+        try {
+          const res = await fetch('/api/quiz', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subjectName: s.name, chapterName: ch.name }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Error');
+          this.quiz.questions = data.questions;
+        } catch(e) {
+          ch.done = true;
+          this.syncSubjectPct(s);
+          this.quiz.active = false;
+        } finally {
+          this.quiz.loading = false;
+        }
+      } else {
+        ch.done = false;
+        this.syncSubjectPct(s);
+      }
+    },
+
+    submitQuiz() {
+      let score = 0;
+      this.quiz.questions.forEach((q, i) => {
+        if (this.quiz.answers[i] === q.correct) score++;
+      });
+      this.quiz.score = score;
+      this.quiz.submitted = true;
+      if (score >= 2) {
+        this.quiz.subjectRef.chapList[this.quiz.chapIdx].done = true;
+        this.syncSubjectPct(this.quiz.subjectRef);
+      }
+    },
+
+    closeQuiz() { this.quiz.active = false; },
+
+    skipQuiz() {
+      this.quiz.subjectRef.chapList[this.quiz.chapIdx].done = true;
+      this.syncSubjectPct(this.quiz.subjectRef);
+      this.quiz.active = false;
+    },
+
+    // ── Pomodoro focus ──
+    pomoFocusSubjectId: '',
+    pomoFocusChapterName: '',
+    get pomoFocusSubject() {
+      return this.subjects.find(s => s.id === this.pomoFocusSubjectId) || null;
+    },
+    get pomoFocusLabel() {
+      if (!this.pomoFocusSubjectId) return '';
+      const s = this.pomoFocusSubject;
+      if (!s) return '';
+      return this.pomoFocusChapterName ? s.name + ' — ' + this.pomoFocusChapterName : s.name;
     },
 
     // ── Chapter / subject helpers ──

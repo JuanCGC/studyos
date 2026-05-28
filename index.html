@@ -367,6 +367,27 @@
             <span class="st">Temporizador Pomodoro</span>
             <span class="chip" :class="pomoPhase==='work'?'blue':'green'" x-text="pomoPhase==='work'?'Enfoque':'Descanso'"></span>
           </div>
+          <!-- ── Focus selector ── -->
+          <div class="card" style="max-width:480px;margin:0 auto 20px;padding:16px 18px">
+            <div style="font-size:11px;color:var(--t4);font-family:var(--mono);letter-spacing:.08em;margin-bottom:10px">¿QUÉ ESTÁS ESTUDIANDO?</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <select x-model="pomoFocusSubjectId" @change="pomoFocusChapterName=''" style="flex:1;min-width:160px;background:var(--layer);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;font-size:14px;color:var(--t1);font-family:var(--font);outline:none;cursor:pointer">
+                <option value="">Seleccionar materia...</option>
+                <template x-for="s in subjects" :key="s.id">
+                  <option :value="s.id" x-text="s.icon+' '+s.name"></option>
+                </template>
+              </select>
+              <select x-show="pomoFocusSubjectId" x-model="pomoFocusChapterName" style="flex:1;min-width:160px;background:var(--layer);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;font-size:14px;color:var(--t1);font-family:var(--font);outline:none;cursor:pointer">
+                <option value="">Seleccionar capítulo...</option>
+                <template x-for="(ch,i) in (pomoFocusSubject?.chapList||[])" :key="i">
+                  <option :value="ch.name" x-text="String(i+1).padStart(2,'0')+'. '+ch.name" :disabled="ch.done"></option>
+                </template>
+              </select>
+            </div>
+            <div x-show="pomoFocusLabel" style="margin-top:9px;font-size:13px;color:var(--blue2);font-family:var(--mono);display:flex;align-items:center;gap:6px">
+              <span>📍</span><span x-text="pomoFocusLabel"></span>
+            </div>
+          </div>
           <div class="pomo-tabs" style="max-width:280px;margin:0 auto 20px">
             <button class="pomo-tab" :class="pomoPhase==='work'?'active':''" @click="setPhase('work')">25 min</button>
             <button class="pomo-tab" :class="pomoPhase==='short'?'active':''" @click="setPhase('short')">5 min</button>
@@ -402,10 +423,13 @@
           </div>
           <div class="pomo-log">
             <template x-for="log in pomoLog" :key="log.id">
-              <div class="plog-item">
-                <span x-text="log.label"></span>
-                <span class="badge" :class="log.type==='work'?'blue':'green'" x-text="log.type==='work'?'Enfoque':'Descanso'"></span>
-                <span class="plog-time" x-text="log.time"></span>
+              <div class="plog-item" style="flex-direction:column;align-items:flex-start;gap:4px">
+                <div style="display:flex;align-items:center;gap:8px;width:100%">
+                  <span x-text="log.label"></span>
+                  <span class="badge" :class="log.type==='work'?'blue':'green'" x-text="log.type==='work'?'Enfoque':'Descanso'"></span>
+                  <span class="plog-time" style="margin-left:auto" x-text="log.time"></span>
+                </div>
+                <div x-show="log.focus" style="font-size:12px;color:var(--blue2);font-family:var(--mono)" x-text="'📖 '+log.focus"></div>
               </div>
             </template>
             <div x-show="!pomoLog.length" class="txt-sm c-t4" style="text-align:center;padding:20px">
@@ -619,18 +643,32 @@
 
             <div class="chapter-list">
               <template x-for="(ch,i) in s.chapList" :key="i">
-                <div class="chap-item" :class="ch.done?'done':''" @click="ch.done=!ch.done;syncSubjectPct(s)">
-                  <div class="tcheck" :class="ch.done?'on':''">
-                    <span x-show="ch.done">✓</span>
+                <div>
+                  <div class="chap-item" :class="ch.done?'done':''" @click="toggleChapDone(s,ch,i)">
+                    <div class="tcheck" :class="ch.done?'on':''">
+                      <span x-show="ch.done">✓</span>
+                    </div>
+                    <span class="chap-num" x-text="String(i+1).padStart(2,'0')"></span>
+                    <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" :style="(CHAP_MAP[ch.name]||s.aiSuggested)?'cursor:pointer':''" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):(s.aiSuggested?openAIGuide(s,ch,i):null)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':(s.aiSuggested?'Generar guía con IA':'')"></span>
+                    <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="Ver instrucciones">📖</span>
+                    <span x-show="s.aiSuggested&&!CHAP_MAP[ch.name]" @click.stop="openAIGuide(s,ch,i)" title="Generar guía con IA" style="font-size:14px;color:var(--blue2);margin-left:4px;flex-shrink:0;cursor:pointer;">✨</span>
+                    <span class="chap-status mono txt-xs"
+                      :style="ch.done?'color:var(--green2)':'color:var(--t4)'"
+                      x-text="ch.done?'✓ Completado':'Pendiente'">
+                    </span>
+                    <button @click.stop="toggleNotes(s,i)" :title="isNotesOpen(s,i)?'Cerrar notas':'Mis notas'" style="background:none;border:none;cursor:pointer;padding:2px 5px;border-radius:5px;font-size:13px;flex-shrink:0;transition:all .15s;margin-left:4px" :style="isNotesOpen(s,i)?'color:var(--blue2)':'color:'+(ch.notes&&ch.notes.trim()?'var(--blue2)':'var(--t4)')">📝</button>
                   </div>
-                  <span class="chap-num" x-text="String(i+1).padStart(2,'0')"></span>
-                  <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" :style="(CHAP_MAP[ch.name]||s.aiSuggested)?'cursor:pointer':''" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):(s.aiSuggested?openAIGuide(s,ch,i):null)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':(s.aiSuggested?'Generar guía con IA':'')"></span>
-                  <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="Ver instrucciones">📖</span>
-                  <span x-show="s.aiSuggested&&!CHAP_MAP[ch.name]" @click.stop="openAIGuide(s,ch,i)" title="Generar guía con IA" style="font-size:14px;color:var(--blue2);margin-left:4px;flex-shrink:0;cursor:pointer;">✨</span>
-                  <span class="chap-status mono txt-xs"
-                    :style="ch.done?'color:var(--green2)':'color:var(--t4)'"
-                    x-text="ch.done?'✓ Completado':'Pendiente'">
-                  </span>
+                  <div x-show="isNotesOpen(s,i)" style="margin:4px 0 6px 52px">
+                    <textarea
+                      x-model="ch.notes"
+                      @click.stop
+                      placeholder="Notas, dudas, conceptos clave de este capítulo..."
+                      style="width:100%;min-height:88px;background:var(--layer2);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--t1);font-family:var(--font);resize:vertical;outline:none;line-height:1.6;transition:border-color .15s"
+                      @focus="$event.target.style.borderColor='rgba(59,130,246,.4)'"
+                      @blur="$event.target.style.borderColor='rgba(255,255,255,.08)'"
+                    ></textarea>
+                    <div style="font-size:10px;color:var(--t4);font-family:var(--mono);margin-top:3px">💾 Guardado automáticamente</div>
+                  </div>
                 </div>
               </template>
             </div>
@@ -911,6 +949,69 @@
           </div>
         </div>
       </div>
+
+  <!-- ══ QUIZ MODAL ══ -->
+  <div x-show="quiz.active" x-cloak style="position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto">
+      <!-- Loading -->
+      <div x-show="quiz.loading" style="padding:52px;text-align:center">
+        <div style="font-size:36px;margin-bottom:14px">⏳</div>
+        <div style="color:var(--t3);font-size:15px">Generando preguntas con IA...</div>
+        <div style="font-size:12px;color:var(--t4);margin-top:6px;font-family:var(--mono)" x-text="quiz.ch?.name"></div>
+      </div>
+      <!-- Questions -->
+      <div x-show="!quiz.loading && !quiz.submitted" style="padding:28px">
+        <div style="margin-bottom:22px">
+          <div style="font-size:11px;color:var(--blue2);font-family:var(--mono);margin-bottom:6px;letter-spacing:.08em">VERIFICACIÓN DEL CAPÍTULO</div>
+          <div style="font-size:20px;font-weight:700;color:var(--t1);margin-bottom:6px" x-text="quiz.ch?.name"></div>
+          <div style="font-size:13px;color:var(--t4)">Responde 2 de 3 correctamente para marcar el capítulo como completado.</div>
+        </div>
+        <template x-for="(q, qi) in quiz.questions" :key="qi">
+          <div style="margin-bottom:22px">
+            <div style="font-size:15px;font-weight:500;color:var(--t1);margin-bottom:10px;line-height:1.5" x-text="(qi+1)+'. '+q.q"></div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <template x-for="(opt, oi) in q.options" :key="oi">
+                <button
+                  @click="quiz.answers = quiz.answers.map((a,idx)=>idx===qi?oi:a)"
+                  style="text-align:left;padding:11px 14px;border-radius:9px;border:1px solid var(--border2);background:var(--layer);color:var(--t2);font-size:14px;cursor:pointer;transition:all .15s;font-family:var(--font);display:flex;align-items:center;gap:10px"
+                  :style="quiz.answers[qi]===oi?'background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue2)':''"
+                >
+                  <span style="font-family:var(--mono);font-size:12px;color:var(--t4);flex-shrink:0" x-text="['A','B','C','D'][oi]"></span>
+                  <span x-text="opt"></span>
+                </button>
+              </template>
+            </div>
+          </div>
+        </template>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <button
+            @click="submitQuiz()"
+            :disabled="quiz.answers.some(a=>a===null)"
+            style="flex:1;padding:13px;border-radius:10px;background:var(--blue3);border:1px solid var(--blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s"
+            :style="quiz.answers.some(a=>a===null)?'opacity:.45;cursor:not-allowed':''"
+          >Verificar respuestas</button>
+          <button @click="skipQuiz()" style="padding:13px 18px;border-radius:10px;border:1px solid var(--border2);background:var(--layer);color:var(--t4);font-size:13px;cursor:pointer;font-family:var(--font)" title="Marcar como completado sin quiz">Saltar quiz</button>
+        </div>
+      </div>
+      <!-- Results -->
+      <div x-show="quiz.submitted" style="padding:32px;text-align:center">
+        <div style="font-size:52px;margin-bottom:14px" x-text="quiz.score>=2?'🎉':'📚'"></div>
+        <div style="font-size:24px;font-weight:700;margin-bottom:8px" :style="quiz.score>=2?'color:var(--green2)':'color:var(--orange2)'" x-text="quiz.score>=2?'¡Capítulo completado!':'Necesitas repasar'"></div>
+        <div style="font-size:15px;color:var(--t3);margin-bottom:6px" x-text="quiz.score+'/3 respuestas correctas'"></div>
+        <div x-show="quiz.score<2" style="font-size:13px;color:var(--t4);margin-bottom:20px">Vuelve al capítulo, repasa los conceptos e intenta de nuevo.</div>
+        <div style="margin:20px 0;text-align:left">
+          <template x-for="(q, qi) in quiz.questions" :key="qi">
+            <div style="margin-bottom:10px;padding:12px 14px;border-radius:9px" :style="quiz.answers[qi]===q.correct?'background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2)':'background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)'">
+              <div style="font-size:13px;color:var(--t2);margin-bottom:5px" x-text="(qi+1)+'. '+q.q"></div>
+              <div style="font-size:13px;font-family:var(--mono)" :style="quiz.answers[qi]===q.correct?'color:var(--green2)':'color:#f87171'" x-text="(quiz.answers[qi]===q.correct?'✓ ':'✗ ')+q.options[quiz.answers[qi]??0]"></div>
+              <div x-show="quiz.answers[qi]!==q.correct" style="font-size:12px;color:var(--t4);margin-top:3px;font-family:var(--mono)" x-text="'Correcto: '+q.options[q.correct]"></div>
+            </div>
+          </template>
+        </div>
+        <button @click="closeQuiz()" style="padding:13px 32px;border-radius:10px;background:var(--blue3);border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font)" x-text="quiz.score>=2?'Continuar':'Volver a estudiar'"></button>
+      </div>
+    </div>
+  </div>
 
   </main><!-- /main -->
 
