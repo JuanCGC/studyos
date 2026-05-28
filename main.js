@@ -491,6 +491,34 @@ function app() {
     confirmReset(s){ this.resetTarget=this.resetTarget===s.id?null:s.id; },
     doReset(s){ s.chapList.forEach(ch=>ch.done=false); s.pct=0; this.resetTarget=null; },
 
+    // ── AI Guide Modal ──
+    guideModal: { open: false, loading: false, error: '', content: null, chapterName: '' },
+
+    async openGuideModal(subject, chapter, chapterIndex) {
+      this.guideModal = { open: true, loading: false, error: '', content: null, chapterName: chapter.name };
+      const cacheKey = `guide_${subject.id}_${chapterIndex}`;
+      try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) { this.guideModal.content = JSON.parse(cached); return; }
+      } catch(e) {}
+      this.guideModal.loading = true;
+      try {
+        const res = await fetch('/api/generate-guide', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, subjectReason: subject.reason || '' }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error');
+        this.guideModal.content = data.guide;
+        try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch(e) {}
+      } catch(e) {
+        this.guideModal.error = e.message;
+      } finally {
+        this.guideModal.loading = false;
+      }
+    },
+
     // ── AI Suggestions ──
     aiLoading: false,
     aiError: '',
