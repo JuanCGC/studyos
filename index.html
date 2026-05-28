@@ -812,6 +812,106 @@
       </div>
 
     </div><!-- /page -->
+
+      <!-- ── AI GUIDE VIEW ── -->
+      <div x-show="view==='ai-guide'" x-cloak>
+        <div class="view">
+
+          <!-- Header -->
+          <div class="detail-header" style="flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+            <button class="back-btn" @click="navigate('subject-'+(aiGuide.subject?.id||''))">← Volver</button>
+            <div class="flex aic g8" style="flex:1;min-width:0;">
+              <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;">✨ Guía IA</span>
+              <div class="detail-title" style="font-size:18px;" x-text="aiGuide.chapter?.name"></div>
+            </div>
+            <span style="font-size:12px;font-family:var(--mono);color:var(--t4)" x-text="aiGuide.subject?.name"></span>
+          </div>
+
+          <!-- Loading -->
+          <div x-show="aiGuide.loading" style="padding:60px 0;text-align:center;color:var(--t4);">
+            <div style="font-size:36px;margin-bottom:14px;">⏳</div>
+            <div style="font-size:14px;font-family:var(--mono)">Generando guía con Gemini...</div>
+            <div style="font-size:12px;font-family:var(--mono);color:var(--t4);margin-top:6px;">Esto puede tomar 2-5 segundos</div>
+          </div>
+
+          <!-- Error -->
+          <div x-show="aiGuide.error&&!aiGuide.loading">
+            <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:14px 16px;color:#f87171;font-size:13px;font-family:var(--mono)" x-text="'Error: '+aiGuide.error"></div>
+          </div>
+
+          <!-- Content -->
+          <div x-show="aiGuide.content&&!aiGuide.loading">
+
+            <div style="margin-bottom:24px;padding:16px 20px;background:rgba(59,130,246,.07);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;font-size:14px;color:var(--t2);line-height:1.7" x-text="aiGuide.content?.summary"></div>
+
+            <template x-for="(sec,si) in (aiGuide.content?.sections||[])" :key="si">
+              <div style="margin-bottom:24px;">
+                <template x-if="sec.type==='text'">
+                  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                      <span style="color:var(--blue2);font-size:16px;">◈</span>
+                      <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></span>
+                    </div>
+                    <div style="font-size:14px;color:var(--t2);line-height:1.8;white-space:pre-wrap" x-text="sec.content"></div>
+                  </div>
+                </template>
+                <template x-if="sec.type==='code'">
+                  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+                    <div style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="color:var(--green2);font-size:14px;">{ }</span>
+                        <span style="font-size:13px;font-weight:700;color:var(--t1);font-family:var(--mono)" x-text="sec.title"></span>
+                      </div>
+                      <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.12);padding:2px 10px;border-radius:20px;" x-text="sec.language"></span>
+                    </div>
+                    <div x-show="sec.what" style="padding:10px 20px;background:rgba(16,185,129,.06);border-bottom:1px solid var(--border);font-size:12px;color:var(--green2);font-family:var(--mono)" x-text="'→ ' + sec.what"></div>
+                    <pre style="margin:0;padding:20px;overflow-x:auto;font-size:13px;color:var(--t2);line-height:1.7;font-family:var(--mono);background:var(--layer);"><code x-text="sec.content"></code></pre>
+                  </div>
+                </template>
+                <template x-if="sec.type==='list'">
+                  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                      <span style="color:var(--green2);font-size:16px;">✓</span>
+                      <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                      <template x-for="(item,ii) in (sec.items||[])" :key="ii">
+                        <div style="display:flex;align-items:flex-start;gap:12px;">
+                          <span style="min-width:22px;height:22px;background:var(--blue3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;" x-text="ii+1"></span>
+                          <span style="font-size:14px;color:var(--t2);line-height:1.6;padding-top:2px" x-text="item"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+            <template x-if="aiGuide.content?.exercises?.length">
+              <div style="display:flex;flex-direction:column;gap:16px;margin-top:8px;">
+                <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);">🛠 Ejercicios prácticos</div>
+                <template x-for="(ex,ei) in (aiGuide.content?.exercises||[])" :key="ei">
+                  <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:20px 24px;">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                      <span style="min-width:24px;height:24px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;" x-text="ei+1"></span>
+                      <span style="font-size:14px;font-weight:700;color:var(--t1)" x-text="ex.title"></span>
+                    </div>
+                    <div style="font-size:13px;color:var(--green2);font-family:var(--mono);margin-bottom:12px" x-text="'Objetivo: ' + ex.goal"></div>
+                    <ol style="padding-left:20px;margin:0 0 12px 0;display:flex;flex-direction:column;gap:6px;">
+                      <template x-for="(step,si) in (ex.steps||[])" :key="si">
+                        <li style="font-size:14px;color:var(--t2);line-height:1.5" x-text="step"></li>
+                      </template>
+                    </ol>
+                    <div x-show="ex.hint" style="background:var(--layer);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--t3);font-family:var(--mono)" x-text="'💡 ' + ex.hint"></div>
+                  </div>
+                </template>
+              </div>
+            </template>
+
+          </div>
+        </div>
+      </div>
+
   </main><!-- /main -->
 
   <!-- ═══ MOBILE BOTTOM NAV ═══ -->
@@ -824,119 +924,6 @@
     </template>
   </nav>
 
-  <!-- ── AI GUIDE VIEW ── -->
-  <div x-show="view==='ai-guide'" x-cloak>
-    <div class="view">
-
-      <!-- Header -->
-      <div class="detail-header" style="flex-wrap:wrap;gap:10px;margin-bottom:20px;">
-        <button class="back-btn" @click="navigate('subject-'+(aiGuide.subject?.id||''))">← Volver</button>
-        <div class="flex aic g8" style="flex:1;min-width:0;">
-          <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;">✨ Guía IA</span>
-          <div class="detail-title" style="font-size:18px;" x-text="aiGuide.chapter?.name"></div>
-        </div>
-        <span style="font-size:12px;font-family:var(--mono);color:var(--t4)" x-text="aiGuide.subject?.name"></span>
-      </div>
-
-      <!-- Loading -->
-      <div x-show="aiGuide.loading" style="padding:60px 0;text-align:center;color:var(--t4);">
-        <div style="font-size:36px;margin-bottom:14px;">⏳</div>
-        <div style="font-size:14px;font-family:var(--mono)">Generando guía con Gemini...</div>
-        <div style="font-size:12px;font-family:var(--mono);color:var(--t4);margin-top:6px;">Esto puede tomar 2-5 segundos</div>
-      </div>
-
-      <!-- Error -->
-      <div x-show="aiGuide.error&&!aiGuide.loading">
-        <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:14px 16px;color:#f87171;font-size:13px;font-family:var(--mono)" x-text="'Error: '+aiGuide.error"></div>
-      </div>
-
-      <!-- Content -->
-      <div x-show="aiGuide.content&&!aiGuide.loading">
-
-        <!-- Summary callout -->
-        <div style="margin-bottom:24px;padding:16px 20px;background:rgba(59,130,246,.07);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;font-size:14px;color:var(--t2);line-height:1.7" x-text="aiGuide.content?.summary"></div>
-
-        <!-- Sections -->
-        <template x-for="(sec,si) in (aiGuide.content?.sections||[])" :key="si">
-          <div style="margin-bottom:24px;">
-
-            <!-- text section -->
-            <template x-if="sec.type==='text'">
-              <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                  <span style="color:var(--blue2);font-size:16px;">◈</span>
-                  <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></span>
-                </div>
-                <div style="font-size:14px;color:var(--t2);line-height:1.8;white-space:pre-wrap" x-text="sec.content"></div>
-              </div>
-            </template>
-
-            <!-- code section -->
-            <template x-if="sec.type==='code'">
-              <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
-                <div style="padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="color:var(--green2);font-size:14px;">{ }</span>
-                    <span style="font-size:13px;font-weight:700;color:var(--t1);font-family:var(--mono)" x-text="sec.title"></span>
-                  </div>
-                  <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.12);padding:2px 10px;border-radius:20px;" x-text="sec.language"></span>
-                </div>
-                <div x-show="sec.what" style="padding:10px 20px;background:rgba(16,185,129,.06);border-bottom:1px solid var(--border);font-size:12px;color:var(--green2);font-family:var(--mono)" x-text="'→ ' + sec.what"></div>
-                <pre style="margin:0;padding:20px;overflow-x:auto;font-size:13px;color:var(--t2);line-height:1.7;font-family:var(--mono);background:var(--layer);"><code x-text="sec.content"></code></pre>
-              </div>
-            </template>
-
-            <!-- list section -->
-            <template x-if="sec.type==='list'">
-              <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-                  <span style="color:var(--green2);font-size:16px;">✓</span>
-                  <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)" x-text="sec.title"></span>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                  <template x-for="(item,ii) in (sec.items||[])" :key="ii">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                      <span style="min-width:22px;height:22px;background:var(--blue3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;" x-text="ii+1"></span>
-                      <span style="font-size:14px;color:var(--t2);line-height:1.6;padding-top:2px" x-text="item"></span>
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </template>
-
-          </div>
-        </template>
-
-        <!-- Exercises array -->
-        <template x-if="aiGuide.content?.exercises?.length">
-          <div style="display:flex;flex-direction:column;gap:16px;">
-            <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);">🛠 Ejercicios prácticos</div>
-            <template x-for="(ex,ei) in (aiGuide.content?.exercises||[])" :key="ei">
-              <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:20px 24px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                  <span style="min-width:24px;height:24px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;font-family:var(--mono);flex-shrink:0;" x-text="ei+1"></span>
-                  <span style="font-size:14px;font-weight:700;color:var(--t1)" x-text="ex.title"></span>
-                </div>
-                <div style="font-size:13px;color:var(--green2);font-family:var(--mono);margin-bottom:12px" x-text="'Objetivo: ' + ex.goal"></div>
-                <ol style="padding-left:20px;margin:0 0 12px 0;display:flex;flex-direction:column;gap:6px;">
-                  <template x-for="(step,si) in (ex.steps||[])" :key="si">
-                    <li style="font-size:14px;color:var(--t2);line-height:1.5" x-text="step"></li>
-                  </template>
-                </ol>
-                <div x-show="ex.hint" style="background:var(--layer);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--t3);font-family:var(--mono)" x-text="'💡 ' + ex.hint"></div>
-              </div>
-            </template>
-          </div>
-        </template>
-        <!-- Fallback for old single exercise field -->
-        <div x-show="aiGuide.content?.exercise&&!aiGuide.content?.exercises?.length" style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:20px 24px;">
-          <div style="font-size:13px;font-weight:700;color:var(--green2);margin-bottom:8px;font-family:var(--mono);">🛠 Ejercicio práctico</div>
-          <div style="font-size:14px;color:var(--t2);line-height:1.7" x-text="aiGuide.content?.exercise"></div>
-        </div>
-
-      </div>
-    </div>
-  </div>
 
 </div><!-- /app -->
 

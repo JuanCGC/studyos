@@ -511,14 +511,13 @@ function app() {
     aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, error: '', content: null },
 
     async openAIGuide(subject, chapter, chapterIndex) {
-      this.aiGuide = { subject, chapter, chapterIndex, loading: false, error: '', content: null };
+      this.aiGuide = { subject, chapter, chapterIndex, loading: true, error: '', content: null };
       this.navigate('ai-guide');
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
       try {
         const cached = localStorage.getItem(cacheKey);
-        if (cached) { this.aiGuide.content = JSON.parse(cached); return; }
+        if (cached) { this.aiGuide.content = JSON.parse(cached); this.aiGuide.loading = false; return; }
       } catch(e) {}
-      this.aiGuide.loading = true;
       try {
         const res = await fetch('/api/generate-guide', {
           method: 'POST',
