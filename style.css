@@ -914,18 +914,21 @@ textarea.note:focus { border-color:var(--blue); }
 .today-pill .d { font-size: 14px; }
 
 /* Stat cards */
-.si { font-size: 22px; margin-bottom: 8px; }
-.sv { font-size: 34px !important; }
-.slb { font-size: 13px !important; }
+.si { font-size: 26px; margin-bottom: 10px; }
+.sv { font-size: 38px !important; }
+.slb { font-size: 14px !important; font-weight: 500; }
 .sdelta { font-size: 12px; margin-top: 5px; }
-.scard { padding: 24px 22px 20px !important; border-radius: 16px; }
+.scard { padding: 28px 24px 22px !important; border-radius: 16px; }
 .scard::before { height: 3px; }
-.stats-row { gap: 16px !important; margin-bottom: 28px; }
+.stats-row { gap: 18px !important; margin-bottom: 30px; }
 
 /* Section headers */
-.st { font-size: 12px; letter-spacing: 0.12em; }
-.sh { margin-bottom: 16px; }
-.sl { font-size: 13px; }
+.st { font-size: 13px; letter-spacing: 0.1em; }
+.sh { margin-bottom: 18px; }
+.sl { font-size: 14px; }
+
+/* Card padding */
+.card { padding: 24px !important; }
 
 /* Badges & chips */
 .badge { font-size: 12px; padding: 3px 10px; }
@@ -933,32 +936,33 @@ textarea.note:focus { border-color:var(--blue); }
 
 /* Back button & detail header */
 .back-btn { font-size: 14px; padding: 9px 18px; gap: 8px; border-radius: 10px; }
-.detail-title { font-size: 26px; }
+.detail-title { font-size: 28px; }
 
 /* Chapter list */
-.chapter-list { gap: 10px; }
-.chap-item { padding: 16px 18px; gap: 16px; border-radius: 12px; }
-.chap-num { font-size: 12px; width: 28px; }
-.chap-name { font-size: 16px; }
+.chapter-list { gap: 12px; }
+.chap-item { padding: 18px 20px; gap: 16px; border-radius: 12px; }
+.chap-num { font-size: 13px; width: 30px; }
+.chap-name { font-size: 17px; }
 .chap-status { font-size: 13px; }
-.chap-link-icon { font-size: 14px; }
+.chap-link-icon { font-size: 15px; }
 
 /* Progress bars */
-.track { height: 7px; }
-.track.thick { height: 10px; }
+.track { height: 8px; border-radius: 4px; }
+.track.thick { height: 12px; border-radius: 6px; }
 
-/* Subject list */
-.subj-name { font-size: 15px; gap: 9px; }
-.subj-pct { font-size: 13px; }
-.subj-meta { font-size: 12px; }
-.subj-list { gap: 18px; }
+/* Subject list — Trailhead-style: bigger names, more breathing room */
+.subj-name { font-size: 16px; gap: 10px; }
+.subj-pct { font-size: 14px; font-weight: 600; }
+.subj-meta { font-size: 13px; }
+.subj-list { gap: 22px; }
+.subj-item { gap: 9px; }
 
 /* Deadline items */
-.dl-item { padding: 14px 16px; border-radius: 12px; }
-.dl-title { font-size: 14px; }
-.dl-sub { font-size: 12px; margin-top: 2px; }
-.dl-date { font-size: 12px; }
-.dl-dot { width: 9px; height: 9px; }
+.dl-item { padding: 16px 18px; border-radius: 12px; }
+.dl-title { font-size: 15px; }
+.dl-sub { font-size: 13px; margin-top: 3px; }
+.dl-date { font-size: 13px; }
+.dl-dot { width: 10px; height: 10px; }
 
 /* Page padding — keep original, just remove max-width */
 .page { max-width: none !important; }
@@ -978,8 +982,8 @@ textarea.note:focus { border-color:var(--blue); }
 }
 .ruta-title { display: flex; align-items: center; gap: 14px; }
 .ruta-icon { font-size: 24px; }
-.ruta-label { font-size: 16px; font-weight: 700; color: var(--t1); }
-.ruta-sub { font-size: 12px; color: var(--t4); font-family: var(--mono); margin-top: 2px; }
+.ruta-label { font-size: 18px; font-weight: 700; color: var(--t1); }
+.ruta-sub { font-size: 13px; color: var(--t4); font-family: var(--mono); margin-top: 3px; }
 
 .ruta-cards {
   display: grid;
@@ -991,24 +995,25 @@ textarea.note:focus { border-color:var(--blue); }
 .ruta-card {
   background: var(--layer);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 14px;
+  padding: 20px;
   cursor: pointer;
   transition: all .15s;
-  display: flex; flex-direction: column; gap: 8px;
+  display: flex; flex-direction: column; gap: 10px;
 }
 .ruta-card:hover { border-color: var(--blue); background: var(--layer2); transform: translateY(-2px); }
 
 .ruta-card-top { display: flex; align-items: center; justify-content: space-between; }
 .ruta-num {
-  width: 24px; height: 24px; border-radius: 50%;
+  width: 28px; height: 28px; border-radius: 50%;
   background: rgba(59,130,246,0.15); color: var(--blue2);
-  font-size: 11px; font-weight: 700; font-family: var(--mono);
+  font-size: 13px; font-weight: 700; font-family: var(--mono);
   display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 .ruta-action {
-  font-size: 10px; font-family: var(--mono); font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px;
+  font-size: 11px; font-family: var(--mono); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 10px;
   border-radius: 20px;
 }
 .ruta-action.blue { background: rgba(59,130,246,0.13); color: var(--blue2); }
@@ -1016,9 +1021,9 @@ textarea.note:focus { border-color:var(--blue); }
 .ruta-action.orange { background: var(--orangebg); color: var(--orange2); }
 .ruta-action.purple { background: rgba(139,92,246,0.13); color: var(--purple2); }
 
-.ruta-subject { font-size: 12px; color: var(--t4); font-family: var(--mono); display: flex; gap: 5px; align-items: center; }
-.ruta-chap { font-size: 14px; font-weight: 600; color: var(--t1); line-height: 1.3; }
-.ruta-reason { font-size: 11px; color: var(--t4); font-family: var(--mono); margin-top: 2px; }
+.ruta-subject { font-size: 13px; color: var(--t4); font-family: var(--mono); display: flex; gap: 6px; align-items: center; }
+.ruta-chap { font-size: 16px; font-weight: 600; color: var(--t1); line-height: 1.4; }
+.ruta-reason { font-size: 12px; color: var(--t4); font-family: var(--mono); margin-top: 2px; }
 .ruta-progress-wrap .track { margin-top: 6px; }
 
 .ai-suggest-btn {
