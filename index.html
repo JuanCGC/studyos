@@ -3786,15 +3786,15 @@ jobs:
   function buildBlock(sectionId, chapterName) {
     const d = document.createElement('div');
     d.id = 'quiz-block-' + sectionId;
-    d.style.cssText = 'border-top:2px solid #e0e0e0;margin-top:40px;padding-top:36px';
+    d.style.cssText = 'border-top:2px solid var(--border2,rgba(255,255,255,.1));margin-top:40px;padding-top:36px';
     d.innerHTML =
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
-        '<strong style="font-size:20px;color:#16325c">Prueba</strong>' +
-        '<span style="color:#0070d2;font-weight:700;font-size:14px">+100 puntos</span>' +
+        '<strong style="font-size:20px;color:var(--t1,#F1F5F9)">Prueba</strong>' +
+        '<span style="color:var(--blue2,#60A5FA);font-weight:700;font-size:14px">+100 puntos</span>' +
       '</div>' +
-      '<p style="color:#555;font-size:14px;margin:0 0 20px;line-height:1.6">Para completar esta unidad, debes responder correctamente las preguntas.</p>' +
+      '<p style="color:var(--t3,#94A3B8);font-size:14px;margin:0 0 20px;line-height:1.6">Para completar esta unidad, debes responder correctamente las preguntas.</p>' +
       '<button onclick="loadStaticQuiz(\'' + sectionId + '\',\'' + chapterName.replace(/'/g,"\\'") + '\')"' +
-        ' style="background:#0070d2;color:#fff;border:none;padding:11px 26px;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600">Iniciar prueba →</button>' +
+        ' style="background:var(--blue3,#2563EB);color:#fff;border:1px solid var(--blue,#3B82F6);padding:11px 26px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;font-family:inherit">Iniciar prueba →</button>' +
       '<div id="quiz-content-' + sectionId + '"></div>';
     return d;
   }
@@ -3814,7 +3814,7 @@ async function loadStaticQuiz(sectionId, chapterName) {
   const container = document.getElementById('quiz-content-' + sectionId);
   const btn = container.previousElementSibling;
   btn.style.display = 'none';
-  container.innerHTML = '<div style="padding:32px;text-align:center;color:#888;font-size:15px">⏳ Generando preguntas con IA...</div>';
+  container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--t3,#94A3B8);font-size:15px">⏳ Generando preguntas con IA...</div>';
   try {
     const res = await fetch('/api/quiz', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -3824,7 +3824,7 @@ async function loadStaticQuiz(sectionId, chapterName) {
     if (!data.questions) throw new Error('no questions');
     renderStaticQuiz(container, sectionId, data.questions);
   } catch (e) {
-    container.innerHTML = '<div style="color:#e74c3c;padding:16px;font-size:14px">Error generando preguntas. Intenta de nuevo.</div>';
+    container.innerHTML = '<div style="color:#f87171;padding:16px;font-size:14px">Error generando preguntas. Intenta de nuevo.</div>';
     btn.style.display = '';
   }
 }
@@ -3833,30 +3833,31 @@ function renderStaticQuiz(container, sectionId, questions) {
   window._sqd = window._sqd || {};
   window._sqd[sectionId] = { questions, answers: new Array(questions.length).fill(null) };
 
+  const bdr = 'rgba(255,255,255,.1)';
   let html = '';
   questions.forEach(function (q, qi) {
-    html += '<div style="margin-top:' + (qi > 0 ? '28px' : '24px') + ';padding-top:' + (qi > 0 ? '28px' : '0') + ';border-top:' + (qi > 0 ? '1px solid #e8e8e8' : 'none') + '">';
+    html += '<div style="margin-top:' + (qi > 0 ? '28px' : '24px') + ';padding-top:' + (qi > 0 ? '28px' : '0') + ';border-top:' + (qi > 0 ? '1px solid ' + bdr : 'none') + '">';
     html += '<div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:18px">';
-    html += '<div style="min-width:38px;height:38px;border-radius:50%;background:#e8f4fd;border:2px solid #0070d2;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#0070d2;flex-shrink:0">' + (qi + 1) + '</div>';
-    html += '<div style="font-size:17px;font-weight:500;color:#16325c;line-height:1.55;padding-top:6px">' + q.q + '</div></div>';
-    html += '<div style="display:flex;flex-direction:column;gap:9px;padding-left:54px">';
+    html += '<div style="min-width:40px;height:40px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--blue2,#60A5FA);flex-shrink:0">' + (qi + 1) + '</div>';
+    html += '<div style="font-size:17px;font-weight:500;color:var(--t1,#F1F5F9);line-height:1.55;padding-top:7px">' + q.q + '</div></div>';
+    html += '<div style="display:flex;flex-direction:column;gap:9px;padding-left:56px">';
     q.options.forEach(function (opt, oi) {
       html += '<div id="opt-' + sectionId + '-' + qi + '-' + oi + '" onclick="selectSQ(\'' + sectionId + '\',' + qi + ',' + oi + ')"' +
-        ' style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-radius:8px;border:2px solid #d8d8d8;cursor:pointer;transition:all .15s">';
-      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" style="width:34px;height:34px;border-radius:50%;border:2px solid #d8d8d8;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#999;flex-shrink:0">' + ['A','B','C','D'][oi] + '</div>';
-      html += '<span style="font-size:15px;color:#333;line-height:1.4">' + opt + '</span></div>';
+        ' style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-radius:10px;border:2px solid ' + bdr + ';cursor:pointer;transition:all .15s;background:var(--layer,#263348)">';
+      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" style="width:34px;height:34px;border-radius:50%;border:2px solid ' + bdr + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--t4,#64748B);flex-shrink:0">' + ['A','B','C','D'][oi] + '</div>';
+      html += '<span style="font-size:15px;color:var(--t2,#CBD5E1);line-height:1.4">' + opt + '</span></div>';
     });
     html += '</div></div>';
   });
 
-  html += '<div style="display:flex;align-items:center;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid #e8e8e8">';
-  html += '<div style="display:flex;gap:6px;flex:1">';
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid ' + bdr + '">';
+  html += '<div style="display:flex;gap:7px;flex:1">';
   questions.forEach(function (_, i) {
-    html += '<div id="dot-' + sectionId + '-' + i + '" style="width:11px;height:11px;border-radius:50%;background:#d8d8d8"></div>';
+    html += '<div id="dot-' + sectionId + '-' + i + '" style="width:11px;height:11px;border-radius:50%;background:' + bdr + '"></div>';
   });
   html += '</div>';
   html += '<button id="sqbtn-' + sectionId + '" onclick="submitSQ(\'' + sectionId + '\')"' +
-    ' style="background:#0070d2;color:#fff;border:none;padding:12px 30px;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600;opacity:.35;pointer-events:none">Verificar →</button>';
+    ' style="background:var(--blue3,#2563EB);color:#fff;border:1px solid var(--blue,#3B82F6);padding:13px 30px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;opacity:.35;pointer-events:none;font-family:inherit">Verificar →</button>';
   html += '</div>';
   html += '<div id="sqres-' + sectionId + '" style="display:none;margin-top:28px"></div>';
 
@@ -3870,14 +3871,14 @@ function selectSQ(sectionId, qi, oi) {
     const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + idx);
     const cir = document.getElementById('cir-' + sectionId + '-' + qi + '-' + idx);
     if (idx === oi) {
-      lbl.style.borderColor = '#0070d2'; lbl.style.background = 'rgba(0,112,210,.07)';
-      cir.style.borderColor = '#0070d2'; cir.style.background = '#0070d2'; cir.style.color = '#fff';
+      lbl.style.borderColor = 'var(--blue,#3B82F6)'; lbl.style.background = 'rgba(59,130,246,.1)';
+      cir.style.borderColor = 'var(--blue,#3B82F6)'; cir.style.background = 'var(--blue,#3B82F6)'; cir.style.color = '#fff';
     } else {
-      lbl.style.borderColor = '#d8d8d8'; lbl.style.background = '';
-      cir.style.borderColor = '#d8d8d8'; cir.style.background = ''; cir.style.color = '#999';
+      lbl.style.borderColor = 'rgba(255,255,255,.1)'; lbl.style.background = 'var(--layer,#263348)';
+      cir.style.borderColor = 'rgba(255,255,255,.1)'; cir.style.background = ''; cir.style.color = 'var(--t4,#64748B)';
     }
   });
-  document.getElementById('dot-' + sectionId + '-' + qi).style.background = '#0070d2';
+  document.getElementById('dot-' + sectionId + '-' + qi).style.background = 'var(--blue,#3B82F6)';
   if (d.answers.every(function (a) { return a !== null; })) {
     const btn = document.getElementById('sqbtn-' + sectionId);
     btn.style.opacity = '1'; btn.style.pointerEvents = '';
@@ -3893,13 +3894,12 @@ function submitSQ(sectionId) {
     const correct = d.answers[qi] === q.correct;
     const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + d.answers[qi]);
     if (lbl) {
-      lbl.style.borderColor = correct ? '#27ae60' : '#e74c3c';
-      lbl.style.background = correct ? 'rgba(39,174,96,.07)' : 'rgba(231,76,60,.07)';
+      lbl.style.borderColor = correct ? 'var(--green,#10B981)' : '#f87171';
+      lbl.style.background   = correct ? 'rgba(16,185,129,.1)'  : 'rgba(248,113,113,.1)';
     }
-    // Show correct answer if wrong
     if (!correct) {
       const cLbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + q.correct);
-      if (cLbl) { cLbl.style.borderColor = '#27ae60'; cLbl.style.background = 'rgba(39,174,96,.07)'; }
+      if (cLbl) { cLbl.style.borderColor = 'var(--green,#10B981)'; cLbl.style.background = 'rgba(16,185,129,.1)'; }
     }
   });
 
@@ -3908,11 +3908,11 @@ function submitSQ(sectionId) {
   const res = document.getElementById('sqres-' + sectionId);
   res.style.display = '';
   res.innerHTML =
-    '<div style="text-align:center;padding:32px 24px;border:2px solid ' + (passed ? '#27ae60' : '#e74c3c') + ';border-radius:10px;background:' + (passed ? 'rgba(39,174,96,.05)' : 'rgba(231,76,60,.05)') + '">' +
+    '<div style="text-align:center;padding:32px 24px;border:2px solid ' + (passed ? 'rgba(16,185,129,.3)' : 'rgba(248,113,113,.3)') + ';border-radius:12px;background:' + (passed ? 'rgba(16,185,129,.06)' : 'rgba(248,113,113,.06)') + '">' +
       '<div style="font-size:44px;margin-bottom:12px">' + (passed ? '🎉' : '📚') + '</div>' +
-      '<div style="font-size:20px;font-weight:700;color:' + (passed ? '#27ae60' : '#e74c3c') + ';margin-bottom:8px">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
-      '<div style="font-size:15px;color:#666">' + score + ' de ' + d.questions.length + ' correctas</div>' +
-      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" style="margin-top:18px;background:#0070d2;color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600">Intentar de nuevo</button>' : '') +
+      '<div style="font-size:20px;font-weight:700;color:' + (passed ? 'var(--green2,#34D399)' : '#f87171') + ';margin-bottom:8px">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
+      '<div style="font-size:15px;color:var(--t3,#94A3B8)">' + score + ' de ' + d.questions.length + ' correctas</div>' +
+      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" style="margin-top:18px;background:var(--blue3,#2563EB);color:#fff;border:1px solid var(--blue,#3B82F6);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit">Intentar de nuevo</button>' : '') +
     '</div>';
 }
 
