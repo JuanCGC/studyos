@@ -539,7 +539,7 @@ function app() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Error desconocido');
         data.suggestions.forEach(s => this.subjects.push(s));
-        localStorage.setItem('studyos_subjects', JSON.stringify(this.subjects));
+        await this.saveProgress();
       } catch (e) {
         this.aiError = e.message;
       } finally {
