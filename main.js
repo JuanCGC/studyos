@@ -364,8 +364,6 @@ function app() {
     },
 
     // ── Deadlines ──
-    deadlines: [],
-    get urgentCount(){ return 0; },
     getSubjectTag(s) {
       const pct = this.chapPct(s);
       if (pct === 100) return 'Completado';
@@ -502,54 +500,6 @@ function app() {
       return !!this.notesOpen[s.id + '_' + idx];
     },
 
-    // ── Quiz on chapter completion ──
-    quiz: { active: false, questions: [], answers: [null, null, null], loading: false, subjectRef: null, chapIdx: null, submitted: false, score: 0, ch: null },
-
-    async toggleChapDone(s, ch, i) {
-      if (!ch.done) {
-        this.quiz = { active: true, questions: [], answers: [null, null, null], loading: true, subjectRef: s, chapIdx: i, submitted: false, score: 0, ch };
-        try {
-          const res = await fetch('/api/quiz', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subjectName: s.name, chapterName: ch.name }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Error');
-          this.quiz.questions = data.questions;
-        } catch(e) {
-          ch.done = true;
-          this.syncSubjectPct(s);
-          this.quiz.active = false;
-        } finally {
-          this.quiz.loading = false;
-        }
-      } else {
-        ch.done = false;
-        this.syncSubjectPct(s);
-      }
-    },
-
-    submitQuiz() {
-      let score = 0;
-      this.quiz.questions.forEach((q, i) => {
-        if (this.quiz.answers[i] === q.correct) score++;
-      });
-      this.quiz.score = score;
-      this.quiz.submitted = true;
-      if (score >= 2) {
-        this.quiz.subjectRef.chapList[this.quiz.chapIdx].done = true;
-        this.syncSubjectPct(this.quiz.subjectRef);
-      }
-    },
-
-    closeQuiz() { this.quiz.active = false; },
-
-    skipQuiz() {
-      this.quiz.subjectRef.chapList[this.quiz.chapIdx].done = true;
-      this.syncSubjectPct(this.quiz.subjectRef);
-      this.quiz.active = false;
-    },
 
     // ── Pomodoro focus ──
     pomoFocusSubjectId: '',
@@ -580,7 +530,7 @@ function app() {
     },
     syncSubjectPct(s){ s.pct=this.chapPct(s); },
     confirmReset(s){ this.resetTarget=this.resetTarget===s.id?null:s.id; },
-    doReset(s){ s.chapList.forEach(ch=>ch.done=false); s.pct=0; this.resetTarget=null; },
+    doReset(s){ s.chapList.forEach(ch=>ch.done=false); s.pct=0; this.resetTarget=null; this.saveProgress(); },
 
     // ── AI Guide View ──
     aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null, quiz: null },
@@ -767,8 +717,8 @@ function app() {
           }
         }, { once: true });
       }
-      this.$watch('subjects', () => this._debounceSave());
-      this.$watch('tasks', () => this._debounceSave());
+      this.$watch('subjects', () => this._debounceSave(), { deep: true });
+      this.$watch('tasks', () => this._debounceSave(), { deep: true });
       this.$watch('settings', () => this._saveSettings(), { deep: true });
       this.$watch('pomoSettings', () => this._saveSettings(), { deep: true });
       this.$watch('weekGoal', () => this._saveSettings());
