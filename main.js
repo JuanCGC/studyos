@@ -110,7 +110,22 @@ function app() {
     ],
 
     // ── Auth / user ──
-    get userName() { return window._user?.user_metadata?.full_name?.split(' ')[0] || window._user?.email?.split('@')[0] || 'Usuario'; },
+    profileName: '',
+    profileSaving: false,
+    profileSaved: false,
+    get userName() { return this.profileName || window._user?.user_metadata?.full_name?.split(' ')[0] || window._user?.email?.split('@')[0] || 'Usuario'; },
+    async saveProfile() {
+      this.profileSaving = true;
+      try {
+        localStorage.setItem('studyos_profileName', this.profileName);
+        if (window._sb && window._user) {
+          await window._sb.auth.updateUser({ data: { full_name: this.profileName } });
+        }
+        this.profileSaved = true;
+        setTimeout(() => this.profileSaved = false, 2000);
+      } catch(e) {}
+      this.profileSaving = false;
+    },
     async logout() {
       if (window._sb) await window._sb.auth.signOut();
       window.location.href = '/login.html';
@@ -593,6 +608,10 @@ function app() {
         if (s.pomoSettings) { Object.assign(this.pomoSettings, s.pomoSettings); this.applyPomoSettings(); }
         if (s.weekGoal != null) this.weekGoal = s.weekGoal;
         if (s.pomosGoal != null) this.pomosGoal = s.pomosGoal;
+        if (s.currentWeek != null) this.currentWeek = s.currentWeek;
+        const savedName = localStorage.getItem('studyos_profileName');
+        if (savedName) this.profileName = savedName;
+        else if (window._user?.user_metadata?.full_name) this.profileName = window._user.user_metadata.full_name;
       } catch(e) {}
     },
     _saveSettings() {
@@ -602,6 +621,7 @@ function app() {
           pomoSettings: this.pomoSettings,
           weekGoal: this.weekGoal,
           pomosGoal: this.pomosGoal,
+          currentWeek: this.currentWeek,
         }));
       } catch(e) {}
     },
@@ -614,6 +634,9 @@ function app() {
       } else {
         window.addEventListener('supabase-ready', async () => {
           await this.loadProgress();
+          if (!this.profileName && window._user?.user_metadata?.full_name) {
+            this.profileName = window._user.user_metadata.full_name;
+          }
         }, { once: true });
       }
       this.$watch('subjects', () => this._debounceSave());
@@ -622,6 +645,7 @@ function app() {
       this.$watch('pomoSettings', () => this._saveSettings(), { deep: true });
       this.$watch('weekGoal', () => this._saveSettings());
       this.$watch('pomosGoal', () => this._saveSettings());
+      this.$watch('currentWeek', () => this._saveSettings());
     },
 
     _saveTimer: null,
