@@ -12,40 +12,64 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not set' });
 
   const prompt = `Eres un instructor técnico senior especializado en SDET (Software Development Engineer in Test).
-Genera una guía de estudio completa para el capítulo "${chapterName}" de la materia "${subjectName}".
+Genera una guía de estudio PRÁCTICA para el capítulo "${chapterName}" de la materia "${subjectName}".
 ${subjectReason ? `Contexto del tema: ${subjectReason}` : ''}
+
+FILOSOFÍA: Menos teoría, más código. Cada concepto debe ir seguido inmediatamente de un ejercicio real.
 
 Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
 {
   "title": "${chapterName}",
-  "summary": "Resumen de 2-3 frases explicando qué aprenderás y por qué es importante",
+  "summary": "1-2 frases: qué vas a construir/practicar en este capítulo",
   "sections": [
     {
       "type": "text",
-      "title": "Título de la sección",
-      "content": "Explicación detallada del concepto en 3-5 párrafos"
+      "title": "Título corto",
+      "content": "Explicación BREVE (máximo 3 oraciones). Solo lo esencial para entender el código que sigue."
     },
     {
       "type": "code",
-      "title": "Título del ejemplo de código",
+      "title": "Título del ejercicio",
+      "what": "Una línea explicando exactamente qué hace este código y por qué",
       "language": "java",
-      "content": "// código real aquí"
+      "content": "// código real, completo y ejecutable"
+    },
+    {
+      "type": "code",
+      "title": "Siguiente ejercicio",
+      "what": "Una línea explicando exactamente qué hace este código y por qué",
+      "language": "java",
+      "content": "// código que amplía el anterior"
     },
     {
       "type": "list",
-      "title": "Puntos clave",
-      "items": ["punto 1", "punto 2", "punto 3", "punto 4", "punto 5"]
+      "title": "Puntos clave para recordar",
+      "items": ["punto concreto 1", "punto concreto 2", "punto concreto 3"]
     }
   ],
-  "exercise": "Descripción clara del ejercicio práctico para consolidar este capítulo"
+  "exercises": [
+    {
+      "title": "Ejercicio 1",
+      "goal": "Qué debes lograr",
+      "steps": ["paso 1", "paso 2", "paso 3"],
+      "hint": "Pista o snippet inicial"
+    },
+    {
+      "title": "Ejercicio 2 — variante más difícil",
+      "goal": "Qué debes lograr",
+      "steps": ["paso 1", "paso 2", "paso 3"],
+      "hint": "Pista o snippet inicial"
+    }
+  ]
 }
 
-Reglas:
-- Incluye exactamente: 1-2 secciones de texto, 1-2 ejemplos de código reales, 1 lista de puntos clave
-- Máximo 5 secciones totales
-- Código en el lenguaje más apropiado para el tema (java, javascript, bash, yaml, python)
-- Todo en español excepto el código
-- Ejemplos de código deben ser funcionales y relevantes para SDET`;
+Reglas estrictas:
+- Secciones de texto: máximo 3 oraciones cada una. NO explicar lo que el código ya dice.
+- Código: mínimo 3 secciones de código, máximo 2 de texto. Total máximo 7 secciones.
+- Cada sección de código DEBE tener campo "what" explicando qué hace en una línea.
+- exercises: exactamente 2 ejercicios prácticos con pasos claros y hint de código.
+- Código funcional, real, del stack SDET (java, javascript, bash, yaml, python, groovy).
+- Todo en español excepto el código.`;
 
   try {
     const geminiRes = await fetch(
