@@ -690,12 +690,12 @@
               </div>
               <div style="margin-bottom:12px">
                 <div class="st" style="margin-bottom:6px">Resumen</div>
-                <div class="txt-sm" x-text="cvAnalysis.experience_summary"></div>
+                <div class="txt-sm" x-text="cvAnalysis?.experience_summary"></div>
               </div>
               <div style="margin-bottom:12px">
                 <div class="st" style="margin-bottom:8px">Skills detectados</div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px">
-                  <template x-for="sk in cvAnalysis.skills" :key="sk">
+                  <template x-for="sk in (cvAnalysis?.skills || [])" :key="sk">
                     <span class="badge blue" x-text="sk"></span>
                   </template>
                 </div>
@@ -703,7 +703,7 @@
               <div>
                 <div class="st" style="margin-bottom:8px">Preguntas frecuentes de entrevista</div>
                 <div style="display:flex;flex-direction:column;gap:6px">
-                  <template x-for="(q,i) in cvAnalysis.interview_questions" :key="i">
+                  <template x-for="(q,i) in (cvAnalysis?.interview_questions || [])" :key="i">
                     <div style="font-size:13px;color:var(--t2);padding:8px 12px;background:var(--layer);border-radius:8px;cursor:pointer" @click="startInterviewWithQuestion(q)">
                       <span style="color:var(--blue2);margin-right:8px;font-family:var(--mono)" x-text="(i+1)+'.'"></span>
                       <span x-text="q"></span>
