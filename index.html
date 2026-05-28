@@ -626,7 +626,7 @@
                   <span class="chap-num" x-text="String(i+1).padStart(2,'0')"></span>
                   <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" :style="(CHAP_MAP[ch.name]||s.aiSuggested)?'cursor:pointer':''" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):(s.aiSuggested?openGuideModal(s,ch,i):null)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':(s.aiSuggested?'Generar guía con IA':'')"></span>
                   <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="Ver instrucciones">📖</span>
-                  <span class="chap-link-icon" x-show="s.aiSuggested&&!CHAP_MAP[ch.name]" @click.stop="openGuideModal(s,ch,i)" title="Generar guía con IA">✨</span>
+                  <span x-show="s.aiSuggested&&!CHAP_MAP[ch.name]" @click.stop="openGuideModal(s,ch,i)" title="Generar guía con IA" style="font-size:14px;color:var(--blue2);margin-left:4px;flex-shrink:0;cursor:pointer;">✨</span>
                   <span class="chap-status mono txt-xs"
                     :style="ch.done?'color:var(--green2)':'color:var(--t4)'"
                     x-text="ch.done?'✓ Completado':'Pendiente'">
