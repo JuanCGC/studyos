@@ -799,10 +799,22 @@ textarea.note:focus { border-color:var(--blue); }
 #panel-guide .top-bar .desc { font-size: 15px; }
 #panel-guide .top-bar .sep { height: 20px; }
 
-/* Guide back bar */
-.guide-back-bar { padding: 12px 56px; }
+/* Guide back bar — fixed so it persists during scroll */
+#panel-guide .guide-back-bar {
+  position: fixed !important;
+  top: 48px;
+  left: 0; right: 0;
+  z-index: 150;
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+  backdrop-filter: blur(10px);
+  padding: 12px 56px;
+}
 .guide-back-btn { font-size: 14px; padding: 8px 18px; }
 .guide-back-crumb { font-size: 14px; }
+
+/* Push top-bar down so it's not hidden under fixed back bar */
+#panel-guide .top-bar { margin-top: 52px; }
 
 /* Cards */
 #panel-guide .card { padding: 32px; margin-bottom: 22px; }
