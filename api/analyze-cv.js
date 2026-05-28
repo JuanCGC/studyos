@@ -65,7 +65,7 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
               { text: prompt },
             ],
           }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
+          generationConfig: { temperature: 0.4, maxOutputTokens: 8192, thinkingConfig: { thinkingBudget: 0 } },
         }),
       }
     );
