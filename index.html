@@ -43,14 +43,6 @@
 
   <!-- ═══ SIDEBAR ═══ -->
   <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-dot">📚</div>
-      <div>
-        <div class="brand-name">Study<span>OS</span></div>
-        <div style="font-size:10px;color:var(--t4);font-family:var(--mono)">v2.0</div>
-      </div>
-    </div>
-
     <span class="nav-label">General</span>
     <template x-for="item in navMain" :key="item.id">
       <div class="nav-item" :class="view===item.id?'active':''" @click="navigate(item.id)">
@@ -649,9 +641,9 @@
                       <span x-show="ch.done">✓</span>
                     </div>
                     <span class="chap-num" x-text="String(i+1).padStart(2,'0')"></span>
-                    <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" style="cursor:pointer" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):openAIGuide(s,ch,i)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':'Generar guía con IA'"></span>
+                    <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" style="cursor:pointer" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):openAIGuide(s,ch,i,!s.aiSuggested)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':(s.aiSuggested?'Generar guía + quiz con IA':'Generar quiz')"></span>
                     <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="Ver instrucciones">📖</span>
-                    <span @click.stop="openAIGuide(s,ch,i)" title="Generar guía + quiz con IA" style="font-size:14px;color:var(--blue2);margin-left:4px;flex-shrink:0;cursor:pointer;">✨</span>
+                    <span @click.stop="openAIGuide(s,ch,i,!s.aiSuggested)" :title="s.aiSuggested?'Generar guía + quiz con IA':'Generar quiz'" style="font-size:14px;color:var(--blue2);margin-left:4px;flex-shrink:0;cursor:pointer;">✨</span>
                     <span class="chap-status mono txt-xs"
                       :style="ch.done?'color:var(--green2)':'color:var(--t4)'"
                       x-text="ch.done?'✓ Completado':'Pendiente'">
@@ -859,7 +851,7 @@
           <div class="detail-header" style="flex-wrap:wrap;gap:10px;margin-bottom:20px;">
             <button class="back-btn" @click="navigate('subject-'+(aiGuide.subject?.id||''))">← Volver</button>
             <div class="flex aic g8" style="flex:1;min-width:0;">
-              <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;">✨ Guía IA</span>
+              <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;" x-text="aiGuide.quizOnly?'📝 Quiz':'✨ Guía IA'"></span>
               <div class="detail-title" style="font-size:18px;" x-text="aiGuide.chapter?.name"></div>
             </div>
             <span style="font-size:12px;font-family:var(--mono);color:var(--t4)" x-text="aiGuide.subject?.name"></span>
@@ -946,8 +938,10 @@
               </div>
             </template>
 
-            <!-- ══ QUIZ SECTION — Trailhead style ══ -->
-            <div style="margin-top:48px;border-top:2px solid var(--border);padding-top:40px">
+          </div><!-- /guide content -->
+
+          <!-- ══ QUIZ SECTION — Trailhead style ══ -->
+          <div x-show="aiGuide.quiz" :style="aiGuide.quizOnly?'margin-top:24px':'margin-top:48px;border-top:2px solid var(--border);padding-top:40px'">
               <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px">
                 <div style="width:48px;height:48px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🧠</div>
                 <div>
@@ -1049,7 +1043,6 @@
             </div>
             <!-- ══ END QUIZ ══ -->
 
-          </div>
         </div>
       </div>
 

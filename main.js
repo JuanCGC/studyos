@@ -582,11 +582,11 @@ function app() {
     doReset(s){ s.chapList.forEach(ch=>ch.done=false); s.pct=0; this.resetTarget=null; },
 
     // ── AI Guide View ──
-    aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, error: '', content: null, quiz: null },
+    aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null, quiz: null },
 
-    async openAIGuide(subject, chapter, chapterIndex) {
+    async openAIGuide(subject, chapter, chapterIndex, quizOnly = false) {
       this.aiGuide = {
-        subject, chapter, chapterIndex, loading: true, error: '', content: null,
+        subject, chapter, chapterIndex, loading: !quizOnly, quizOnly, error: '', content: null,
         quiz: { questions: [], answers: [null, null, null], loading: true, submitted: false, score: 0 },
       };
       this.navigate('ai-guide');
@@ -594,20 +594,20 @@ function app() {
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
       const quizKey  = `quiz_${subject.id}_${chapterIndex}`;
 
-      // Check caches
-      try {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) { this.aiGuide.content = JSON.parse(cached); this.aiGuide.loading = false; }
-      } catch(e) {}
+      if (!quizOnly) {
+        try {
+          const cached = localStorage.getItem(cacheKey);
+          if (cached) { this.aiGuide.content = JSON.parse(cached); this.aiGuide.loading = false; }
+        } catch(e) {}
+      }
       try {
         const cachedQ = localStorage.getItem(quizKey);
         if (cachedQ) { this.aiGuide.quiz.questions = JSON.parse(cachedQ); this.aiGuide.quiz.loading = false; }
       } catch(e) {}
 
-      // Fetch guide + quiz in parallel (skip if cached)
       const tasks = [];
 
-      if (!this.aiGuide.content) {
+      if (!quizOnly && !this.aiGuide.content) {
         tasks.push(
           fetch('/api/generate-guide', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
