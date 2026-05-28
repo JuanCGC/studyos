@@ -231,6 +231,7 @@ function app() {
             messages: this.interviewMessages.slice(-10),
             cvSummary,
             topic: this.interviewTopic,
+            userName: this.profileName || this.userName,
           }),
         });
         const data = await res.json();

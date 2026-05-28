@@ -5,28 +5,30 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { messages = [], cvSummary = '', topic = '' } = req.body || {};
+  const { messages = [], cvSummary = '', topic = '', userName = '' } = req.body || {};
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not set' });
 
-  // Build conversation history for Gemini
+  const candidateName = userName || 'el candidato';
+
   const systemContext = `Eres un entrevistador técnico senior especializado en SDET.
-Contexto del candidato: ${cvSummary || 'Candidato SDET en preparación'}.
+El candidato se llama ${candidateName}.
+${cvSummary ? `Contexto del candidato: ${cvSummary}.` : ''}
 ${topic ? `Tema de esta sesión: ${topic}.` : ''}
 Tu rol:
+- Dirige al candidato por su nombre (${candidateName})
 - Haz preguntas técnicas reales de entrevista SDET
 - Da feedback constructivo a las respuestas
 - Si el candidato no sabe algo, explícalo brevemente y pasa a la siguiente pregunta
 - Alterna entre preguntas teóricas y prácticas
 - Habla en español
-Empieza la sesión con una pregunta de introducción sobre el tema.`;
+Empieza la sesión saludando al candidato por su nombre y con una pregunta técnica directa.`;
 
   const contents = [];
 
-  // First turn: system context as user message (Gemini doesn't have system role)
   if (messages.length === 0) {
     contents.push({ role: 'user', parts: [{ text: systemContext }] });
-    contents.push({ role: 'model', parts: [{ text: '¡Perfecto! Empecemos la sesión de práctica. ' }] });
+    contents.push({ role: 'model', parts: [{ text: `¡Empecemos, ${candidateName}! ` }] });
   } else {
     // inject system context in first exchange
     contents.push({ role: 'user', parts: [{ text: systemContext }] });
