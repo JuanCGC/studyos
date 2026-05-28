@@ -1040,7 +1040,7 @@
                     style="flex:1;padding:15px;border-radius:12px;background:var(--green);border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font)">
                     ← Volver a la materia
                   </button>
-                  <button x-show="(aiGuide.quiz?.score||0)<2" @click="aiGuide.quiz.submitted=false;aiGuide.quiz.answers=[null,null,null]"
+                  <button x-show="(aiGuide.quiz?.score||0)<2" @click="aiGuide.quiz.submitted=false;aiGuide.quiz.answers=Array(aiGuide.quiz.questions?.length||3).fill(null)"
                     style="flex:1;padding:15px;border-radius:12px;background:var(--blue3);border:1px solid var(--blue);color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font)">
                     Intentar de nuevo
                   </button>

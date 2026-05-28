@@ -659,6 +659,7 @@ function app() {
         if (s?.chapList?.[idx]) {
           s.chapList[idx].done = true;
           this.syncSubjectPct(s);
+          this.saveProgress();
         }
       }
     },
