@@ -582,30 +582,83 @@ function app() {
     doReset(s){ s.chapList.forEach(ch=>ch.done=false); s.pct=0; this.resetTarget=null; },
 
     // ── AI Guide View ──
-    aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, error: '', content: null },
+    aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, error: '', content: null, quiz: null },
 
     async openAIGuide(subject, chapter, chapterIndex) {
-      this.aiGuide = { subject, chapter, chapterIndex, loading: true, error: '', content: null };
+      this.aiGuide = {
+        subject, chapter, chapterIndex, loading: true, error: '', content: null,
+        quiz: { questions: [], answers: [null, null, null], loading: true, submitted: false, score: 0 },
+      };
       this.navigate('ai-guide');
+
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
+      const quizKey  = `quiz_${subject.id}_${chapterIndex}`;
+
+      // Check caches
       try {
         const cached = localStorage.getItem(cacheKey);
-        if (cached) { this.aiGuide.content = JSON.parse(cached); this.aiGuide.loading = false; return; }
+        if (cached) { this.aiGuide.content = JSON.parse(cached); this.aiGuide.loading = false; }
       } catch(e) {}
       try {
-        const res = await fetch('/api/generate-guide', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, subjectReason: subject.reason || '' }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Error');
-        this.aiGuide.content = data.guide;
-        try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch(e) {}
-      } catch(e) {
-        this.aiGuide.error = e.message;
-      } finally {
-        this.aiGuide.loading = false;
+        const cachedQ = localStorage.getItem(quizKey);
+        if (cachedQ) { this.aiGuide.quiz.questions = JSON.parse(cachedQ); this.aiGuide.quiz.loading = false; }
+      } catch(e) {}
+
+      // Fetch guide + quiz in parallel (skip if cached)
+      const tasks = [];
+
+      if (!this.aiGuide.content) {
+        tasks.push(
+          fetch('/api/generate-guide', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, subjectReason: subject.reason || '' }),
+          })
+          .then(r => r.json())
+          .then(data => {
+            if (data.error) throw new Error(data.error);
+            this.aiGuide.content = data.guide;
+            try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch(e) {}
+          })
+          .catch(e => { this.aiGuide.error = e.message; })
+          .finally(() => { this.aiGuide.loading = false; })
+        );
+      }
+
+      if (!this.aiGuide.quiz.questions.length) {
+        tasks.push(
+          fetch('/api/quiz', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name }),
+          })
+          .then(r => r.json())
+          .then(data => {
+            if (data.questions) {
+              this.aiGuide.quiz.questions = data.questions;
+              try { localStorage.setItem(quizKey, JSON.stringify(data.questions)); } catch(e) {}
+            }
+          })
+          .catch(() => {})
+          .finally(() => { this.aiGuide.quiz.loading = false; })
+        );
+      }
+
+      await Promise.all(tasks);
+    },
+
+    submitAIQuiz() {
+      let score = 0;
+      (this.aiGuide.quiz.questions || []).forEach((q, i) => {
+        if (this.aiGuide.quiz.answers[i] === q.correct) score++;
+      });
+      this.aiGuide.quiz.score = score;
+      this.aiGuide.quiz.submitted = true;
+      if (score >= 2) {
+        const s = this.aiGuide.subject;
+        const idx = this.aiGuide.chapterIndex;
+        if (s?.chapList?.[idx]) {
+          s.chapList[idx].done = true;
+          this.syncSubjectPct(s);
+        }
       }
     },
 

@@ -644,7 +644,7 @@
             <div class="chapter-list">
               <template x-for="(ch,i) in s.chapList" :key="i">
                 <div>
-                  <div class="chap-item" :class="ch.done?'done':''" @click="toggleChapDone(s,ch,i)">
+                  <div class="chap-item" :class="ch.done?'done':''" @click="ch.done=!ch.done;syncSubjectPct(s)">
                     <div class="tcheck" :class="ch.done?'on':''">
                       <span x-show="ch.done">✓</span>
                     </div>
@@ -946,72 +946,112 @@
               </div>
             </template>
 
-          </div>
-        </div>
-      </div>
+            <!-- ══ QUIZ SECTION — Trailhead style ══ -->
+            <div style="margin-top:48px;border-top:2px solid var(--border);padding-top:40px">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px">
+                <div style="width:48px;height:48px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🧠</div>
+                <div>
+                  <div style="font-size:22px;font-weight:700;color:var(--t1)">Verificar conocimiento</div>
+                  <div style="font-size:14px;color:var(--t4);margin-top:3px">Responde 2 de 3 correctamente para completar este capítulo</div>
+                </div>
+              </div>
 
-  <!-- ══ QUIZ MODAL ══ -->
-  <div x-show="quiz.active" x-cloak style="position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px">
-    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto">
-      <!-- Loading -->
-      <div x-show="quiz.loading" style="padding:52px;text-align:center">
-        <div style="font-size:36px;margin-bottom:14px">⏳</div>
-        <div style="color:var(--t3);font-size:15px">Generando preguntas con IA...</div>
-        <div style="font-size:12px;color:var(--t4);margin-top:6px;font-family:var(--mono)" x-text="quiz.ch?.name"></div>
-      </div>
-      <!-- Questions -->
-      <div x-show="!quiz.loading && !quiz.submitted" style="padding:28px">
-        <div style="margin-bottom:22px">
-          <div style="font-size:11px;color:var(--blue2);font-family:var(--mono);margin-bottom:6px;letter-spacing:.08em">VERIFICACIÓN DEL CAPÍTULO</div>
-          <div style="font-size:20px;font-weight:700;color:var(--t1);margin-bottom:6px" x-text="quiz.ch?.name"></div>
-          <div style="font-size:13px;color:var(--t4)">Responde 2 de 3 correctamente para marcar el capítulo como completado.</div>
-        </div>
-        <template x-for="(q, qi) in quiz.questions" :key="qi">
-          <div style="margin-bottom:22px">
-            <div style="font-size:15px;font-weight:500;color:var(--t1);margin-bottom:10px;line-height:1.5" x-text="(qi+1)+'. '+q.q"></div>
-            <div style="display:flex;flex-direction:column;gap:7px">
-              <template x-for="(opt, oi) in q.options" :key="oi">
-                <button
-                  @click="quiz.answers = quiz.answers.map((a,idx)=>idx===qi?oi:a)"
-                  style="text-align:left;padding:11px 14px;border-radius:9px;border:1px solid var(--border2);background:var(--layer);color:var(--t2);font-size:14px;cursor:pointer;transition:all .15s;font-family:var(--font);display:flex;align-items:center;gap:10px"
-                  :style="quiz.answers[qi]===oi?'background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue2)':''"
-                >
-                  <span style="font-family:var(--mono);font-size:12px;color:var(--t4);flex-shrink:0" x-text="['A','B','C','D'][oi]"></span>
-                  <span x-text="opt"></span>
-                </button>
-              </template>
+              <!-- Loading -->
+              <div x-show="aiGuide.quiz&&aiGuide.quiz.loading" style="padding:44px;text-align:center;background:var(--layer);border-radius:16px;border:1px solid var(--border)">
+                <div style="font-size:32px;margin-bottom:12px">⏳</div>
+                <div style="color:var(--t3);font-size:15px">Generando preguntas con IA...</div>
+              </div>
+
+              <!-- Questions -->
+              <div x-show="aiGuide.quiz&&!aiGuide.quiz.loading&&!aiGuide.quiz.submitted">
+                <template x-for="(q, qi) in (aiGuide.quiz?.questions||[])" :key="qi">
+                  <div :style="qi>0?'border-top:1px solid var(--border);margin-top:32px;padding-top:32px':''">
+                    <div style="display:flex;gap:18px;align-items:flex-start;margin-bottom:22px">
+                      <div style="min-width:46px;height:46px;border-radius:50%;background:rgba(59,130,246,.1);border:2px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--blue2);font-family:var(--mono);flex-shrink:0" x-text="qi+1"></div>
+                      <div style="font-size:18px;font-weight:500;color:var(--t1);line-height:1.65;padding-top:9px" x-text="q.q"></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;padding-left:64px">
+                      <template x-for="(opt, oi) in q.options" :key="oi">
+                        <button
+                          @click="aiGuide.quiz.answers = aiGuide.quiz.answers.map((a,idx)=>idx===qi?oi:a)"
+                          style="display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:13px;border:2px solid;background:transparent;cursor:pointer;transition:all .15s;text-align:left;width:100%;font-family:var(--font)"
+                          :style="aiGuide.quiz.answers[qi]===oi?'border-color:var(--blue);background:rgba(59,130,246,.08)':'border-color:var(--border2)'"
+                        >
+                          <div style="width:40px;height:40px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;font-family:var(--mono);flex-shrink:0;transition:all .15s"
+                            :style="aiGuide.quiz.answers[qi]===oi?'border-color:var(--blue);background:var(--blue);color:#fff':'border-color:var(--border2);color:var(--t4)'"
+                            x-text="['A','B','C','D'][oi]"></div>
+                          <span style="font-size:16px;line-height:1.5;transition:all .15s"
+                            :style="aiGuide.quiz.answers[qi]===oi?'color:var(--t1);font-weight:500':'color:var(--t2)'"
+                            x-text="opt"></span>
+                        </button>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- Submit bar -->
+                <div style="display:flex;align-items:center;gap:14px;margin-top:36px;padding-top:28px;border-top:1px solid var(--border)">
+                  <div style="display:flex;gap:8px;flex:1">
+                    <template x-for="(q,qi) in (aiGuide.quiz?.questions||[])" :key="qi">
+                      <div style="width:13px;height:13px;border-radius:50%;transition:all .2s"
+                        :style="(aiGuide.quiz?.answers||[])[qi]!==null&&(aiGuide.quiz?.answers||[])[qi]!==undefined?'background:var(--blue)':'background:var(--border2)'"></div>
+                    </template>
+                  </div>
+                  <button
+                    @click="submitAIQuiz()"
+                    :disabled="(aiGuide.quiz?.answers||[]).some(a=>a===null||a===undefined)"
+                    style="padding:14px 32px;border-radius:12px;background:var(--blue3);border:1px solid var(--blue);color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s"
+                    :style="(aiGuide.quiz?.answers||[]).some(a=>a===null||a===undefined)?'opacity:.4;cursor:not-allowed':''"
+                  >Verificar respuestas →</button>
+                </div>
+              </div>
+
+              <!-- Results -->
+              <div x-show="aiGuide.quiz&&aiGuide.quiz.submitted" style="animation:fadeUp .3s ease both">
+                <div style="text-align:center;padding:36px 24px;margin-bottom:24px;background:var(--layer);border-radius:18px;border:1px solid var(--border)">
+                  <div style="font-size:56px;margin-bottom:16px" x-text="(aiGuide.quiz?.score||0)>=2?'🎉':'📚'"></div>
+                  <div style="font-size:26px;font-weight:700;margin-bottom:10px"
+                    :style="(aiGuide.quiz?.score||0)>=2?'color:var(--green2)':'color:var(--orange2)'"
+                    x-text="(aiGuide.quiz?.score||0)>=2?'¡Capítulo completado!':'Necesitas repasar'"></div>
+                  <div style="display:inline-flex;padding:7px 20px;border-radius:20px;font-size:15px;font-family:var(--mono)"
+                    :style="(aiGuide.quiz?.score||0)>=2?'background:rgba(16,185,129,.12);color:var(--green2)':'background:rgba(249,115,22,.1);color:var(--orange2)'"
+                    x-text="(aiGuide.quiz?.score||0)+'/3 correctas'"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+                  <template x-for="(q, qi) in (aiGuide.quiz?.questions||[])" :key="qi">
+                    <div style="padding:18px 20px;border-radius:13px;display:flex;gap:16px;align-items:flex-start"
+                      :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2)':'background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2)'">
+                      <div style="font-size:24px;flex-shrink:0"
+                        x-text="(aiGuide.quiz?.answers||[])[qi]===q.correct?'✓':'✗'"
+                        :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'color:var(--green2)':'color:#f87171'"></div>
+                      <div>
+                        <div style="font-size:15px;color:var(--t2);margin-bottom:6px;line-height:1.5" x-text="q.q"></div>
+                        <div style="font-size:14px;font-family:var(--mono)"
+                          :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'color:var(--green2)':'color:#f87171'"
+                          x-text="q.options[(aiGuide.quiz?.answers||[])[qi]??0]"></div>
+                        <div x-show="(aiGuide.quiz?.answers||[])[qi]!==q.correct" style="font-size:13px;color:var(--t4);margin-top:5px;font-family:var(--mono)"
+                          x-text="'✓ Correcto: '+q.options[q.correct]"></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+                <div style="display:flex;gap:10px">
+                  <button x-show="(aiGuide.quiz?.score||0)>=2" @click="navigate('subject-'+(aiGuide.subject?.id||''))"
+                    style="flex:1;padding:15px;border-radius:12px;background:var(--green);border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font)">
+                    ← Volver a la materia
+                  </button>
+                  <button x-show="(aiGuide.quiz?.score||0)<2" @click="aiGuide.quiz.submitted=false;aiGuide.quiz.answers=[null,null,null]"
+                    style="flex:1;padding:15px;border-radius:12px;background:var(--blue3);border:1px solid var(--blue);color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font)">
+                    Intentar de nuevo
+                  </button>
+                </div>
+              </div>
             </div>
+            <!-- ══ END QUIZ ══ -->
+
           </div>
-        </template>
-        <div style="display:flex;gap:10px;margin-top:4px">
-          <button
-            @click="submitQuiz()"
-            :disabled="quiz.answers.some(a=>a===null)"
-            style="flex:1;padding:13px;border-radius:10px;background:var(--blue3);border:1px solid var(--blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s"
-            :style="quiz.answers.some(a=>a===null)?'opacity:.45;cursor:not-allowed':''"
-          >Verificar respuestas</button>
-          <button @click="skipQuiz()" style="padding:13px 18px;border-radius:10px;border:1px solid var(--border2);background:var(--layer);color:var(--t4);font-size:13px;cursor:pointer;font-family:var(--font)" title="Marcar como completado sin quiz">Saltar quiz</button>
         </div>
       </div>
-      <!-- Results -->
-      <div x-show="quiz.submitted" style="padding:32px;text-align:center">
-        <div style="font-size:52px;margin-bottom:14px" x-text="quiz.score>=2?'🎉':'📚'"></div>
-        <div style="font-size:24px;font-weight:700;margin-bottom:8px" :style="quiz.score>=2?'color:var(--green2)':'color:var(--orange2)'" x-text="quiz.score>=2?'¡Capítulo completado!':'Necesitas repasar'"></div>
-        <div style="font-size:15px;color:var(--t3);margin-bottom:6px" x-text="quiz.score+'/3 respuestas correctas'"></div>
-        <div x-show="quiz.score<2" style="font-size:13px;color:var(--t4);margin-bottom:20px">Vuelve al capítulo, repasa los conceptos e intenta de nuevo.</div>
-        <div style="margin:20px 0;text-align:left">
-          <template x-for="(q, qi) in quiz.questions" :key="qi">
-            <div style="margin-bottom:10px;padding:12px 14px;border-radius:9px" :style="quiz.answers[qi]===q.correct?'background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2)':'background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)'">
-              <div style="font-size:13px;color:var(--t2);margin-bottom:5px" x-text="(qi+1)+'. '+q.q"></div>
-              <div style="font-size:13px;font-family:var(--mono)" :style="quiz.answers[qi]===q.correct?'color:var(--green2)':'color:#f87171'" x-text="(quiz.answers[qi]===q.correct?'✓ ':'✗ ')+q.options[quiz.answers[qi]??0]"></div>
-              <div x-show="quiz.answers[qi]!==q.correct" style="font-size:12px;color:var(--t4);margin-top:3px;font-family:var(--mono)" x-text="'Correcto: '+q.options[q.correct]"></div>
-            </div>
-          </template>
-        </div>
-        <button @click="closeQuiz()" style="padding:13px 32px;border-radius:10px;background:var(--blue3);border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font)" x-text="quiz.score>=2?'Continuar':'Volver a estudiar'"></button>
-      </div>
-    </div>
-  </div>
 
   </main><!-- /main -->
 
