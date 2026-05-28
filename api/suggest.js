@@ -10,26 +10,38 @@ export default async function handler(req, res) {
 
   const { subjects = [] } = req.body || {};
 
-  const summary = subjects
-    .map(s => `${s.name} (${s.pct}% completado)`)
-    .join(', ');
-
   const alreadyHave = subjects.map(s => s.name).join(', ');
 
+  const inProgress = subjects.filter(s => s.pct > 0 && s.pct < 100);
+  const completed  = subjects.filter(s => s.pct === 100);
+  const notStarted = subjects.filter(s => s.pct === 0);
+
+  const progressDetail = [
+    inProgress.length  ? `EN PROGRESO: ${inProgress.map(s => `${s.name} (${s.pct}%)`).join(', ')}` : '',
+    completed.length   ? `COMPLETADOS: ${completed.map(s => s.name).join(', ')}` : '',
+    notStarted.length  ? `AÚN NO INICIADOS: ${notStarted.map(s => s.name).join(', ')}` : '',
+  ].filter(Boolean).join('\n');
+
   const prompt = `Eres un advisor de carrera para SDET (Software Development Engineer in Test).
-El estudiante tiene este stack actual: ${summary}.
-NO repitas estas materias: ${alreadyHave}.
 
-Sugiere exactamente 3 nuevos temas técnicos para expandir su stack SDET.
-Prioriza temas como: performance testing, mobile testing, security testing, observability, contract testing, AI/ML testing, chaos engineering, etc.
+PROGRESIÓN ACTUAL DEL ESTUDIANTE:
+${progressDetail}
 
-Responde ÚNICAMENTE con un JSON array válido. Sin markdown, sin \`\`\`, sin texto extra. Solo el JSON:
+Analiza su progresión y sugiere exactamente 3 temas que sean la CONTINUACIÓN LÓGICA de lo que está estudiando.
+Razonamiento esperado:
+- Si está avanzado en API Testing → sugerir temas que profundicen o complementen (ej: Contract Testing, API Security, GraphQL Testing)
+- Si está iniciando CI/CD → sugerir temas que se construyen sobre eso (ej: Infrastructure as Code, GitOps, Observability)
+- Si completó algo → sugerir el siguiente nivel o especialización
+- NO sugerir temas genéricos no relacionados con su progresión actual
+- NO repetir: ${alreadyHave}
+
+Responde ÚNICAMENTE con un JSON array válido. Sin markdown, sin \`\`\`, sin texto extra:
 [
   {
     "name": "Nombre corto del tema",
     "icon": "emoji relevante",
     "color": "blue",
-    "reason": "Una frase explicando por qué este tema expande el stack",
+    "reason": "Una frase concreta explicando por qué sigue lógicamente de su progresión actual",
     "hours": "Xh",
     "chapList": [
       {"name": "Nombre del capítulo 1", "done": false},
@@ -41,7 +53,7 @@ Responde ÚNICAMENTE con un JSON array válido. Sin markdown, sin \`\`\`, sin te
     ]
   }
 ]
-Los colores disponibles son solo: blue, green, orange, purple. Varía los colores entre las 3 sugerencias.`;
+Colores disponibles: blue, green, orange, purple. Varía entre las 3 sugerencias.`;
 
   try {
     const geminiRes = await fetch(
