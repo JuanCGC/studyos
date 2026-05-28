@@ -82,9 +82,10 @@ window._user = null;
 function app() {
   return {
     // ── Routing ──
-    view: 'dashboard',
+    view: localStorage.getItem('stos_view') || 'dashboard',
     navigate(v) {
       this.view = v;
+      localStorage.setItem('stos_view', v);
       this.$nextTick(() => document.getElementById('panel-dash').scrollTo(0, 0));
     },
     goGuide(sectionId) {
