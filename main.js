@@ -475,6 +475,14 @@ function app() {
 
     // ── Chapter / subject helpers ──
     resetTarget: null,
+    deleteTarget: null,
+    confirmDelete(s){ this.deleteTarget = this.deleteTarget === s.id ? null : s.id; },
+    doDelete(s){
+      this.subjects = this.subjects.filter(sub => sub.id !== s.id);
+      this.deleteTarget = null;
+      this.navigate('subjects');
+      this.saveProgress();
+    },
     chapPct(s){
       if(!s.chapList||!s.chapList.length) return 0;
       return Math.round(s.chapList.filter(c=>c.done).length/s.chapList.length*100);

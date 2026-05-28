@@ -528,9 +528,17 @@
               >
                 ↺ Resetear progreso
               </button>
+              <!-- DELETE BUTTON -->
+              <button
+                class="back-btn"
+                style="color:#f87171;border-color:rgba(239,68,68,.3);gap:6px;"
+                @click="confirmDelete(s)"
+              >
+                🗑 Eliminar materia
+              </button>
             </div>
 
-            <!-- Confirm reset banner (solo visible si se pidió confirmar esta materia) -->
+            <!-- Confirm reset banner -->
             <div
               x-show="resetTarget===s.id"
               x-transition
@@ -545,6 +553,25 @@
                 <button
                   style="padding:6px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--layer);color:var(--t2);font-size:12px;cursor:pointer;font-family:var(--font);"
                   @click="resetTarget=null"
+                >Cancelar</button>
+              </div>
+            </div>
+
+            <!-- Confirm delete banner -->
+            <div
+              x-show="deleteTarget===s.id"
+              x-transition
+              style="margin-bottom:16px;padding:14px 16px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:space-between;gap:12px;"
+            >
+              <span style="font-size:13px;color:#fca5a5;">¿Eliminar <strong x-text="s.name"></strong>? Esta acción no se puede deshacer.</span>
+              <div class="flex aic g8">
+                <button
+                  style="padding:6px 14px;border-radius:7px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.15);color:#f87171;font-size:12px;cursor:pointer;font-family:var(--font);"
+                  @click="doDelete(s)"
+                >Sí, eliminar</button>
+                <button
+                  style="padding:6px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--layer);color:var(--t2);font-size:12px;cursor:pointer;font-family:var(--font);"
+                  @click="deleteTarget=null"
                 >Cancelar</button>
               </div>
             </div>
@@ -586,6 +613,10 @@
                 x-text="s.chapList.filter(c=>c.done).length+' de '+s.chapList.length+' completados'">
               </span>
             </div>
+            <div x-show="s.aiSuggested" style="margin-bottom:12px;padding:10px 14px;border-radius:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);font-size:12px;color:var(--t3);font-family:var(--mono)">
+              🤖 Materia sugerida por IA — guía de instrucciones no disponible. Marca los capítulos manualmente a medida que avanzas.
+            </div>
+
             <div class="chapter-list">
               <template x-for="(ch,i) in s.chapList" :key="i">
                 <div class="chap-item" :class="ch.done?'done':''" @click="ch.done=!ch.done;syncSubjectPct(s)">
@@ -593,7 +624,7 @@
                     <span x-show="ch.done">✓</span>
                   </div>
                   <span class="chap-num" x-text="String(i+1).padStart(2,'0')"></span>
-                  <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" @click.stop="goChapter(ch.name,s.id)" style="cursor:pointer" title="Ver instrucciones en la guía"></span>
+                  <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" :style="CHAP_MAP[ch.name]?'cursor:pointer':''" @click.stop="CHAP_MAP[ch.name]&&goChapter(ch.name,s.id)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':''"></span>
                   <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="Ver instrucciones">📖</span>
                   <span class="chap-status mono txt-xs"
                     :style="ch.done?'color:var(--green2)':'color:var(--t4)'"
