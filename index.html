@@ -636,9 +636,10 @@
             <div class="chapter-list">
               <template x-for="(ch,i) in s.chapList" :key="i">
                 <div>
-                  <div class="chap-item" :class="ch.done?'done':''" @click="ch.done=!ch.done;syncSubjectPct(s)">
-                    <div class="tcheck" :class="ch.done?'on':''">
+                  <div class="chap-item" :class="ch.done?'done':''" @click="ch.done?(ch.done=false,syncSubjectPct(s)):openAIGuide(s,ch,i,!s.aiSuggested)">
+                    <div class="tcheck" :class="ch.done?'on':''" :title="ch.done?'Desmarcar':'Completa el quiz para marcar como hecho'">
                       <span x-show="ch.done">✓</span>
+                      <span x-show="!ch.done" style="font-size:11px;opacity:.5">🔒</span>
                     </div>
                     <span class="chap-num" x-text="String(i+1).padStart(2,'0')"></span>
                     <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" style="cursor:pointer" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):openAIGuide(s,ch,i,!s.aiSuggested)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':(s.aiSuggested?'Generar guía + quiz con IA':'Generar quiz')"></span>
