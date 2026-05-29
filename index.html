@@ -806,99 +806,88 @@
       <div x-show="view==='interview'" x-cloak>
         <div class="view">
 
-          <!-- Header -->
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap">
-            <div>
-              <div style="font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.02em">Entrevista IA</div>
-              <div style="font-size:13px;color:var(--t4);margin-top:3px">Sesión simulada con entrevistador técnico SDET</div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-              <select class="sinput" x-model="interviewTopic" style="min-width:180px;padding:8px 12px;border-radius:10px">
-                <option value="">🎯 Tema libre</option>
+          <!-- Header row: title + select + button -->
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+            <div style="font-size:18px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.06em">Entrevista IA</div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <select class="sinput" x-model="interviewTopic" style="min-width:160px;padding:7px 12px;border-radius:9px">
+                <option value="">Tema libre</option>
                 <template x-for="s in subjects" :key="s.id">
-                  <option :value="s.name" x-text="s.icon+' '+s.name"></option>
+                  <option :value="s.name" x-text="s.name"></option>
                 </template>
               </select>
               <button @click="startInterview()"
-                style="padding:10px 22px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);background:linear-gradient(135deg,var(--blue3),var(--blue));color:#fff;transition:all .15s;white-space:nowrap"
-                x-text="interviewMessages.length ? '↺ Reiniciar' : '▶ Iniciar sesión'"></button>
+                style="padding:9px 20px;border-radius:9px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);background:var(--blue3);color:#fff;transition:all .15s;white-space:nowrap;border:1px solid var(--blue)"
+                x-text="interviewMessages.length ? 'Reiniciar' : 'Iniciar sesión'"></button>
             </div>
           </div>
 
-          <!-- Topic suggestions chips -->
-          <div x-show="subjects.length > 0 && !interviewMessages.length" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
-            <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);width:100%;margin-bottom:4px">Sugerencias de temas</div>
-            <template x-for="s in subjects" :key="s.id">
-              <button @click="interviewTopic=s.name"
-                :style="interviewTopic===s.name?'border-color:var(--blue);background:rgba(59,130,246,.1);color:var(--blue2)':'border-color:var(--border2);background:var(--layer);color:var(--t3)'"
-                style="font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid;cursor:pointer;font-family:var(--font);transition:all .15s">
-                <span x-text="s.icon+' '+s.name"></span>
-              </button>
-            </template>
+          <!-- Chat card — full width -->
+          <div class="card" style="min-height:340px;display:flex;flex-direction:column;padding:0;overflow:hidden;margin-bottom:16px">
+            <div style="padding:16px 22px;border-bottom:1px solid var(--border)">
+              <div style="font-size:14px;font-weight:600;color:var(--t2)">Guía de Inicio de Entrevista</div>
+            </div>
+            <!-- Empty state -->
+            <div x-show="interviewMessages.length === 0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:48px 32px;text-align:center">
+              <div style="font-size:52px;filter:drop-shadow(0 4px 16px rgba(59,130,246,.3))">🎤</div>
+              <div>
+                <div style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:8px">Selecciona un tema y presiona Iniciar sesión</div>
+                <div style="font-size:13px;color:var(--t4);line-height:1.6">El entrevistador usará el contexto de tu CV</div>
+              </div>
+            </div>
+            <!-- Messages -->
+            <div class="interview-messages" id="interview-scroll" x-show="interviewMessages.length > 0" style="flex:1;padding:20px 24px">
+              <template x-for="(msg, i) in interviewMessages" :key="i">
+                <div :class="'imsg imsg-' + msg.role">
+                  <div class="imsg-bubble" x-text="msg.content"></div>
+                </div>
+              </template>
+              <div x-show="interviewLoading" class="imsg imsg-assistant">
+                <div class="imsg-bubble imsg-typing"><span></span><span></span><span></span></div>
+              </div>
+            </div>
+            <!-- Input -->
+            <div x-show="interviewMessages.length > 0" style="padding:14px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:7px">
+              <div class="interview-input-wrap" style="margin:0">
+                <textarea class="interview-input" x-model="interviewUserInput" placeholder="Escribe tu respuesta..." @keydown.ctrl.enter="sendInterviewMessage()" rows="3"></textarea>
+                <button class="btn-primary" @click="sendInterviewMessage()" :disabled="interviewLoading || !interviewUserInput.trim()">Enviar</button>
+              </div>
+              <div style="font-size:11px;color:var(--t4);font-family:var(--mono)">Ctrl+Enter para enviar</div>
+            </div>
           </div>
 
-          <!-- Main 2-column layout -->
-          <div style="display:grid;grid-template-columns:1fr auto;gap:16px;margin-bottom:20px" :style="cvAnalysis?'':'grid-template-columns:1fr'">
+          <!-- Row: Suggestions (left) + CV card (right) -->
+          <div style="display:grid;gap:16px;margin-bottom:16px" :style="cvAnalysis?'grid-template-columns:1fr 220px':'grid-template-columns:1fr'">
 
-            <!-- Chat card -->
-            <div class="card" style="min-height:420px;display:flex;flex-direction:column;padding:0;overflow:hidden">
-              <!-- Card header when empty -->
-              <div x-show="interviewMessages.length === 0" style="padding:20px 24px;border-bottom:1px solid var(--border)">
-                <div style="font-size:13px;font-weight:600;color:var(--t2)">Guía de Inicio de Entrevista</div>
-              </div>
-              <!-- Empty state -->
-              <div x-show="interviewMessages.length === 0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:48px 32px;text-align:center">
-                <div style="width:72px;height:72px;border-radius:50%;background:rgba(59,130,246,.08);border:2px solid rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center;font-size:32px">🎤</div>
-                <div>
-                  <div style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:8px">Selecciona un tema y presiona Iniciar sesión</div>
-                  <div style="font-size:14px;color:var(--t4);line-height:1.6" x-show="cvAnalysis">El entrevistador usará el contexto de tu CV para personalizar las preguntas</div>
-                  <div style="font-size:14px;color:var(--t4);line-height:1.6" x-show="!cvAnalysis">Sube tu CV en Ajustes para obtener preguntas personalizadas</div>
-                </div>
-              </div>
-              <!-- Messages -->
-              <div class="interview-messages" id="interview-scroll" x-show="interviewMessages.length > 0" style="flex:1;padding:20px 24px">
-                <template x-for="(msg, i) in interviewMessages" :key="i">
-                  <div :class="'imsg imsg-' + msg.role">
-                    <div class="imsg-bubble" x-text="msg.content"></div>
-                  </div>
+            <!-- Suggestions card -->
+            <div class="card" style="padding:18px 20px">
+              <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:14px">Sugerencias de Temas</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <template x-for="s in subjects" :key="s.id">
+                  <button @click="interviewTopic=s.name"
+                    :style="interviewTopic===s.name?'border-color:var(--blue);background:rgba(59,130,246,.12);color:var(--blue2)':'border-color:var(--border2);background:transparent;color:var(--t3)'"
+                    style="font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid;cursor:pointer;font-family:var(--font);transition:all .15s;display:flex;align-items:center;gap:6px">
+                    <span x-text="s.icon"></span><span x-text="s.name"></span>
+                  </button>
                 </template>
-                <div x-show="interviewLoading" class="imsg imsg-assistant">
-                  <div class="imsg-bubble imsg-typing"><span></span><span></span><span></span></div>
-                </div>
-              </div>
-              <!-- Input -->
-              <div x-show="interviewMessages.length > 0" style="padding:16px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px">
-                <div class="interview-input-wrap" style="margin:0">
-                  <textarea class="interview-input" x-model="interviewUserInput" placeholder="Escribe tu respuesta..." @keydown.ctrl.enter="sendInterviewMessage()" rows="3"></textarea>
-                  <button class="btn-primary" @click="sendInterviewMessage()" :disabled="interviewLoading || !interviewUserInput.trim()">Enviar</button>
-                </div>
-                <div style="font-size:11px;color:var(--t4);font-family:var(--mono)">Ctrl+Enter para enviar</div>
               </div>
             </div>
 
-            <!-- CV sidebar card -->
-            <div x-show="cvAnalysis" style="width:260px;display:flex;flex-direction:column;gap:12px">
-              <div class="card" style="padding:18px">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--t1)" x-text="'CV de '+(profileName||'candidato')"></div>
-                    <div style="font-size:11px;color:var(--t4);font-family:var(--mono)" x-text="cvFilename||''"></div>
-                  </div>
-                </div>
-                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:8px">Skills</div>
-                <div style="display:flex;flex-wrap:wrap;gap:5px">
-                  <template x-for="sk in (cvAnalysis?.skills||[]).slice(0,10)" :key="sk">
-                    <span style="font-size:11px;font-family:var(--mono);color:var(--t3);background:var(--layer);border:1px solid var(--border2);padding:3px 8px;border-radius:5px" x-text="sk"></span>
-                  </template>
+            <!-- CV card (only if CV loaded) -->
+            <div x-show="cvAnalysis" class="card" style="padding:18px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:40px;height:40px;border-radius:10px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📄</div>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--t1)" x-text="'CV de '+(profileName||'candidato')"></div>
+                  <div style="font-size:11px;color:var(--t4);font-family:var(--mono);margin-top:2px" x-text="cvFilename||''"></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Interview history -->
+          <!-- History table -->
           <div x-show="interviewHistory.length > 0" class="card" style="padding:0;overflow:hidden">
-            <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
               <div style="font-size:13px;font-weight:700;color:var(--t1)">Historial de Entrevistas</div>
               <button @click="interviewHistory=[];localStorage.removeItem('stos_interview_history')" style="font-size:11px;color:var(--t4);background:none;border:none;cursor:pointer;font-family:var(--mono)">Limpiar</button>
             </div>
@@ -908,7 +897,7 @@
                   <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Fecha</th>
                   <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Tema</th>
                   <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Duración</th>
-                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Score</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Scontario</th>
                 </tr>
               </thead>
               <tbody>
@@ -919,7 +908,7 @@
                     <td style="padding:12px 20px;font-size:13px;color:var(--t3);font-family:var(--mono)" x-text="h.duration>0?h.duration+' min':'< 1 min'"></td>
                     <td style="padding:12px 20px">
                       <span style="font-size:13px;font-weight:700;font-family:var(--mono);padding:3px 10px;border-radius:20px"
-                        :style="h.score>=80?'color:var(--green2);background:rgba(16,185,129,.1)':(h.score>=60?'color:var(--orange2);background:rgba(249,115,22,.1)':'color:#f87171;background:rgba(248,113,113,.1)')"
+                        :style="h.score>=80?'color:var(--green2);background:rgba(16,185,129,.1)':(h.score>=60?'color:var(--orange2,#fb923c);background:rgba(251,146,60,.1)':'color:#f87171;background:rgba(248,113,113,.1)')"
                         x-text="h.score"></span>
                     </td>
                   </tr>
