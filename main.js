@@ -446,6 +446,7 @@ function app() {
       return this.tasks;
     },
     toggleTask(i){ this.tasks[i].done=!this.tasks[i].done },
+    deleteTask(id){ this.tasks=this.tasks.filter(t=>t.id!==id); },
     addTask(){
       if(!this.newTask.trim()) return;
       this.tasks.push({id:Date.now(),text:this.newTask.trim(),done:false,pri:'medium'});
@@ -600,7 +601,7 @@ function app() {
         tasks.push(
           fetch('/api/quiz', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name }),
+            body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0 }),
           })
           .then(r => r.json())
           .then(data => {
@@ -726,6 +727,11 @@ function app() {
     },
 
     async init() {
+      // Bust old quiz caches so improved prompt regenerates questions
+      if (!localStorage.getItem('stos_quiz_cache_v2')) {
+        Object.keys(localStorage).filter(k => k.startsWith('quiz_')).forEach(k => localStorage.removeItem(k));
+        localStorage.setItem('stos_quiz_cache_v2', '1');
+      }
       this.loadSettings();
       // Wait for Supabase auth before loading progress (auth init is async)
       if (window._sb) {

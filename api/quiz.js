@@ -8,16 +8,19 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not set' });
 
-  const { subjectName = '', chapterName = '' } = req.body || {};
+  const { subjectName = '', chapterName = '', chapterIndex = 0, totalChapters = 0 } = req.body || {};
 
-  const prompt = `Eres un instructor SDET experto. Crea exactamente 3 preguntas de opción múltiple para verificar comprensión del capítulo "${chapterName}" de la materia "${subjectName}".
+  const position = totalChapters > 0 ? `capítulo ${chapterIndex + 1} de ${totalChapters}` : `capítulo ${chapterIndex + 1}`;
+  const level = chapterIndex <= 2 ? 'introductorio' : chapterIndex <= Math.floor((totalChapters || 10) * 0.5) ? 'intermedio' : 'avanzado';
 
-Reglas:
-- Preguntas concretas, técnicas, orientadas a la práctica real de SDET
-- 4 opciones por pregunta (A, B, C, D)
-- Solo UNA respuesta correcta por pregunta
-- Dificultad media-alta: no triviales, que requieran haber estudiado el tema
-- Las opciones incorrectas deben ser plausibles (no obvias)
+  const prompt = `Eres un instructor SDET experto. Crea exactamente 3 preguntas de opción múltiple sobre el capítulo "${chapterName}" (${position}, nivel ${level}) de la materia "${subjectName}".
+
+Reglas ESTRICTAS:
+- Las preguntas deben cubrir ÚNICAMENTE el contenido de "${chapterName}". NO introduzcas conceptos de otros capítulos.
+- Nivel ${level}: si es introductorio, pregunta sobre definiciones, conceptos básicos y usos fundamentales de "${chapterName}".
+- Las preguntas deben ser respondibles por alguien que acaba de estudiar "${chapterName}" y nada más.
+- 4 opciones por pregunta (A, B, C, D). Solo UNA correcta.
+- Opciones incorrectas plausibles pero claramente incorrectas para quien estudió el tema.
 
 Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
 [
