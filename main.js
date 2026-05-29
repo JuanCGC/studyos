@@ -193,16 +193,37 @@ function app() {
     interviewMessages: [],
     interviewUserInput: '',
     interviewLoading: false,
+    interviewStartTime: null,
+    interviewHistory: JSON.parse(localStorage.getItem('stos_interview_history') || '[]'),
+
+    _saveInterviewSession() {
+      const userMsgs = this.interviewMessages.filter(m => m.role === 'user').length;
+      if (!userMsgs) return;
+      const duration = this.interviewStartTime ? Math.round((Date.now() - this.interviewStartTime) / 60000) : 0;
+      const score = Math.min(100, Math.round(40 + userMsgs * 8 + (duration > 5 ? 10 : 0)));
+      const entry = {
+        date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }),
+        topic: this.interviewTopic || 'Tema libre',
+        duration,
+        score,
+      };
+      this.interviewHistory = [entry, ...this.interviewHistory].slice(0, 20);
+      try { localStorage.setItem('stos_interview_history', JSON.stringify(this.interviewHistory)); } catch(e) {}
+    },
 
     async startInterview() {
+      this._saveInterviewSession();
       this.interviewMessages = [];
       this.interviewUserInput = '';
+      this.interviewStartTime = Date.now();
       await this.sendInterviewMessage('__start__');
     },
 
     startInterviewWithQuestion(q) {
       this.navigate('interview');
+      this._saveInterviewSession();
       this.interviewMessages = [];
+      this.interviewStartTime = Date.now();
       this.$nextTick(() => this.sendInterviewMessage('__start__'));
     },
 
