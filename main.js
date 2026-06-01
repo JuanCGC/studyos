@@ -556,8 +556,10 @@ function app() {
 
     // ── AI Guide View ──
     aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null, quiz: null },
+    _guideSession: 0,
 
     async openAIGuide(subject, chapter, chapterIndex, quizOnly = false) {
+      const session = ++this._guideSession;
       const alreadyDone = chapter?.done === true;
       this.aiGuide = {
         subject, chapter, chapterIndex, loading: !quizOnly, quizOnly, error: '', content: null,
@@ -589,12 +591,13 @@ function app() {
           })
           .then(r => r.json())
           .then(data => {
+            if (this._guideSession !== session) return;
             if (data.error) throw new Error(data.error);
             this.aiGuide.content = data.guide;
             try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch(e) {}
           })
-          .catch(e => { this.aiGuide.error = e.message; })
-          .finally(() => { this.aiGuide.loading = false; })
+          .catch(e => { if (this._guideSession === session) this.aiGuide.error = e.message; })
+          .finally(() => { if (this._guideSession === session) this.aiGuide.loading = false; })
         );
       }
 
@@ -606,13 +609,14 @@ function app() {
           })
           .then(r => r.json())
           .then(data => {
+            if (this._guideSession !== session) return;
             if (data.questions) {
               this.aiGuide.quiz.questions = data.questions;
               try { localStorage.setItem(quizKey, JSON.stringify(data.questions)); } catch(e) {}
             }
           })
-          .catch(() => { this.aiGuide.quiz.error = true; })
-          .finally(() => { this.aiGuide.quiz.loading = false; })
+          .catch(() => { if (this._guideSession === session) this.aiGuide.quiz.error = true; })
+          .finally(() => { if (this._guideSession === session) this.aiGuide.quiz.loading = false; })
         );
       }
 
