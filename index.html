@@ -641,9 +641,9 @@
                       :style="isNotesOpen(s,i)?'color:var(--blue2);border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.08)':(ch.notes&&ch.notes.trim()?'color:var(--blue2);border-color:rgba(59,130,246,.2);background:transparent':'color:var(--t4);border-color:rgba(255,255,255,.06);background:transparent')"
                     >✎</button>
                   </div>
-                  <div x-show="isNotesOpen(s,i)" style="margin:4px 0 6px 52px">
-                    <textarea x-model="ch.notes" @click.stop placeholder="Notas, dudas, conceptos clave de este capítulo..." style="width:100%;min-height:88px;background:var(--layer2);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--t1);font-family:var(--font);resize:vertical;outline:none;line-height:1.6;transition:border-color .15s" @focus="$event.target.style.borderColor='rgba(59,130,246,.4)'" @blur="$event.target.style.borderColor='rgba(255,255,255,.08)'"></textarea>
-                    <div style="font-size:10px;color:var(--t4);font-family:var(--mono);margin-top:3px">💾 Guardado automáticamente</div>
+                  <div x-show="isNotesOpen(s,i)" style="margin:6px 0 8px 52px">
+                    <textarea x-model="ch.notes" @click.stop placeholder="Notas, dudas, conceptos clave de este capítulo..." style="width:100%;min-height:140px;max-height:600px;background:var(--layer2);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--t1);font-family:var(--font);resize:vertical;outline:none;line-height:1.7;transition:border-color .15s;box-sizing:border-box;display:block" @focus="$event.target.style.borderColor='rgba(59,130,246,.4)'" @blur="$event.target.style.borderColor='rgba(255,255,255,.08)'"></textarea>
+                    <div style="font-size:10px;color:var(--t4);font-family:var(--mono);margin-top:4px;display:flex;align-items:center;gap:5px">💾 Guardado automáticamente · arrastra la esquina para agrandar</div>
                   </div>
                 </div>
               </template>
