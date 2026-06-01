@@ -1,3 +1,20 @@
+function safeParseJSON(text) {
+  try { return JSON.parse(text); } catch {}
+  let out = '';
+  let inStr = false;
+  let esc = false;
+  for (const ch of text) {
+    if (esc)          { out += ch; esc = false; continue; }
+    if (ch === '\\' && inStr) { out += ch; esc = true;  continue; }
+    if (ch === '"')   { inStr = !inStr; out += ch; continue; }
+    if (inStr && ch === '\n') { out += '\\n'; continue; }
+    if (inStr && ch === '\r') { out += '\\r'; continue; }
+    if (inStr && ch === '\t') { out += '\\t'; continue; }
+    out += ch;
+  }
+  return JSON.parse(out);
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -61,7 +78,7 @@ Respond with ONLY this JSON structure. No code fields. No markdown:
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const exercise = JSON.parse(rawText);
+    const exercise = safeParseJSON(rawText);
     exercise.language = language;
     exercise.difficulty = difficulty;
     exercise.topic = topic;
