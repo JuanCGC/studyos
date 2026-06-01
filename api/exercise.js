@@ -1,20 +1,3 @@
-function safeParseJSON(text) {
-  try { return JSON.parse(text); } catch {}
-  let out = '';
-  let inStr = false;
-  let esc = false;
-  for (const ch of text) {
-    if (esc)          { out += ch; esc = false; continue; }
-    if (ch === '\\' && inStr) { out += ch; esc = true;  continue; }
-    if (ch === '"')   { inStr = !inStr; out += ch; continue; }
-    if (inStr && ch === '\n') { out += '\\n'; continue; }
-    if (inStr && ch === '\r') { out += '\\r'; continue; }
-    if (inStr && ch === '\t') { out += '\\t'; continue; }
-    out += ch;
-  }
-  return JSON.parse(out);
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -26,34 +9,41 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not set' });
 
   const { topic = 'API Testing', difficulty = 'medium', language = 'javascript' } = req.body || {};
-
   const langLabel = language === 'python' ? 'Python 3' : 'JavaScript (Node.js)';
 
-  // NO code fields in the JSON — code in JSON strings causes unterminated string errors.
-  // starterCode and solution are generated server-side from functionName.
-  const prompt = `You are an expert SDET creating a practical coding exercise.
-
-Create a ${difficulty}-difficulty exercise for: "${topic}" in ${langLabel}.
+  const prompt = `Create a ${difficulty}-difficulty SDET coding exercise for topic "${topic}" in ${langLabel}.
 
 Rules:
 - Function must be self-contained (no HTTP, no I/O, no imports)
-- Test inputs/outputs must be plain JSON values (primitives, objects, arrays)
-- Topic-relevant: validation, parsing, transformation, assertion helpers
+- testCases: inputJson and expectedJson are the JSON-serialized string of the value
+  Examples: number 200 → "200", boolean true → "true", string hello → "\\"hello\\"", object → "{\\"status\\":200}"
+- 4 test cases covering normal and edge cases
+- hints: practical approach hints, no code`;
 
-Respond with ONLY this JSON structure. No code fields. No markdown:
-{
-  "title": "Short exercise title",
-  "description": "2 sentences about what to implement and why it matters for testing",
-  "functionName": "${language === 'python' ? 'snake_case' : 'camelCase'} name only, no parens",
-  "paramName": "name of the single input parameter",
-  "testCases": [
-    { "input": <JSON value>, "expected": <JSON value>, "label": "what this tests" },
-    { "input": <JSON value>, "expected": <JSON value>, "label": "what this tests" },
-    { "input": <JSON value>, "expected": <JSON value>, "label": "what this tests" },
-    { "input": <JSON value>, "expected": <JSON value>, "label": "edge case" }
-  ],
-  "hints": ["approach hint", "implementation hint"]
-}`;
+  // responseSchema forces constrained decoding — Gemini guarantees valid JSON
+  const responseSchema = {
+    type: 'OBJECT',
+    properties: {
+      title:        { type: 'STRING' },
+      description:  { type: 'STRING' },
+      functionName: { type: 'STRING' },
+      paramName:    { type: 'STRING' },
+      hints: { type: 'ARRAY', items: { type: 'STRING' } },
+      testCases: {
+        type: 'ARRAY',
+        items: {
+          type: 'OBJECT',
+          properties: {
+            inputJson:    { type: 'STRING' },
+            expectedJson: { type: 'STRING' },
+            label:        { type: 'STRING' },
+          },
+          required: ['inputJson', 'expectedJson', 'label'],
+        },
+      },
+    },
+    required: ['title', 'description', 'functionName', 'paramName', 'hints', 'testCases'],
+  };
 
   try {
     const geminiRes = await fetch(
@@ -63,7 +53,12 @@ Respond with ONLY this JSON structure. No code fields. No markdown:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1024, responseMimeType: 'application/json' },
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 1024,
+            responseMimeType: 'application/json',
+            responseSchema,
+          },
         }),
       }
     );
@@ -78,19 +73,35 @@ Respond with ONLY this JSON structure. No code fields. No markdown:
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const exercise = safeParseJSON(rawText);
-    exercise.language = language;
-    exercise.difficulty = difficulty;
-    exercise.topic = topic;
+    const raw = JSON.parse(rawText);
 
-    // Generate starter code server-side — never embed code in Gemini JSON
-    const fn = exercise.functionName || 'solution';
-    const param = exercise.paramName || 'input';
-    exercise.starterCode = language === 'python'
+    // Deserialize inputJson/expectedJson back to actual values
+    const testCases = (raw.testCases || []).map(tc => {
+      let input, expected;
+      try { input = JSON.parse(tc.inputJson); } catch { input = tc.inputJson; }
+      try { expected = JSON.parse(tc.expectedJson); } catch { expected = tc.expectedJson; }
+      return { input, expected, label: tc.label };
+    });
+
+    const fn    = raw.functionName || 'solution';
+    const param = raw.paramName    || 'input';
+    const starterCode = language === 'python'
       ? `def ${fn}(${param}):\n    # TODO: implement\n    pass`
       : `function ${fn}(${param}) {\n  // TODO: implement\n}`;
 
-    res.status(200).json({ exercise });
+    res.status(200).json({
+      exercise: {
+        title:        raw.title,
+        description:  raw.description,
+        functionName: fn,
+        starterCode,
+        testCases,
+        hints:        raw.hints || [],
+        language,
+        difficulty,
+        topic,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
