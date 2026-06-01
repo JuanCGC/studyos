@@ -82,7 +82,7 @@ window._user = null;
 function app() {
   return {
     // ── Routing ──
-    view: (() => { const v = localStorage.getItem('stos_view'); return (v && (v === 'dashboard' || v === 'subjects' || v === 'pomodoro' || v === 'interview' || v === 'settings' || v.startsWith('subject-'))) ? v : 'dashboard'; })(),
+    view: (() => { const v = localStorage.getItem('stos_view'); return (v && (v === 'dashboard' || v === 'subjects' || v === 'pomodoro' || v === 'interview' || v === 'settings' || v === 'challenges' || v.startsWith('subject-'))) ? v : 'dashboard'; })(),
     navigate(v) {
       this.view = v;
       localStorage.setItem('stos_view', v);
@@ -195,6 +195,88 @@ function app() {
     interviewLoading: false,
     interviewStartTime: null,
     interviewHistory: JSON.parse(localStorage.getItem('stos_interview_history') || '[]'),
+
+    // ── Challenges ──
+    challengeTopic: '',
+    challengeTopicCustom: '',
+    challengeDifficulty: 'medium',
+    challengeLanguage: 'javascript',
+    currentExercise: null,
+    challengeCode: '',
+    challengeRunning: false,
+    challengeResult: null,
+    challengeGenerating: false,
+    challengeError: '',
+    challengeShowSolution: false,
+    challengeShowHints: false,
+    challengeHistory: JSON.parse(localStorage.getItem('stos_challenge_history') || '[]'),
+
+    async generateExercise() {
+      const topic = this.challengeTopicCustom.trim() || this.challengeTopic;
+      if (!topic) { this.challengeError = 'Select or type a topic first'; return; }
+      this.challengeGenerating = true;
+      this.challengeError = '';
+      this.currentExercise = null;
+      this.challengeCode = '';
+      this.challengeResult = null;
+      this.challengeShowSolution = false;
+      this.challengeShowHints = false;
+      try {
+        const res = await fetch('/api/exercise', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, difficulty: this.challengeDifficulty, language: this.challengeLanguage }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error generating exercise');
+        this.currentExercise = data.exercise;
+        this.challengeCode = data.exercise.starterCode || '';
+      } catch (e) {
+        this.challengeError = e.message;
+      } finally {
+        this.challengeGenerating = false;
+      }
+    },
+
+    async runChallenge() {
+      if (!this.currentExercise || !this.challengeCode.trim()) return;
+      this.challengeRunning = true;
+      this.challengeResult = null;
+      try {
+        const res = await fetch('/api/run-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userCode: this.challengeCode,
+            testCases: this.currentExercise.testCases,
+            functionName: this.currentExercise.functionName,
+            language: this.challengeLanguage,
+          }),
+        });
+        const data = await res.json();
+        this.challengeResult = data;
+        if (!data.error && data.passed === data.total && data.total > 0) {
+          this._saveChallengeToHistory(true);
+        }
+      } catch (e) {
+        this.challengeResult = { error: e.message };
+      } finally {
+        this.challengeRunning = false;
+      }
+    },
+
+    _saveChallengeToHistory(passed) {
+      const entry = {
+        date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }),
+        topic: this.currentExercise?.topic || '',
+        title: this.currentExercise?.title || '',
+        difficulty: this.currentExercise?.difficulty || '',
+        language: this.challengeLanguage,
+        passed,
+      };
+      this.challengeHistory = [entry, ...this.challengeHistory].slice(0, 50);
+      try { localStorage.setItem('stos_challenge_history', JSON.stringify(this.challengeHistory)); } catch(e) {}
+    },
 
     _saveInterviewSession() {
       const userMsgs = this.interviewMessages.filter(m => m.role === 'user').length;

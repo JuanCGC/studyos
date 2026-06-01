@@ -50,7 +50,7 @@ Empieza la sesión saludando al candidato por su nombre y con una pregunta técn
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents,
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1024, thinkingConfig: { thinkingBudget: 0 } },
+          generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
         }),
       }
     );

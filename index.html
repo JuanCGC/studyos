@@ -61,6 +61,9 @@
     </template>
 
     <span class="nav-label">Herramientas</span>
+    <div class="nav-item" :class="view==='challenges'?'active':''" @click="navigate('challenges')">
+      <span class="nav-icon">🏆</span> Challenges
+    </div>
     <div class="nav-item" :class="view==='interview'?'active':''" @click="navigate('interview')">
       <span class="nav-icon">🎤</span> Entrevista IA
     </div>
@@ -922,6 +925,268 @@
                       <span style="font-size:13px;font-weight:700;font-family:var(--mono);padding:3px 10px;border-radius:20px"
                         :style="h.score>=80?'color:var(--green2);background:rgba(16,185,129,.1)':(h.score>=60?'color:var(--orange2,#fb923c);background:rgba(251,146,60,.1)':'color:#f87171;background:rgba(248,113,113,.1)')"
                         x-text="h.score"></span>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── CHALLENGES ── -->
+      <div x-show="view==='challenges'" x-cloak>
+        <div class="view">
+
+          <!-- Header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap">
+            <div style="font-size:18px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.06em">🏆 Challenges</div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <!-- Topic select -->
+              <select class="sinput" x-model="challengeTopic" style="min-width:160px;padding:7px 12px;border-radius:9px" @change="challengeTopicCustom=''">
+                <option value="">— Topic —</option>
+                <template x-for="s in subjects" :key="s.id"><option :value="s.name" x-text="s.name"></option></template>
+                <option value="API Testing">API Testing</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+                <option value="Data Structures">Data Structures</option>
+              </select>
+              <!-- Custom topic input -->
+              <input type="text" class="sinput" x-model="challengeTopicCustom" placeholder="or type custom topic…"
+                style="min-width:160px;padding:7px 12px;border-radius:9px"
+                @input="if(challengeTopicCustom) challengeTopic=''">
+              <!-- Difficulty -->
+              <div style="display:flex;border:1px solid var(--border2);border-radius:9px;overflow:hidden">
+                <template x-for="d in ['easy','medium','hard']" :key="d">
+                  <button @click="challengeDifficulty=d"
+                    :style="challengeDifficulty===d?'background:var(--blue3);color:var(--blue2);border-color:transparent':'background:transparent;color:var(--t4)'"
+                    style="padding:6px 14px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--mono);text-transform:capitalize;transition:all .15s"
+                    x-text="d"></button>
+                </template>
+              </div>
+              <!-- Language -->
+              <div style="display:flex;border:1px solid var(--border2);border-radius:9px;overflow:hidden">
+                <button @click="challengeLanguage='javascript'"
+                  :style="challengeLanguage==='javascript'?'background:var(--blue3);color:var(--blue2)':'background:transparent;color:var(--t4)'"
+                  style="padding:6px 14px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--mono);transition:all .15s">JS</button>
+                <button @click="challengeLanguage='python'"
+                  :style="challengeLanguage==='python'?'background:var(--blue3);color:var(--blue2)':'background:transparent;color:var(--t4)'"
+                  style="padding:6px 14px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--mono);transition:all .15s">PY</button>
+              </div>
+              <!-- Generate button -->
+              <button @click="generateExercise()" :disabled="challengeGenerating"
+                style="padding:9px 22px;border-radius:10px;border:1px solid rgba(99,102,241,.4);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;transition:all .2s;white-space:nowrap;box-shadow:0 2px 12px rgba(99,102,241,.25)"
+                :style="challengeGenerating?'opacity:.6;cursor:not-allowed':''"
+                onmouseover="if(!this.disabled){this.style.boxShadow='0 4px 20px rgba(99,102,241,.4)';this.style.transform='translateY(-1px)'}"
+                onmouseout="this.style.boxShadow='0 2px 12px rgba(99,102,241,.25)';this.style.transform=''">
+                <span x-show="!challengeGenerating">✨ Generate</span>
+                <span x-show="challengeGenerating">⏳ Generating…</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Error banner -->
+          <div x-show="challengeError" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px 16px;color:#f87171;font-size:13px;font-family:var(--mono);margin-bottom:16px" x-text="'Error: '+challengeError"></div>
+
+          <!-- Generating skeleton -->
+          <div x-show="challengeGenerating" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="card" style="min-height:420px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+              <div style="font-size:32px">⏳</div>
+              <div style="font-size:14px;font-family:var(--mono);color:var(--t4)">Generating exercise with Gemini…</div>
+            </div>
+            <div class="card" style="min-height:420px"></div>
+          </div>
+
+          <!-- Empty state -->
+          <div x-show="!challengeGenerating && !currentExercise" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:80px 32px;text-align:center">
+            <div style="font-size:60px;filter:drop-shadow(0 4px 20px rgba(99,102,241,.3))">🏆</div>
+            <div>
+              <div style="font-size:20px;font-weight:700;color:var(--t1);margin-bottom:8px">Select a topic and generate your first challenge</div>
+              <div style="font-size:14px;color:var(--t4);line-height:1.6">Gemini will create SDET-themed coding exercises<br>that run in a real sandbox via Judge0</div>
+            </div>
+          </div>
+
+          <!-- Exercise layout -->
+          <div x-show="currentExercise && !challengeGenerating" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+
+            <!-- LEFT: Problem -->
+            <div style="display:flex;flex-direction:column;gap:14px">
+
+              <!-- Title + meta -->
+              <div class="card" style="padding:20px 24px">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px">
+                  <div style="font-size:17px;font-weight:700;color:var(--t1);line-height:1.4" x-text="currentExercise?.title"></div>
+                  <div style="display:flex;gap:6px;flex-shrink:0">
+                    <span style="font-size:11px;font-family:var(--mono);padding:3px 10px;border-radius:20px;font-weight:700;text-transform:capitalize"
+                      :style="currentExercise?.difficulty==='easy'?'background:rgba(16,185,129,.12);color:var(--green2)':(currentExercise?.difficulty==='hard'?'background:rgba(239,68,68,.12);color:#f87171':'background:rgba(251,191,36,.12);color:#fbbf24')"
+                      x-text="currentExercise?.difficulty"></span>
+                    <span style="font-size:11px;font-family:var(--mono);background:rgba(99,102,241,.12);color:#a78bfa;padding:3px 10px;border-radius:20px;font-weight:700" x-text="currentExercise?.topic"></span>
+                    <span style="font-size:11px;font-family:var(--mono);background:rgba(59,130,246,.1);color:var(--blue2);padding:3px 10px;border-radius:20px;font-weight:700;text-transform:uppercase" x-text="currentExercise?.language"></span>
+                  </div>
+                </div>
+                <div style="font-size:14px;color:var(--t2);line-height:1.75;white-space:pre-wrap" x-text="currentExercise?.description"></div>
+              </div>
+
+              <!-- Test Cases -->
+              <div class="card" style="padding:18px 20px">
+                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:14px">Test Cases</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <template x-for="(tc, i) in (currentExercise?.testCases||[])" :key="i">
+                    <div style="background:var(--layer);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+                      <div style="font-size:11px;font-weight:700;color:var(--t4);font-family:var(--mono);margin-bottom:6px" x-text="'Test '+(i+1)+': '+(tc.label||'')"></div>
+                      <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12px;font-family:var(--mono)">
+                        <span style="color:var(--t4)">Input:</span>
+                        <span style="color:var(--blue2)" x-text="JSON.stringify(tc.input)"></span>
+                        <span style="color:var(--t4)">Expected:</span>
+                        <span style="color:var(--green2)" x-text="JSON.stringify(tc.expected)"></span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Hints -->
+              <div class="card" style="padding:0;overflow:hidden">
+                <button @click="challengeShowHints=!challengeShowHints"
+                  style="width:100%;padding:14px 18px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:var(--font)">
+                  <span style="font-size:13px;font-weight:700;color:var(--t2)">💡 Hints</span>
+                  <span style="font-size:12px;color:var(--t4);font-family:var(--mono)" x-text="challengeShowHints?'▲ Hide':'▼ Show'"></span>
+                </button>
+                <div x-show="challengeShowHints" style="padding:0 18px 14px;display:flex;flex-direction:column;gap:8px">
+                  <template x-for="(hint, hi) in (currentExercise?.hints||[])" :key="hi">
+                    <div style="font-size:13px;color:var(--t3);padding:10px 14px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:8px;line-height:1.6">
+                      <span style="color:#fbbf24;font-weight:700;font-family:var(--mono)" x-text="'#'+(hi+1)+' '"></span>
+                      <span x-text="hint"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+            </div><!-- /left -->
+
+            <!-- RIGHT: Editor + Output -->
+            <div style="display:flex;flex-direction:column;gap:14px">
+
+              <!-- Code editor -->
+              <div class="card" style="padding:0;overflow:hidden">
+                <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                  <div style="display:flex;gap:6px">
+                    <div style="width:12px;height:12px;border-radius:50%;background:#f87171"></div>
+                    <div style="width:12px;height:12px;border-radius:50%;background:#fbbf24"></div>
+                    <div style="width:12px;height:12px;border-radius:50%;background:var(--green2)"></div>
+                  </div>
+                  <span style="font-size:11px;font-family:var(--mono);color:var(--t4)" x-text="challengeLanguage==='python'?'solution.py':'solution.js'"></span>
+                </div>
+                <textarea
+                  x-model="challengeCode"
+                  spellcheck="false"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  style="width:100%;min-height:320px;background:var(--layer);border:none;padding:20px;font-size:13px;color:var(--t1);font-family:var(--mono);line-height:1.7;resize:vertical;outline:none;box-sizing:border-box;display:block;tab-size:2"
+                  @keydown.tab.prevent="
+                    const s = $event.target.selectionStart;
+                    const e = $event.target.selectionEnd;
+                    challengeCode = challengeCode.substring(0,s) + '  ' + challengeCode.substring(e);
+                    $nextTick(() => { $event.target.selectionStart = $event.target.selectionEnd = s+2; })
+                  "
+                ></textarea>
+              </div>
+
+              <!-- Run + Solution buttons -->
+              <div style="display:flex;gap:10px">
+                <button @click="runChallenge()" :disabled="challengeRunning || !challengeCode.trim()"
+                  style="flex:1;padding:12px 20px;border-radius:10px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);background:linear-gradient(135deg,var(--green),#10b981);color:#fff;transition:all .2s;box-shadow:0 2px 12px rgba(16,185,129,.25)"
+                  :style="(challengeRunning||!challengeCode.trim())?'opacity:.5;cursor:not-allowed':''">
+                  <span x-show="!challengeRunning">▶ Run Code</span>
+                  <span x-show="challengeRunning">⏳ Running…</span>
+                </button>
+                <button @click="challengeShowSolution=!challengeShowSolution"
+                  style="padding:12px 18px;border-radius:10px;border:1px solid var(--border2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);background:transparent;color:var(--t3);transition:all .2s"
+                  x-text="challengeShowSolution?'Hide Solution':'Show Solution'"></button>
+              </div>
+
+              <!-- Solution -->
+              <div x-show="challengeShowSolution" style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:12px;overflow:hidden">
+                <div style="padding:10px 16px;border-bottom:1px solid rgba(251,191,36,.15);font-size:11px;font-weight:700;color:#fbbf24;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em">Solution</div>
+                <pre style="margin:0;padding:18px 20px;font-size:13px;color:var(--t2);line-height:1.7;font-family:var(--mono);overflow-x:auto;background:var(--layer)"><code x-text="currentExercise?.solution"></code></pre>
+              </div>
+
+              <!-- Output -->
+              <div x-show="challengeResult" class="card" style="padding:18px 20px">
+                <!-- Error state -->
+                <div x-show="challengeResult?.error">
+                  <div style="font-size:12px;font-weight:700;color:var(--t4);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Output</div>
+                  <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:12px 14px;font-size:13px;font-family:var(--mono);color:#f87171;white-space:pre-wrap" x-text="challengeResult?.compileOutput || challengeResult?.stderr || challengeResult?.error"></div>
+                </div>
+                <!-- Results state -->
+                <div x-show="!challengeResult?.error">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                    <div style="font-size:28px" x-text="challengeResult?.passed===challengeResult?.total && challengeResult?.total>0?'🎉':'📊'"></div>
+                    <div>
+                      <div style="font-size:16px;font-weight:700"
+                        :style="challengeResult?.passed===challengeResult?.total && challengeResult?.total>0?'color:var(--green2)':'color:var(--orange2,#fb923c)'"
+                        x-text="challengeResult?.passed===challengeResult?.total && challengeResult?.total>0?'All tests passed!':challengeResult?.passed+'/'+challengeResult?.total+' tests passed'"></div>
+                      <div x-show="challengeResult?.time" style="font-size:11px;font-family:var(--mono);color:var(--t4)" x-text="'Time: '+challengeResult?.time+'s'"></div>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <template x-for="(r, ri) in (challengeResult?.results||[])" :key="ri">
+                      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:9px"
+                        :style="r.s==='PASS'?'background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.18)':(r.s==='ERROR'?'background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18)':'background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.18)')">
+                        <span style="font-size:14px;flex-shrink:0" x-text="r.s==='PASS'?'✅':(r.s==='ERROR'?'💥':'❌')"></span>
+                        <div style="font-size:12px;font-family:var(--mono);flex:1;min-width:0">
+                          <div style="font-weight:700;margin-bottom:3px"
+                            :style="r.s==='PASS'?'color:var(--green2)':(r.s==='ERROR'?'color:#f87171':'color:var(--orange2,#fb923c)')"
+                            x-text="'Test '+r.t+(r.label?' — '+r.label:'')+': '+r.s"></div>
+                          <div x-show="r.s==='ERROR'" style="color:#f87171;opacity:.8" x-text="r.err"></div>
+                          <div x-show="r.s==='FAIL'" style="color:var(--t4)">
+                            <span>Got: </span><span style="color:var(--t2)" x-text="r.got"></span>
+                            <span style="margin-left:8px">Expected: </span><span style="color:var(--green2)" x-text="r.exp"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /right -->
+
+          </div><!-- /exercise layout -->
+
+          <!-- History table -->
+          <div x-show="challengeHistory.length > 0 && !challengeGenerating" class="card" style="padding:0;overflow:hidden;margin-top:20px">
+            <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:13px;font-weight:700;color:var(--t1)">Challenge History</div>
+              <button @click="challengeHistory=[];localStorage.removeItem('stos_challenge_history')"
+                style="font-size:11px;color:var(--t4);background:none;border:none;cursor:pointer;font-family:var(--mono)">Clear</button>
+            </div>
+            <table style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border)">
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Date</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Exercise</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Topic</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Difficulty</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="(h, i) in challengeHistory" :key="i">
+                  <tr :style="i===challengeHistory.length-1?'':'border-bottom:1px solid var(--border)'">
+                    <td style="padding:12px 20px;font-size:12px;color:var(--t3);font-family:var(--mono)" x-text="h.date"></td>
+                    <td style="padding:12px 20px;font-size:13px;color:var(--t2);font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" x-text="h.title"></td>
+                    <td style="padding:12px 20px;font-size:12px;color:var(--t3)" x-text="h.topic"></td>
+                    <td style="padding:12px 20px">
+                      <span style="font-size:11px;font-family:var(--mono);padding:2px 9px;border-radius:20px;font-weight:700;text-transform:capitalize"
+                        :style="h.difficulty==='easy'?'background:rgba(16,185,129,.12);color:var(--green2)':(h.difficulty==='hard'?'background:rgba(239,68,68,.12);color:#f87171':'background:rgba(251,191,36,.12);color:#fbbf24')"
+                        x-text="h.difficulty"></span>
+                    </td>
+                    <td style="padding:12px 20px">
+                      <span style="font-size:12px;font-weight:700;font-family:var(--mono)"
+                        :style="h.passed?'color:var(--green2)':'color:#f87171'"
+                        x-text="h.passed?'✓ Solved':'✗ Failed'"></span>
                     </td>
                   </tr>
                 </template>

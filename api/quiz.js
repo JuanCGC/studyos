@@ -40,7 +40,7 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.5, maxOutputTokens: 1024, thinkingConfig: { thinkingBudget: 0 } },
+          generationConfig: { temperature: 0.5, maxOutputTokens: 1024 },
         }),
       }
     );
