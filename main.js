@@ -558,9 +558,10 @@ function app() {
     aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null, quiz: null },
 
     async openAIGuide(subject, chapter, chapterIndex, quizOnly = false) {
+      const alreadyDone = chapter?.done === true;
       this.aiGuide = {
         subject, chapter, chapterIndex, loading: !quizOnly, quizOnly, error: '', content: null,
-        quiz: { questions: [], answers: [null, null, null], loading: true, submitted: false, score: 0, error: false },
+        quiz: { questions: [], answers: [null, null, null], loading: !alreadyDone, submitted: alreadyDone, score: alreadyDone ? 3 : 0, error: false },
       };
       this.navigate('ai-guide');
 

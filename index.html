@@ -3930,18 +3930,19 @@ function renderStaticQuiz(container, sectionId, questions) {
   window._sqd[sectionId] = { questions, answers: new Array(questions.length).fill(null) };
 
   const bdr = 'rgba(255,255,255,.1)';
+  const bg  = '#1e2a3a';
   let html = '';
   questions.forEach(function (q, qi) {
     html += '<div style="margin-top:' + (qi > 0 ? '28px' : '24px') + ';padding-top:' + (qi > 0 ? '28px' : '0') + ';border-top:' + (qi > 0 ? '1px solid ' + bdr : 'none') + '">';
     html += '<div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:18px">';
-    html += '<div style="min-width:40px;height:40px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:var(--blue2,#60A5FA);flex-shrink:0">' + (qi + 1) + '</div>';
-    html += '<div style="font-size:17px;font-weight:500;color:var(--t1,#F1F5F9);line-height:1.55;padding-top:7px">' + q.q + '</div></div>';
+    html += '<div style="min-width:40px;height:40px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#60A5FA;flex-shrink:0">' + (qi + 1) + '</div>';
+    html += '<div style="font-size:17px;font-weight:500;color:#F1F5F9;line-height:1.6;padding-top:7px">' + q.q + '</div></div>';
     html += '<div style="display:flex;flex-direction:column;gap:9px;padding-left:56px">';
     q.options.forEach(function (opt, oi) {
       html += '<div id="opt-' + sectionId + '-' + qi + '-' + oi + '" onclick="selectSQ(\'' + sectionId + '\',' + qi + ',' + oi + ')"' +
-        ' style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-radius:10px;border:2px solid ' + bdr + ';cursor:pointer;transition:all .15s;background:var(--layer,#263348)">';
-      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" style="width:34px;height:34px;border-radius:50%;border:2px solid ' + bdr + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--t4,#64748B);flex-shrink:0">' + ['A','B','C','D'][oi] + '</div>';
-      html += '<span style="font-size:15px;color:var(--t2,#CBD5E1);line-height:1.4">' + opt + '</span></div>';
+        ' style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-radius:10px;border:2px solid ' + bdr + ';cursor:pointer;transition:all .15s;background:' + bg + '">';
+      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" style="width:34px;height:34px;border-radius:50%;border:2px solid ' + bdr + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#64748B;flex-shrink:0">' + ['A','B','C','D'][oi] + '</div>';
+      html += '<span style="font-size:15px;color:#CBD5E1;line-height:1.4">' + opt + '</span></div>';
     });
     html += '</div></div>';
   });
@@ -3953,7 +3954,7 @@ function renderStaticQuiz(container, sectionId, questions) {
   });
   html += '</div>';
   html += '<button id="sqbtn-' + sectionId + '" onclick="submitSQ(\'' + sectionId + '\')"' +
-    ' style="background:var(--blue3,#2563EB);color:#fff;border:1px solid var(--blue,#3B82F6);padding:13px 30px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;opacity:.35;pointer-events:none;font-family:inherit">Verificar →</button>';
+    ' style="background:#2563EB;color:#fff;border:1px solid #3B82F6;padding:13px 30px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;opacity:.35;pointer-events:none;font-family:inherit">Verificar →</button>';
   html += '</div>';
   html += '<div id="sqres-' + sectionId + '" style="display:none;margin-top:28px"></div>';
 
@@ -3967,14 +3968,14 @@ function selectSQ(sectionId, qi, oi) {
     const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + idx);
     const cir = document.getElementById('cir-' + sectionId + '-' + qi + '-' + idx);
     if (idx === oi) {
-      lbl.style.borderColor = 'var(--blue,#3B82F6)'; lbl.style.background = 'rgba(59,130,246,.1)';
-      cir.style.borderColor = 'var(--blue,#3B82F6)'; cir.style.background = 'var(--blue,#3B82F6)'; cir.style.color = '#fff';
+      lbl.style.borderColor = '#3B82F6'; lbl.style.background = 'rgba(59,130,246,.12)';
+      cir.style.borderColor = '#3B82F6'; cir.style.background = '#3B82F6'; cir.style.color = '#fff';
     } else {
-      lbl.style.borderColor = 'rgba(255,255,255,.1)'; lbl.style.background = 'var(--layer,#263348)';
-      cir.style.borderColor = 'rgba(255,255,255,.1)'; cir.style.background = ''; cir.style.color = 'var(--t4,#64748B)';
+      lbl.style.borderColor = 'rgba(255,255,255,.1)'; lbl.style.background = '#1e2a3a';
+      cir.style.borderColor = 'rgba(255,255,255,.1)'; cir.style.background = ''; cir.style.color = '#64748B';
     }
   });
-  document.getElementById('dot-' + sectionId + '-' + qi).style.background = 'var(--blue,#3B82F6)';
+  document.getElementById('dot-' + sectionId + '-' + qi).style.background = '#3B82F6';
   if (d.answers.every(function (a) { return a !== null; })) {
     const btn = document.getElementById('sqbtn-' + sectionId);
     btn.style.opacity = '1'; btn.style.pointerEvents = '';
@@ -3990,12 +3991,12 @@ function submitSQ(sectionId) {
     const correct = d.answers[qi] === q.correct;
     const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + d.answers[qi]);
     if (lbl) {
-      lbl.style.borderColor = correct ? 'var(--green,#10B981)' : '#f87171';
-      lbl.style.background   = correct ? 'rgba(16,185,129,.1)'  : 'rgba(248,113,113,.1)';
+      lbl.style.borderColor = correct ? '#10B981' : '#f87171';
+      lbl.style.background  = correct ? 'rgba(16,185,129,.12)' : 'rgba(248,113,113,.1)';
     }
     if (!correct) {
       const cLbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + q.correct);
-      if (cLbl) { cLbl.style.borderColor = 'var(--green,#10B981)'; cLbl.style.background = 'rgba(16,185,129,.1)'; }
+      if (cLbl) { cLbl.style.borderColor = '#10B981'; cLbl.style.background = 'rgba(16,185,129,.12)'; }
     }
   });
 
@@ -4006,9 +4007,9 @@ function submitSQ(sectionId) {
   res.innerHTML =
     '<div style="text-align:center;padding:32px 24px;border:2px solid ' + (passed ? 'rgba(16,185,129,.3)' : 'rgba(248,113,113,.3)') + ';border-radius:12px;background:' + (passed ? 'rgba(16,185,129,.06)' : 'rgba(248,113,113,.06)') + '">' +
       '<div style="font-size:44px;margin-bottom:12px">' + (passed ? '🎉' : '📚') + '</div>' +
-      '<div style="font-size:20px;font-weight:700;color:' + (passed ? 'var(--green2,#34D399)' : '#f87171') + ';margin-bottom:8px">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
-      '<div style="font-size:15px;color:var(--t3,#94A3B8)">' + score + ' de ' + d.questions.length + ' correctas</div>' +
-      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" style="margin-top:18px;background:var(--blue3,#2563EB);color:#fff;border:1px solid var(--blue,#3B82F6);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit">Intentar de nuevo</button>' : '') +
+      '<div style="font-size:20px;font-weight:700;color:' + (passed ? '#34D399' : '#f87171') + ';margin-bottom:8px">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
+      '<div style="font-size:15px;color:#94A3B8">' + score + ' de ' + d.questions.length + ' correctas</div>' +
+      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" style="margin-top:18px;background:#2563EB;color:#fff;border:1px solid #3B82F6;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit">Intentar de nuevo</button>' : '') +
     '</div>';
 }
 
