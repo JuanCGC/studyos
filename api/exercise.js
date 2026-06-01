@@ -11,23 +11,25 @@ export default async function handler(req, res) {
   const { topic = 'API Testing', difficulty = 'medium', language = 'javascript' } = req.body || {};
   const langLabel = language === 'python' ? 'Python 3' : 'JavaScript (Node.js)';
 
-  const prompt = `Create a ${difficulty} SDET coding exercise for topic "${topic}" in ${langLabel}.
+  const prompt = `Create a ${difficulty} SDET coding exercise for "${topic}" in ${langLabel}.
 
-Reply with EXACTLY these lines and nothing else:
+Reply with EXACTLY this format and nothing else:
 TITLE: <title>
-DESC: <one sentence description, no line breaks>
-FN: <functionName in ${language === 'python' ? 'snake_case' : 'camelCase'}>
-PARAM: <single parameter name>
+DESC: <one sentence, no line break>
+FN: <functionName>
+PARAM: <paramName>
 HINT: <hint 1>
 HINT: <hint 2>
-TESTS: <compact JSON array on ONE line, no spaces, format: [{"i":<value>,"e":<value>,"l":"<label>"},...]>
+TEST: <input>|<expected>|<label>
+TEST: <input>|<expected>|<label>
+TEST: <input>|<expected>|<label>
+TEST: <input>|<expected>|<label>
 
-Rules:
-- Function takes one argument and returns a simple value
-- TESTS must be a single-line compact JSON array with exactly 4 items
-- i = input value, e = expected value, l = label string
-- Use only numbers, booleans, or strings as i/e values
-- No newlines inside any field`;
+Rules for TEST lines:
+- input and expected must be simple primitives: a number, true, false, or a plain word (no quotes, no objects, no arrays)
+- Use | as separator
+- Example valid line: TEST: 200|true|valid status code
+- Example valid line: TEST: hello|5|string length`;
 
   try {
     const geminiRes = await fetch(
@@ -37,7 +39,7 @@ Rules:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 512 },
+          generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
         }),
       }
     );
@@ -52,26 +54,46 @@ Rules:
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    // Parse line-based format — no full-document JSON parsing
     const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
-    const get = (key) => {
+
+    const getFirst = (key) => {
       const line = lines.find(l => l.startsWith(key + ': '));
       return line ? line.slice(key.length + 2).trim() : '';
     };
     const getAll = (key) =>
       lines.filter(l => l.startsWith(key + ': ')).map(l => l.slice(key.length + 2).trim());
 
-    const functionName = get('FN') || 'solution';
-    const paramName    = get('PARAM') || 'input';
-    const testsLine    = get('TESTS');
-
-    let testCases = [];
-    try {
-      const raw = JSON.parse(testsLine);
-      testCases = raw.map(t => ({ input: t.i, expected: t.e, label: t.l || '' }));
-    } catch {
-      // fallback: empty test cases
+    // Collect all non-labeled continuation lines after DESC into the description
+    const descIdx = lines.findIndex(l => l.startsWith('DESC: '));
+    let description = getFirst('DESC');
+    if (descIdx !== -1) {
+      for (let i = descIdx + 1; i < lines.length; i++) {
+        if (/^[A-Z]+: /.test(lines[i])) break;
+        description += ' ' + lines[i];
+      }
+      description = description.trim();
     }
+
+    // Parse TEST lines: input|expected|label — no JSON
+    const toValue = (s) => {
+      const t = s.trim();
+      if (t === 'true')  return true;
+      if (t === 'false') return false;
+      if (t !== '' && !isNaN(t)) return Number(t);
+      return t;
+    };
+
+    const testCases = getAll('TEST').map(line => {
+      const [inp, exp, ...labelParts] = line.split('|');
+      return {
+        input:    toValue(inp || ''),
+        expected: toValue(exp || ''),
+        label:    labelParts.join('|').trim(),
+      };
+    });
+
+    const functionName = getFirst('FN') || 'solution';
+    const paramName    = getFirst('PARAM') || 'input';
 
     const starterCode = language === 'python'
       ? `def ${functionName}(${paramName}):\n    # TODO: implement\n    pass`
@@ -79,12 +101,12 @@ Rules:
 
     res.status(200).json({
       exercise: {
-        title:        get('TITLE') || topic + ' Exercise',
-        description:  get('DESC')  || '',
+        title: getFirst('TITLE') || topic + ' Exercise',
+        description,
         functionName,
         starterCode,
         testCases,
-        hints:        getAll('HINT'),
+        hints: getAll('HINT'),
         language,
         difficulty,
         topic,
