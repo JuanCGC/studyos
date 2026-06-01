@@ -626,7 +626,7 @@
                     <!-- Chapter number -->
                     <span style="min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:11px;font-weight:700;font-family:var(--mono);color:var(--t4);flex-shrink:0" x-text="String(i+1).padStart(2,'0')"></span>
                     <!-- Chapter name -->
-                    <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" style="cursor:pointer;flex:1" @click.stop="CHAP_MAP[ch.name]?goChapter(ch.name,s.id):openAIGuide(s,ch,i,false)" :title="CHAP_MAP[ch.name]?'Ver instrucciones en la guía':(s.aiSuggested?'Generar guía + quiz con IA':'Generar quiz')"></span>
+                    <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" style="cursor:pointer;flex:1" @click.stop="openAIGuide(s,ch,i,false)" title="Generar guía + quiz con IA"></span>
                     <!-- Icons -->
                     <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="Ver sección en guía">📖</span>
                     <!-- ✨ only for non-CHAP_MAP chapters (CHAP_MAP sections already have quiz) -->
