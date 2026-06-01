@@ -1,3 +1,9 @@
+function parseJSON(text) {
+  try { return JSON.parse(text); } catch {}
+  const repaired = text.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)(\s*:)/g, '$1"$2"$3');
+  return JSON.parse(repaired);
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -55,7 +61,7 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const questions = JSON.parse(rawText);
+    const questions = parseJSON(rawText);
     res.status(200).json({ questions });
   } catch (err) {
     res.status(500).json({ error: err.message });

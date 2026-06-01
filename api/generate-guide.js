@@ -1,3 +1,9 @@
+function parseJSON(text) {
+  try { return JSON.parse(text); } catch {}
+  const repaired = text.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)(\s*:)/g, '$1"$2"$3');
+  return JSON.parse(repaired);
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -94,7 +100,7 @@ Reglas estrictas:
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const guide = JSON.parse(rawText);
+    const guide = parseJSON(rawText);
     res.status(200).json({ guide });
   } catch (err) {
     res.status(500).json({ error: err.message });
