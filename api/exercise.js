@@ -1,7 +1,25 @@
 function parseJSON(text) {
+  // Try direct parse first
   try { return JSON.parse(text); } catch {}
-  // Gemini occasionally generates unquoted keys — quote them and retry
-  const repaired = text.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)(\s*:)/g, '$1"$2"$3');
+
+  // Escape raw newlines/tabs that appear inside JSON string values
+  let sanitized = '';
+  let inString = false;
+  let escaped = false;
+  for (const ch of text) {
+    if (escaped) { sanitized += ch; escaped = false; continue; }
+    if (ch === '\\' && inString) { sanitized += ch; escaped = true; continue; }
+    if (ch === '"') { inString = !inString; sanitized += ch; continue; }
+    if (inString && ch === '\n') { sanitized += '\\n'; continue; }
+    if (inString && ch === '\r') { sanitized += '\\r'; continue; }
+    if (inString && ch === '\t') { sanitized += '\\t'; continue; }
+    sanitized += ch;
+  }
+
+  try { return JSON.parse(sanitized); } catch {}
+
+  // Also fix unquoted property keys
+  const repaired = sanitized.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)(\s*:)/g, '$1"$2"$3');
   return JSON.parse(repaired);
 }
 
