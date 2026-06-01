@@ -54,21 +54,28 @@ Rules for TEST lines:
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
+    // Strip any markdown formatting Gemini might add
+    const cleaned = rawText.replace(/\*\*/g, '').replace(/`/g, '').replace(/^#+\s*/gm, '');
+    const lines = cleaned.split('\n').map(l => l.trim()).filter(Boolean);
 
+    // Match KEY: or KEY:value (with or without space, case-insensitive key)
+    const parseLine = (line) => {
+      const m = line.match(/^([A-Z_]+)\s*:\s*(.*)/i);
+      return m ? { key: m[1].toUpperCase(), val: m[2].trim() } : null;
+    };
     const getFirst = (key) => {
-      const line = lines.find(l => l.startsWith(key + ': '));
-      return line ? line.slice(key.length + 2).trim() : '';
+      const line = lines.map(parseLine).find(p => p?.key === key);
+      return line?.val || '';
     };
     const getAll = (key) =>
-      lines.filter(l => l.startsWith(key + ': ')).map(l => l.slice(key.length + 2).trim());
+      lines.map(parseLine).filter(p => p?.key === key).map(p => p.val);
 
-    // Collect all non-labeled continuation lines after DESC into the description
-    const descIdx = lines.findIndex(l => l.startsWith('DESC: '));
+    // Collect continuation lines after DESC until next labeled key
+    const descIdx = lines.findIndex(l => parseLine(l)?.key === 'DESC');
     let description = getFirst('DESC');
     if (descIdx !== -1) {
       for (let i = descIdx + 1; i < lines.length; i++) {
-        if (/^[A-Z]+: /.test(lines[i])) break;
+        if (parseLine(lines[i])) break;
         description += ' ' + lines[i];
       }
       description = description.trim();

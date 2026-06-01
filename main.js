@@ -243,20 +243,45 @@ function app() {
       this.challengeRunning = true;
       this.challengeResult = null;
       try {
-        const res = await fetch('/api/run-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userCode: this.challengeCode,
-            testCases: this.currentExercise.testCases,
-            functionName: this.currentExercise.functionName,
-            language: this.challengeLanguage,
-          }),
-        });
-        const data = await res.json();
-        this.challengeResult = data;
-        if (!data.error && data.passed === data.total && data.total > 0) {
-          this._saveChallengeToHistory(true);
+        if (this.challengeLanguage === 'javascript') {
+          // Run directly in browser — no external API, instant, zero failures
+          const tc = this.currentExercise.testCases || [];
+          const fn = this.currentExercise.functionName || 'solution';
+          let userFn;
+          try {
+            userFn = new Function(`${this.challengeCode}; return ${fn};`)();
+          } catch(e) {
+            this.challengeResult = { error: 'Syntax error: ' + e.message, passed: 0, total: tc.length, results: [] };
+            return;
+          }
+          let passed = 0;
+          const results = tc.map((t, i) => {
+            try {
+              const got = userFn(t.input);
+              const ok = JSON.stringify(got) === JSON.stringify(t.expected);
+              if (ok) passed++;
+              return { t: i+1, s: ok ? 'PASS' : 'FAIL', got: JSON.stringify(got), exp: JSON.stringify(t.expected), label: t.label || '' };
+            } catch(e) {
+              return { t: i+1, s: 'ERROR', err: e.message, label: t.label || '' };
+            }
+          });
+          this.challengeResult = { passed, total: tc.length, results };
+          if (passed === tc.length && tc.length > 0) this._saveChallengeToHistory(true);
+        } else {
+          // Python — use Piston API
+          const res = await fetch('/api/run-code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userCode: this.challengeCode,
+              testCases: this.currentExercise.testCases,
+              functionName: this.currentExercise.functionName,
+              language: this.challengeLanguage,
+            }),
+          });
+          const data = await res.json();
+          this.challengeResult = data;
+          if (!data.error && data.passed === data.total && data.total > 0) this._saveChallengeToHistory(true);
         }
       } catch (e) {
         this.challengeResult = { error: e.message };
