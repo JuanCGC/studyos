@@ -63,7 +63,7 @@ Colores disponibles: blue, green, orange, purple. Varía entre las 3 sugerencias
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
+          generationConfig: { temperature: 0.7, maxOutputTokens: 2048, responseMimeType: 'application/json' },
         }),
       }
     );
@@ -76,12 +76,9 @@ Colores disponibles: blue, green, orange, purple. Varía entre las 3 sugerencias
     const data = await geminiRes.json();
     const parts = data.candidates?.[0]?.content?.parts || [];
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
-    const raw = rawText.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '');
+    if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) return res.status(502).json({ error: 'No JSON in Gemini response', raw });
-
-    const suggestions = JSON.parse(match[0]);
+    const suggestions = JSON.parse(rawText);
 
     // attach unique ids and mark as AI-suggested
     const enriched = suggestions.map((s, i) => ({

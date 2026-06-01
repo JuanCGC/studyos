@@ -65,7 +65,7 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
               { text: prompt },
             ],
           }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 8192 },
+          generationConfig: { temperature: 0.4, maxOutputTokens: 8192, responseMimeType: 'application/json' },
         }),
       }
     );
@@ -78,11 +78,9 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
     const data = await geminiRes.json();
     const parts = data.candidates?.[0]?.content?.parts || [];
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
-    const raw = rawText.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '');
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) return res.status(502).json({ error: 'No JSON in response', raw });
+    if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const analysis = JSON.parse(match[0]);
+    const analysis = JSON.parse(rawText);
 
     // enrich recommended subjects with IDs
     analysis.recommended_subjects = (analysis.recommended_subjects || []).map((s, i) => ({

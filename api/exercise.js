@@ -53,7 +53,7 @@ Respond with ONLY valid JSON (no markdown backticks, no extra text):
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
+          generationConfig: { temperature: 0.7, maxOutputTokens: 2048, responseMimeType: 'application/json' },
         }),
       }
     );
@@ -66,11 +66,9 @@ Respond with ONLY valid JSON (no markdown backticks, no extra text):
     const data = await geminiRes.json();
     const parts = data.candidates?.[0]?.content?.parts || [];
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
-    const raw = rawText.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '');
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) return res.status(502).json({ error: 'No JSON in response', raw });
+    if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const exercise = JSON.parse(match[0]);
+    const exercise = JSON.parse(rawText);
     exercise.language = language;
     exercise.difficulty = difficulty;
     exercise.topic = topic;

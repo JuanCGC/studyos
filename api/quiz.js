@@ -40,7 +40,7 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.5, maxOutputTokens: 1024 },
+          generationConfig: { temperature: 0.5, maxOutputTokens: 1024, responseMimeType: 'application/json' },
         }),
       }
     );
@@ -53,11 +53,9 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
     const data = await geminiRes.json();
     const parts = data.candidates?.[0]?.content?.parts || [];
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
-    const raw = rawText.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '');
-    const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) return res.status(502).json({ error: 'No JSON in response', raw });
+    if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const questions = JSON.parse(match[0]);
+    const questions = JSON.parse(rawText);
     res.status(200).json({ questions });
   } catch (err) {
     res.status(500).json({ error: err.message });
