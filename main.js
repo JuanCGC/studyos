@@ -32,6 +32,7 @@ function switchPanel(panel) {
   document.getElementById('panel-dash').classList.toggle('visible', panel==='dash');
   document.getElementById('panel-guide').classList.toggle('visible', panel==='guide');
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.panel===panel));
+  try { localStorage.setItem('stos_panel', panel); } catch(e) {}
   if (panel==='dash') window._dashApp && window._dashApp.$nextTick(()=>null);
 }
 
@@ -82,10 +83,11 @@ window._user = null;
 function app() {
   return {
     // ── Routing ──
-    view: (() => { const v = localStorage.getItem('stos_view'); return (v && (v === 'dashboard' || v === 'subjects' || v === 'pomodoro' || v === 'interview' || v === 'settings' || v === 'challenges' || v.startsWith('subject-'))) ? v : 'dashboard'; })(),
+    view: (() => { const v = localStorage.getItem('stos_view'); return (v && (v === 'dashboard' || v === 'subjects' || v === 'pomodoro' || v === 'interview' || v === 'settings' || v === 'challenges' || v.startsWith('subject-') || v === 'ai-guide')) ? v : 'dashboard'; })(),
     navigate(v) {
       this.view = v;
       localStorage.setItem('stos_view', v);
+      if (v !== 'ai-guide') localStorage.removeItem('stos_ai_guide');
       this.$nextTick(() => document.getElementById('panel-dash').scrollTo(0, 0));
     },
     goGuide(sectionId) {
@@ -692,6 +694,11 @@ function app() {
         quiz: { questions: [], answers: [null, null, null], loading: !alreadyDone, submitted: alreadyDone, score: alreadyDone ? 3 : 0, error: false },
       };
       this.navigate('ai-guide');
+      localStorage.setItem('stos_ai_guide', JSON.stringify({
+        subjectId: subject.id, chapterIndex,
+        quizOnly
+      }));
+      try { localStorage.setItem('stos_panel', 'dash'); } catch(e) {}
 
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
       const quizKey  = `quiz_${subject.id}_${chapterIndex}`;
@@ -777,6 +784,48 @@ function app() {
           this.saveProgress();
         }
       }
+    },
+
+    _restoreAIGuide() {
+      if (this.view !== 'ai-guide') return;
+      const saved = localStorage.getItem('stos_ai_guide');
+      if (!saved) { this._leaveAIGuide(); return; }
+      try {
+        const g = JSON.parse(saved);
+        const subject = this.subjects.find(s => s.id === g.subjectId);
+        if (!subject || g.chapterIndex < 0 || g.chapterIndex >= subject.chapList.length) throw new Error('invalid');
+        const chapter = subject.chapList[g.chapterIndex];
+        const cacheKey = `guide_${g.subjectId}_${g.chapterIndex}`;
+        const quizKey  = `quiz_${g.subjectId}_${g.chapterIndex}`;
+        const cached = localStorage.getItem(cacheKey);
+        const alreadyDone = chapter.done === true;
+        if (!cached && !g.quizOnly) { this._leaveAIGuide(); return; }
+        this.aiGuide = {
+          subject, chapter, chapterIndex: g.chapterIndex,
+          loading: false, quizOnly: !!g.quizOnly, error: '',
+          content: cached ? JSON.parse(cached) : null,
+          quiz: {
+            questions: [],
+            answers: [null, null, null],
+            loading: !alreadyDone,
+            submitted: alreadyDone,
+            score: alreadyDone ? 3 : 0,
+            error: false,
+          },
+        };
+        const cachedQ = localStorage.getItem(quizKey);
+        if (cachedQ) {
+          this.aiGuide.quiz.questions = JSON.parse(cachedQ);
+          this.aiGuide.quiz.loading = false;
+        }
+      } catch(e) {
+        this._leaveAIGuide();
+      }
+    },
+    _leaveAIGuide() {
+      this.view = 'dashboard';
+      localStorage.setItem('stos_view', 'dashboard');
+      localStorage.removeItem('stos_ai_guide');
     },
 
     // ── AI Suggestions ──
@@ -876,15 +925,18 @@ function app() {
         localStorage.setItem('stos_quiz_cache_v2', '1');
       }
       this.loadSettings();
-      // Wait for Supabase auth before loading progress (auth init is async)
+      // Restore ai-guide state after subjects are finalised
       if (window._sb) {
         await this.loadProgress();
+        this._restoreAIGuide();
       } else {
+        this._restoreAIGuide();
         window.addEventListener('supabase-ready', async () => {
           await this.loadProgress();
           if (!this.profileName && window._user?.user_metadata?.full_name) {
             this.profileName = window._user.user_metadata.full_name;
           }
+          this._restoreAIGuide();
         }, { once: true });
       }
       this.$watch('subjects', () => this._debounceSave(), { deep: true });
@@ -998,8 +1050,9 @@ document.addEventListener('DOMContentLoaded', () => {
   buildGroup(p4postman_items, 'p4postman', 'tr-p4postman', 'p4postman-counter', 'p4postman-bar', 'teal');
   buildGroup(p5playwright_items, 'p5playwright', 'tr-p5playwright', 'p5playwright-counter', 'p5playwright-bar', 'amber');
 
-  // Default to dash panel
-  switchPanel('dash');
+  // Restore panel preference (default dash)
+  const panelPref = localStorage.getItem('stos_panel') || 'dash';
+  switchPanel(panelPref);
   updateTrackerAll();
 });
 
