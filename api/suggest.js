@@ -1,3 +1,5 @@
+import parseJSON from './_parse.js';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -49,7 +51,11 @@ Responde ÚNICAMENTE con un JSON array válido. Sin markdown, sin \`\`\`, sin te
       {"name": "Nombre del capítulo 3", "done": false},
       {"name": "Nombre del capítulo 4", "done": false},
       {"name": "Nombre del capítulo 5", "done": false},
-      {"name": "Nombre del capítulo 6", "done": false}
+      {"name": "Nombre del capítulo 6", "done": false},
+      {"name": "Nombre del capítulo 7", "done": false},
+      {"name": "Nombre del capítulo 8", "done": false},
+      {"name": "Nombre del capítulo 9", "done": false},
+      {"name": "Nombre del capítulo 10", "done": false}
     ]
   }
 ]
@@ -63,7 +69,7 @@ Colores disponibles: blue, green, orange, purple. Varía entre las 3 sugerencias
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 2048, responseMimeType: 'application/json' },
+          generationConfig: { temperature: 0.4, maxOutputTokens: 4096, responseMimeType: 'application/json' },
         }),
       }
     );
@@ -78,18 +84,26 @@ Colores disponibles: blue, green, orange, purple. Varía entre las 3 sugerencias
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const suggestions = JSON.parse(rawText);
+    const suggestions = parseJSON(rawText);
 
-    // attach unique ids and mark as AI-suggested
-    const enriched = suggestions.map((s, i) => ({
+    // deterministic ID based on name so cache survives re-suggestion
+    const used = new Set();
+    const slug = name => {
+      let base = 'ai_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      let id = base;
+      for (let n = 1; used.has(id); n++) id = base + '_' + n;
+      used.add(id);
+      return id;
+    };
+    const enriched = suggestions.map((s, idx) => ({
       ...s,
-      id: 'ai_' + Date.now() + '_' + i,
+      id: slug(s.name),
       pct: 0,
       tag: 'Sugerido',
       chapters: `0/${s.chapList.length} caps`,
       exam: null,
       aiSuggested: true,
-      priority: 10 + i,
+      priority: 10 + idx,
     }));
 
     res.status(200).json({ suggestions: enriched });

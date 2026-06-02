@@ -1,21 +1,4 @@
-function parseJSON(text) {
-  try { return JSON.parse(text); } catch {}
-  let sanitized = '';
-  let inString = false;
-  let escaped = false;
-  for (const ch of text) {
-    if (escaped) { sanitized += ch; escaped = false; continue; }
-    if (ch === '\\' && inString) { sanitized += ch; escaped = true; continue; }
-    if (ch === '"') { inString = !inString; sanitized += ch; continue; }
-    if (inString && ch === '\n') { sanitized += '\\n'; continue; }
-    if (inString && ch === '\r') { sanitized += '\\r'; continue; }
-    if (inString && ch === '\t') { sanitized += '\\t'; continue; }
-    sanitized += ch;
-  }
-  try { return JSON.parse(sanitized); } catch {}
-  const repaired = sanitized.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)(\s*:)/g, '$1"$2"$3');
-  return JSON.parse(repaired);
-}
+import parseJSON from './_parse.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -59,7 +42,7 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.5, maxOutputTokens: 1024, responseMimeType: 'application/json' },
+          generationConfig: { temperature: 0.3, maxOutputTokens: 2048, responseMimeType: 'application/json' },
         }),
       }
     );

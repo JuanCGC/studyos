@@ -16,12 +16,25 @@ create table if not exists profiles (
   updated_at   timestamptz default now()
 );
 
--- 3. Row Level Security
+-- 3. Guide cache table (cross-device AI content persistence)
+create table if not exists guide_cache (
+  user_id    uuid references auth.users(id) on delete cascade,
+  cache_key  text,
+  content    jsonb,
+  updated_at timestamptz default now(),
+  primary key (user_id, cache_key)
+);
+
+-- 4. Row Level Security
 alter table progress enable row level security;
 alter table profiles enable row level security;
+alter table guide_cache enable row level security;
 
 create policy "own_progress" on progress
   for all using (auth.uid() = user_id);
 
 create policy "own_profile" on profiles
   for all using (auth.uid() = id);
+
+create policy "own_guide_cache" on guide_cache
+  for all using (auth.uid() = user_id);

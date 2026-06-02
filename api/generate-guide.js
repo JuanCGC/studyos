@@ -1,21 +1,4 @@
-function parseJSON(text) {
-  try { return JSON.parse(text); } catch {}
-  let sanitized = '';
-  let inString = false;
-  let escaped = false;
-  for (const ch of text) {
-    if (escaped) { sanitized += ch; escaped = false; continue; }
-    if (ch === '\\' && inString) { sanitized += ch; escaped = true; continue; }
-    if (ch === '"') { inString = !inString; sanitized += ch; continue; }
-    if (inString && ch === '\n') { sanitized += '\\n'; continue; }
-    if (inString && ch === '\r') { sanitized += '\\r'; continue; }
-    if (inString && ch === '\t') { sanitized += '\\t'; continue; }
-    sanitized += ch;
-  }
-  try { return JSON.parse(sanitized); } catch {}
-  const repaired = sanitized.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)(\s*:)/g, '$1"$2"$3');
-  return JSON.parse(repaired);
-}
+import parseJSON from './_parse.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -88,7 +71,8 @@ Reglas estrictas:
 - Cada sección de código DEBE tener campo "what" explicando qué hace en una línea.
 - exercises: exactamente 2 ejercicios prácticos con pasos claros y hint de código.
 - Código funcional, real, del stack SDET (java, javascript, bash, yaml, python, groovy).
-- Todo en español excepto el código.`;
+- Todo en español excepto el código.
+- ESCAPE CORRECTAMENTE el JSON: escapa comillas dobles (\\") y barras invertidas (\\) dentro de los valores de código. NO pongas saltos de línea literales dentro de strings JSON.`;
 
   try {
     const geminiRes = await fetch(
@@ -98,7 +82,7 @@ Reglas estrictas:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.5, maxOutputTokens: 4096, responseMimeType: 'application/json' },
+          generationConfig: { temperature: 0.3, maxOutputTokens: 8192, responseMimeType: 'application/json' },
         }),
       }
     );
@@ -109,9 +93,13 @@ Reglas estrictas:
     }
 
     const data = await geminiRes.json();
-    const parts = data.candidates?.[0]?.content?.parts || [];
+    const candidate = data.candidates?.[0];
+    const parts = candidate?.content?.parts || [];
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
+    if (candidate?.finishReason === 'MAX_TOKENS') {
+      return res.status(502).json({ error: 'Gemini response was truncated. Try reducing the chapter size.' });
+    }
 
     const guide = parseJSON(rawText);
     res.status(200).json({ guide });

@@ -1,3 +1,5 @@
+import parseJSON from './_parse.js';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -37,9 +39,13 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
         {"name": "Capítulo 1", "done": false},
         {"name": "Capítulo 2", "done": false},
         {"name": "Capítulo 3", "done": false},
-        {"name": "Capítulo 4", "done": false},
-        {"name": "Capítulo 5", "done": false},
-        {"name": "Capítulo 6", "done": false}
+      {"name": "Capítulo 4", "done": false},
+      {"name": "Capítulo 5", "done": false},
+      {"name": "Capítulo 6", "done": false},
+      {"name": "Capítulo 7", "done": false},
+      {"name": "Capítulo 8", "done": false},
+      {"name": "Capítulo 9", "done": false},
+      {"name": "Capítulo 10", "done": false}
       ]
     }
   ],
@@ -80,12 +86,20 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
 
-    const analysis = JSON.parse(rawText);
+    const analysis = parseJSON(rawText);
 
-    // enrich recommended subjects with IDs
+    // deterministic ID based on name so cache survives re-analysis
+    const used = new Set();
+    const slug = name => {
+      let base = 'cv_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      let id = base;
+      for (let n = 1; used.has(id); n++) id = base + '_' + n;
+      used.add(id);
+      return id;
+    };
     analysis.recommended_subjects = (analysis.recommended_subjects || []).map((s, i) => ({
       ...s,
-      id: 'cv_' + Date.now() + '_' + i,
+      id: slug(s.name),
       pct: 0,
       tag: 'Recomendado CV',
       chapters: `0/${s.chapList?.length || 0} caps`,

@@ -665,6 +665,25 @@ function app() {
     aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null, quiz: null },
     _guideSession: 0,
 
+    async _loadCacheFromSupabase(key) {
+      if (!window._sb || !window._user) return null;
+      try {
+        const { data } = await window._sb.from('guide_cache').select('content').eq('user_id', window._user.id).eq('cache_key', key).single();
+        return data?.content || null;
+      } catch { return null; }
+    },
+    async _saveCacheToSupabase(key, content) {
+      if (!window._sb || !window._user) return;
+      try {
+        await window._sb.from('guide_cache').upsert({
+          user_id: window._user.id,
+          cache_key: key,
+          content,
+          updated_at: new Date().toISOString(),
+        });
+      } catch {}
+    },
+
     async openAIGuide(subject, chapter, chapterIndex, quizOnly = false) {
       const session = ++this._guideSession;
       const alreadyDone = chapter?.done === true;
@@ -677,15 +696,25 @@ function app() {
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
       const quizKey  = `quiz_${subject.id}_${chapterIndex}`;
 
+      // Guide: localStorage → Supabase fallback
       if (!quizOnly) {
         try {
-          const cached = localStorage.getItem(cacheKey);
-          if (cached) { this.aiGuide.content = JSON.parse(cached); this.aiGuide.loading = false; }
+          let cached = localStorage.getItem(cacheKey);
+          if (!cached) cached = await this._loadCacheFromSupabase(cacheKey);
+          if (cached) {
+            this.aiGuide.content = typeof cached === 'string' ? JSON.parse(cached) : cached;
+            this.aiGuide.loading = false;
+          }
         } catch(e) {}
       }
+      // Quiz: localStorage → Supabase fallback
       try {
-        const cachedQ = localStorage.getItem(quizKey);
-        if (cachedQ) { this.aiGuide.quiz.questions = JSON.parse(cachedQ); this.aiGuide.quiz.loading = false; }
+        let cachedQ = localStorage.getItem(quizKey);
+        if (!cachedQ) cachedQ = await this._loadCacheFromSupabase(quizKey);
+        if (cachedQ) {
+          this.aiGuide.quiz.questions = typeof cachedQ === 'string' ? JSON.parse(cachedQ) : cachedQ;
+          this.aiGuide.quiz.loading = false;
+        }
       } catch(e) {}
 
       const tasks = [];
@@ -702,6 +731,7 @@ function app() {
             if (data.error) throw new Error(data.error);
             this.aiGuide.content = data.guide;
             try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch(e) {}
+            this._saveCacheToSupabase(cacheKey, data.guide);
           })
           .catch(e => { if (this._guideSession === session) this.aiGuide.error = e.message; })
           .finally(() => { if (this._guideSession === session) this.aiGuide.loading = false; })
@@ -720,6 +750,7 @@ function app() {
             if (data.questions) {
               this.aiGuide.quiz.questions = data.questions;
               try { localStorage.setItem(quizKey, JSON.stringify(data.questions)); } catch(e) {}
+              this._saveCacheToSupabase(quizKey, data.questions);
             }
           })
           .catch(() => { if (this._guideSession === session) this.aiGuide.quiz.error = true; })
