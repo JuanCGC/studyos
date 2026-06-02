@@ -1289,45 +1289,50 @@
 
           <!-- ══ QUIZ SECTION — Trailhead style ══ -->
           <div x-show="aiGuide.quiz" :style="aiGuide.quizOnly?'margin-top:24px':'margin-top:48px;border-top:2px solid var(--border);padding-top:40px'">
-              <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px">
-                <div style="width:48px;height:48px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🧠</div>
+            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:32px 36px;box-shadow:0 1px 3px rgba(0,0,0,.04)">
+
+              <!-- Header -->
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #e2e8f0">
+                <div style="width:44px;height:44px;border-radius:50%;background:#eef2ff;border:2px solid #c7d2fe;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧠</div>
                 <div>
-                  <div style="font-size:22px;font-weight:700;color:var(--t1)">Verificar conocimiento</div>
-                  <div style="font-size:14px;color:var(--t4);margin-top:3px">Responde 2 de 3 correctamente para completar este capítulo</div>
+                  <div style="font-size:20px;font-weight:700;color:#1e293b">Verificar conocimiento</div>
+                  <div style="font-size:13px;color:#64748b;margin-top:2px">Responde 2 de 3 correctamente para completar este capítulo</div>
                 </div>
               </div>
 
               <!-- Loading -->
-              <div x-show="aiGuide.quiz&&aiGuide.quiz.loading" style="padding:44px;text-align:center;background:var(--layer);border-radius:16px;border:1px solid var(--border)">
+              <div x-show="aiGuide.quiz&&aiGuide.quiz.loading" style="padding:44px;text-align:center;background:#fff;border-radius:12px;border:1px solid #e2e8f0">
                 <div style="font-size:32px;margin-bottom:12px">⏳</div>
-                <div style="color:var(--t3);font-size:15px">Generando preguntas con IA...</div>
+                <div style="color:#64748b;font-size:15px">Generando preguntas con IA...</div>
               </div>
 
               <!-- Quiz error -->
-              <div x-show="aiGuide.quiz&&!aiGuide.quiz.loading&&aiGuide.quiz.error&&!aiGuide.quiz.questions.length" style="padding:28px;text-align:center;background:rgba(239,68,68,.06);border-radius:16px;border:1px solid rgba(239,68,68,.2)">
-                <div style="color:#f87171;font-size:14px;font-family:var(--mono)">No se pudo generar el quiz. Verifica tu conexión e intenta de nuevo.</div>
+              <div x-show="aiGuide.quiz&&!aiGuide.quiz.loading&&aiGuide.quiz.error&&!aiGuide.quiz.questions.length" style="padding:28px;text-align:center;background:#fef2f2;border-radius:12px;border:1px solid #fecaca">
+                <div style="color:#ef4444;font-size:14px">No se pudo generar el quiz. Verifica tu conexión e intenta de nuevo.</div>
               </div>
 
               <!-- Questions -->
               <div x-show="aiGuide.quiz&&!aiGuide.quiz.loading&&!aiGuide.quiz.submitted">
                 <template x-for="(q, qi) in (aiGuide.quiz?.questions||[])" :key="qi">
-                  <div :style="qi>0?'border-top:1px solid var(--border);margin-top:32px;padding-top:32px':''">
-                    <div style="display:flex;gap:18px;align-items:flex-start;margin-bottom:22px">
-                      <div style="min-width:46px;height:46px;border-radius:50%;background:rgba(59,130,246,.1);border:2px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--blue2);font-family:var(--mono);flex-shrink:0" x-text="qi+1"></div>
-                      <div style="font-size:18px;font-weight:500;color:var(--t1);line-height:1.65;padding-top:9px" x-text="q.q"></div>
+                  <div :style="qi>0?'border-top:1px solid #e2e8f0;margin-top:32px;padding-top:32px':''">
+                    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:20px">
+                      <div style="min-width:36px;height:36px;border-radius:50%;background:#eef2ff;border:2px solid #c7d2fe;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#4f46e5;flex-shrink:0;font-family:var(--mono)" x-text="qi+1"></div>
+                      <div style="font-size:17px;font-weight:600;color:#1e293b;line-height:1.6;padding-top:5px" x-text="q.q"></div>
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:10px;padding-left:64px">
+                    <div style="display:flex;flex-direction:column;gap:12px;padding-left:50px">
                       <template x-for="(opt, oi) in q.options" :key="oi">
                         <button
                           @click="aiGuide.quiz.answers = aiGuide.quiz.answers.map((a,idx)=>idx===qi?oi:a)"
-                          style="display:flex;align-items:center;gap:18px;padding:16px 20px;border-radius:13px;border:2px solid;background:transparent;cursor:pointer;transition:all .15s;text-align:left;width:100%;font-family:var(--font)"
-                          :style="aiGuide.quiz.answers[qi]===oi?'border-color:var(--blue);background:rgba(59,130,246,.08)':'border-color:var(--border2)'"
+                          style="display:flex;align-items:center;gap:14px;padding:10px 16px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer;transition:all .15s;text-align:left;width:100%;font-family:var(--font)"
+                          :style="aiGuide.quiz.answers[qi]===oi?'background:#eef2ff;border-color:#c7d2fe':'background:#fff;border-color:#e2e8f0'"
+                          @mouseover="this.style.boxShadow='0 1px 4px rgba(0,0,0,.06)'"
+                          @mouseout="this.style.boxShadow='none'"
                         >
-                          <div style="width:40px;height:40px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;font-family:var(--mono);flex-shrink:0;transition:all .15s"
-                            :style="aiGuide.quiz.answers[qi]===oi?'border-color:var(--blue);background:var(--blue);color:#fff':'border-color:var(--border2);color:var(--t4)'"
+                          <div style="width:36px;height:36px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:var(--mono);flex-shrink:0;transition:all .15s"
+                            :style="aiGuide.quiz.answers[qi]===oi?'border-color:#4f46e5;background:#4f46e5;color:#fff':'border-color:#cbd5e1;color:#64748b'"
                             x-text="['A','B','C','D'][oi]"></div>
-                          <span style="font-size:16px;line-height:1.5;transition:all .15s"
-                            :style="aiGuide.quiz.answers[qi]===oi?'color:var(--t1);font-weight:500':'color:var(--t2)'"
+                          <span style="font-size:15px;line-height:1.5;transition:all .15s"
+                            :style="aiGuide.quiz.answers[qi]===oi?'color:#1e293b;font-weight:500':'color:#475569'"
                             x-text="opt"></span>
                         </button>
                       </template>
@@ -1336,17 +1341,17 @@
                 </template>
 
                 <!-- Submit bar -->
-                <div style="display:flex;align-items:center;gap:14px;margin-top:36px;padding-top:28px;border-top:1px solid var(--border)">
+                <div style="display:flex;align-items:center;gap:14px;margin-top:32px;padding-top:24px;border-top:1px solid #e2e8f0">
                   <div style="display:flex;gap:8px;flex:1">
                     <template x-for="(q,qi) in (aiGuide.quiz?.questions||[])" :key="qi">
-                      <div style="width:13px;height:13px;border-radius:50%;transition:all .2s"
-                        :style="(aiGuide.quiz?.answers||[])[qi]!==null&&(aiGuide.quiz?.answers||[])[qi]!==undefined?'background:var(--blue)':'background:var(--border2)'"></div>
+                      <div style="width:12px;height:12px;border-radius:50%;transition:all .2s"
+                        :style="(aiGuide.quiz?.answers||[])[qi]!==null&&(aiGuide.quiz?.answers||[])[qi]!==undefined?'background:#4f46e5':'background:#cbd5e1'"></div>
                     </template>
                   </div>
                   <button
                     @click="submitAIQuiz()"
                     :disabled="(aiGuide.quiz?.answers||[]).some(a=>a===null||a===undefined)"
-                    style="padding:14px 32px;border-radius:12px;background:var(--blue3);border:1px solid var(--blue);color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s"
+                    style="padding:12px 28px;border-radius:8px;background:#4f46e5;border:1px solid #4338ca;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s"
                     :style="(aiGuide.quiz?.answers||[]).some(a=>a===null||a===undefined)?'opacity:.4;cursor:not-allowed':''"
                   >Verificar respuestas →</button>
                 </div>
@@ -1354,28 +1359,28 @@
 
               <!-- Results -->
               <div x-show="aiGuide.quiz&&aiGuide.quiz.submitted" style="animation:fadeUp .3s ease both">
-                <div style="text-align:center;padding:36px 24px;margin-bottom:24px;background:var(--layer);border-radius:18px;border:1px solid var(--border)">
-                  <div style="font-size:56px;margin-bottom:16px" x-text="(aiGuide.quiz?.score||0)>=2?'🎉':'📚'"></div>
-                  <div style="font-size:26px;font-weight:700;margin-bottom:10px"
-                    :style="(aiGuide.quiz?.score||0)>=2?'color:var(--green2)':'color:var(--orange2)'"
+                <div style="text-align:center;padding:32px 24px;margin-bottom:24px;background:#fff;border-radius:14px;border:1px solid #e2e8f0">
+                  <div style="font-size:48px;margin-bottom:14px" x-text="(aiGuide.quiz?.score||0)>=2?'🎉':'📚'"></div>
+                  <div style="font-size:24px;font-weight:700;margin-bottom:8px"
+                    :style="(aiGuide.quiz?.score||0)>=2?'color:#059669':'color:#d97706'"
                     x-text="(aiGuide.quiz?.score||0)>=2?'¡Capítulo completado!':'Necesitas repasar'"></div>
-                  <div style="display:inline-flex;padding:7px 20px;border-radius:20px;font-size:15px;font-family:var(--mono)"
-                    :style="(aiGuide.quiz?.score||0)>=2?'background:rgba(16,185,129,.12);color:var(--green2)':'background:rgba(249,115,22,.1);color:var(--orange2)'"
+                  <div style="display:inline-flex;padding:6px 18px;border-radius:20px;font-size:14px;font-family:var(--mono)"
+                    :style="(aiGuide.quiz?.score||0)>=2?'background:#ecfdf5;color:#059669':'background:#fffbeb;color:#d97706'"
                     x-text="(aiGuide.quiz?.score||0)+'/3 correctas'"></div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
                   <template x-for="(q, qi) in (aiGuide.quiz?.questions||[])" :key="qi">
-                    <div style="padding:18px 20px;border-radius:13px;display:flex;gap:16px;align-items:flex-start"
-                      :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2)':'background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2)'">
-                      <div style="font-size:24px;flex-shrink:0"
+                    <div style="padding:16px 18px;border-radius:10px;display:flex;gap:14px;align-items:flex-start"
+                      :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'background:#ecfdf5;border:1px solid #a7f3d0':'background:#fef2f2;border:1px solid #fecaca'">
+                      <div style="font-size:20px;flex-shrink:0;padding-top:1px"
                         x-text="(aiGuide.quiz?.answers||[])[qi]===q.correct?'✓':'✗'"
-                        :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'color:var(--green2)':'color:#f87171'"></div>
+                        :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'color:#059669':'color:#ef4444'"></div>
                       <div>
-                        <div style="font-size:15px;color:var(--t2);margin-bottom:6px;line-height:1.5" x-text="q.q"></div>
-                        <div style="font-size:14px;font-family:var(--mono)"
-                          :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'color:var(--green2)':'color:#f87171'"
+                        <div style="font-size:14px;color:#475569;margin-bottom:4px;line-height:1.5" x-text="q.q"></div>
+                        <div style="font-size:13px;font-family:var(--mono)"
+                          :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'color:#059669':'color:#ef4444'"
                           x-text="q.options[(aiGuide.quiz?.answers||[])[qi]??0]"></div>
-                        <div x-show="(aiGuide.quiz?.answers||[])[qi]!==q.correct" style="font-size:13px;color:var(--t4);margin-top:5px;font-family:var(--mono)"
+                        <div x-show="(aiGuide.quiz?.answers||[])[qi]!==q.correct" style="font-size:12px;color:#64748b;margin-top:4px;font-family:var(--mono)"
                           x-text="'✓ Correcto: '+q.options[q.correct]"></div>
                       </div>
                     </div>
@@ -1383,15 +1388,16 @@
                 </div>
                 <div style="display:flex;gap:10px">
                   <button x-show="(aiGuide.quiz?.score||0)>=2" @click="navigate('subject-'+(aiGuide.subject?.id||''))"
-                    style="flex:1;padding:15px;border-radius:12px;background:var(--green);border:none;color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font)">
+                    style="flex:1;padding:13px;border-radius:8px;background:#059669;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font)">
                     ← Volver a la materia
                   </button>
                   <button x-show="(aiGuide.quiz?.score||0)<2" @click="aiGuide.quiz.submitted=false;aiGuide.quiz.answers=Array(aiGuide.quiz.questions?.length||3).fill(null)"
-                    style="flex:1;padding:15px;border-radius:12px;background:var(--blue3);border:1px solid var(--blue);color:#fff;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font)">
+                    style="flex:1;padding:13px;border-radius:8px;background:#eef2ff;border:1px solid #c7d2fe;color:#4f46e5;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font)">
                     Intentar de nuevo
                   </button>
                 </div>
               </div>
+            </div>
             </div>
             <!-- ══ END QUIZ ══ -->
 
@@ -4140,17 +4146,17 @@ jobs:
     d.id = 'quiz-block-' + sectionId;
     d.style.cssText = 'margin-top:40px';
     d.innerHTML =
-      '<div style="background:#111827;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:28px 32px;color:#F1F5F9">' +
+      '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:28px 32px;box-shadow:0 1px 3px rgba(0,0,0,.04)">' +
         '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">' +
-          '<div style="width:44px;height:44px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧠</div>' +
+          '<div style="width:44px;height:44px;border-radius:50%;background:#eef2ff;border:2px solid #c7d2fe;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧠</div>' +
           '<div>' +
-            '<div style="font-size:20px;font-weight:700;color:#F1F5F9">Verificar conocimiento</div>' +
-            '<div style="font-size:13px;color:#94A3B8;margin-top:2px">Responde 2 de 3 correctamente para completar este capítulo</div>' +
+            '<div style="font-size:20px;font-weight:700;color:#1e293b">Verificar conocimiento</div>' +
+            '<div style="font-size:13px;color:#64748b;margin-top:2px">Responde 2 de 3 correctamente para completar este capítulo</div>' +
           '</div>' +
         '</div>' +
         '<button onclick="loadStaticQuiz(\'' + sectionId + '\',\'' + chapterName.replace(/'/g,"\\'") + '\')"' +
-          ' style="margin-top:16px;background:#2563EB;color:#fff;border:1px solid #3B82F6;padding:11px 26px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;font-family:inherit;display:inline-block">Iniciar prueba →</button>' +
-        '<div id="quiz-content-' + sectionId + '" style="color:#F1F5F9"></div>' +
+          ' style="margin-top:16px;background:#4f46e5;color:#fff;border:1px solid #4338ca;padding:11px 26px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;font-family:inherit;display:inline-block">Iniciar prueba →</button>' +
+        '<div id="quiz-content-' + sectionId + '" style="color:#1e293b"></div>' +
       '</div>';
     return d;
   }
@@ -4170,7 +4176,7 @@ async function loadStaticQuiz(sectionId, chapterName) {
   const container = document.getElementById('quiz-content-' + sectionId);
   const btn = container.previousElementSibling;
   btn.style.display = 'none';
-  container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--t3,#94A3B8);font-size:15px">⏳ Generando preguntas con IA...</div>';
+  container.innerHTML = '<div style="padding:32px;text-align:center;color:#64748b;font-size:15px">⏳ Generando preguntas con IA...</div>';
   try {
     const res = await fetch('/api/quiz', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -4189,32 +4195,30 @@ function renderStaticQuiz(container, sectionId, questions) {
   window._sqd = window._sqd || {};
   window._sqd[sectionId] = { questions, answers: new Array(questions.length).fill(null) };
 
-  const bdr = 'rgba(255,255,255,.1)';
-  const bg  = '#1e2a3a';
   let html = '';
   questions.forEach(function (q, qi) {
-    html += '<div style="margin-top:' + (qi > 0 ? '28px' : '24px') + ';padding-top:' + (qi > 0 ? '28px' : '0') + ';border-top:' + (qi > 0 ? '1px solid ' + bdr : 'none') + '">';
-    html += '<div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:18px">';
-    html += '<div style="min-width:40px;height:40px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#60A5FA;flex-shrink:0">' + (qi + 1) + '</div>';
-    html += '<div style="font-size:17px;font-weight:500;color:#F1F5F9;line-height:1.6;padding-top:7px">' + q.q + '</div></div>';
-    html += '<div style="display:flex;flex-direction:column;gap:9px;padding-left:56px">';
+    html += '<div style="margin-top:' + (qi > 0 ? '28px' : '20px') + ';padding-top:' + (qi > 0 ? '28px' : '0') + ';border-top:' + (qi > 0 ? '1px solid #e2e8f0' : 'none') + '">';
+    html += '<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px">';
+    html += '<div style="min-width:36px;height:36px;border-radius:50%;background:#eef2ff;border:2px solid #c7d2fe;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#4f46e5;flex-shrink:0">' + (qi + 1) + '</div>';
+    html += '<div style="font-size:17px;font-weight:600;color:#1e293b;line-height:1.6;padding-top:5px">' + q.q + '</div></div>';
+    html += '<div style="display:flex;flex-direction:column;gap:12px;padding-left:50px">';
     q.options.forEach(function (opt, oi) {
       html += '<div id="opt-' + sectionId + '-' + qi + '-' + oi + '" onclick="selectSQ(\'' + sectionId + '\',' + qi + ',' + oi + ')"' +
-        ' style="display:flex;align-items:center;gap:14px;padding:13px 18px;border-radius:10px;border:2px solid ' + bdr + ';cursor:pointer;transition:all .15s;background:' + bg + '">';
-      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" style="width:34px;height:34px;border-radius:50%;border:2px solid ' + bdr + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#64748B;flex-shrink:0">' + ['A','B','C','D'][oi] + '</div>';
-      html += '<span style="font-size:15px;color:#CBD5E1;line-height:1.4">' + opt + '</span></div>';
+        ' style="display:flex;align-items:center;gap:14px;padding:10px 16px;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer;transition:all .15s;background:#fff" onmouseover="this.style.boxShadow=\'0 1px 4px rgba(0,0,0,.06)\'" onmouseout="this.style.boxShadow=\'none\'">';
+      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" style="width:36px;height:36px;border-radius:50%;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#64748b;flex-shrink:0">' + ['A','B','C','D'][oi] + '</div>';
+      html += '<span style="font-size:15px;color:#475569;line-height:1.5">' + opt + '</span></div>';
     });
     html += '</div></div>';
   });
 
-  html += '<div style="display:flex;align-items:center;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid ' + bdr + '">';
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid #e2e8f0">';
   html += '<div style="display:flex;gap:7px;flex:1">';
   questions.forEach(function (_, i) {
-    html += '<div id="dot-' + sectionId + '-' + i + '" style="width:11px;height:11px;border-radius:50%;background:' + bdr + '"></div>';
+    html += '<div id="dot-' + sectionId + '-' + i + '" style="width:12px;height:12px;border-radius:50%;background:#cbd5e1"></div>';
   });
   html += '</div>';
   html += '<button id="sqbtn-' + sectionId + '" onclick="submitSQ(\'' + sectionId + '\')"' +
-    ' style="background:#2563EB;color:#fff;border:1px solid #3B82F6;padding:13px 30px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;opacity:.35;pointer-events:none;font-family:inherit">Verificar →</button>';
+    ' style="background:#4f46e5;color:#fff;border:1px solid #4338ca;padding:12px 28px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;opacity:.35;pointer-events:none;font-family:inherit">Verificar →</button>';
   html += '</div>';
   html += '<div id="sqres-' + sectionId + '" style="display:none;margin-top:28px"></div>';
 
@@ -4228,14 +4232,14 @@ function selectSQ(sectionId, qi, oi) {
     const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + idx);
     const cir = document.getElementById('cir-' + sectionId + '-' + qi + '-' + idx);
     if (idx === oi) {
-      lbl.style.borderColor = '#3B82F6'; lbl.style.background = 'rgba(59,130,246,.12)';
-      cir.style.borderColor = '#3B82F6'; cir.style.background = '#3B82F6'; cir.style.color = '#fff';
+      lbl.style.borderColor = '#c7d2fe'; lbl.style.background = '#eef2ff';
+      cir.style.borderColor = '#4f46e5'; cir.style.background = '#4f46e5'; cir.style.color = '#fff';
     } else {
-      lbl.style.borderColor = 'rgba(255,255,255,.1)'; lbl.style.background = '#1e2a3a';
-      cir.style.borderColor = 'rgba(255,255,255,.1)'; cir.style.background = ''; cir.style.color = '#64748B';
+      lbl.style.borderColor = '#e2e8f0'; lbl.style.background = '#fff';
+      cir.style.borderColor = '#cbd5e1'; cir.style.background = ''; cir.style.color = '#64748b';
     }
   });
-  document.getElementById('dot-' + sectionId + '-' + qi).style.background = '#3B82F6';
+  document.getElementById('dot-' + sectionId + '-' + qi).style.background = '#4f46e5';
   if (d.answers.every(function (a) { return a !== null; })) {
     const btn = document.getElementById('sqbtn-' + sectionId);
     btn.style.opacity = '1'; btn.style.pointerEvents = '';
@@ -4251,12 +4255,12 @@ function submitSQ(sectionId) {
     const correct = d.answers[qi] === q.correct;
     const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + d.answers[qi]);
     if (lbl) {
-      lbl.style.borderColor = correct ? '#10B981' : '#f87171';
-      lbl.style.background  = correct ? 'rgba(16,185,129,.12)' : 'rgba(248,113,113,.1)';
+      lbl.style.borderColor = correct ? '#a7f3d0' : '#fecaca';
+      lbl.style.background  = correct ? '#ecfdf5' : '#fef2f2';
     }
     if (!correct) {
       const cLbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + q.correct);
-      if (cLbl) { cLbl.style.borderColor = '#10B981'; cLbl.style.background = 'rgba(16,185,129,.12)'; }
+      if (cLbl) { cLbl.style.borderColor = '#a7f3d0'; cLbl.style.background = '#ecfdf5'; }
     }
   });
 
@@ -4265,11 +4269,11 @@ function submitSQ(sectionId) {
   const res = document.getElementById('sqres-' + sectionId);
   res.style.display = '';
   res.innerHTML =
-    '<div style="text-align:center;padding:32px 24px;border:2px solid ' + (passed ? 'rgba(16,185,129,.3)' : 'rgba(248,113,113,.3)') + ';border-radius:12px;background:' + (passed ? 'rgba(16,185,129,.06)' : 'rgba(248,113,113,.06)') + '">' +
+    '<div style="text-align:center;padding:32px 24px;border:1px solid #e2e8f0;border-radius:14px;background:#fff">' +
       '<div style="font-size:44px;margin-bottom:12px">' + (passed ? '🎉' : '📚') + '</div>' +
-      '<div style="font-size:20px;font-weight:700;color:' + (passed ? '#34D399' : '#f87171') + ';margin-bottom:8px">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
-      '<div style="font-size:15px;color:#94A3B8">' + score + ' de ' + d.questions.length + ' correctas</div>' +
-      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" style="margin-top:18px;background:#2563EB;color:#fff;border:1px solid #3B82F6;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit">Intentar de nuevo</button>' : '') +
+      '<div style="font-size:22px;font-weight:700;color:' + (passed ? '#059669' : '#d97706') + ';margin-bottom:8px">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
+      '<div style="font-size:14px;color:#64748b">' + score + ' de ' + d.questions.length + ' correctas</div>' +
+      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" style="margin-top:18px;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit">Intentar de nuevo</button>' : '') +
     '</div>';
 }
 
