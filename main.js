@@ -1,4 +1,4 @@
-// ═══════════════════════════════════════════════
+﻿// ═══════════════════════════════════════════════
 //  UNIFIED APP — STUDYOS + SDET GUIDE
 // ═══════════════════════════════════════════════
 
@@ -993,7 +993,7 @@ function app() {
     // ── Subjects ──
     subjects: [
       {
-        id:'api', name:'API Testing', icon:'🔬', pct:0, color:'blue', tag:'En curso', priority:1,
+        id:'api', name:'API Testing', defaultLang:'Java', icon:'🔬', pct:0, color:'blue', tag:'En curso', priority:1,
         chapters:'14/20 caps', hours:'18h', exam:'Jun 15',
         chapList: [
           {name:'Fundamentos HTTP y REST',done:false},{name:'Status codes y headers',done:false},
@@ -1009,7 +1009,7 @@ function app() {
         ]
       },
       {
-        id:'cicd', name:'CI/CD', icon:'🚀', pct:0, color:'green', tag:'En curso', priority:4,
+        id:'cicd', name:'CI/CD', defaultLang:'YAML', icon:'🚀', pct:0, color:'green', tag:'En curso', priority:4,
         chapters:'8/14 caps', hours:'12h', exam:null,
         chapList: [
           {name:'Pipelines y stages',done:false},{name:'GitHub Actions basics',done:false},
@@ -1022,7 +1022,7 @@ function app() {
         ]
       },
       {
-        id:'playwright', name:'Playwright', icon:'🎭', pct:0, color:'purple', tag:'Iniciado', priority:3,
+        id:'playwright', name:'Playwright', defaultLang:'JavaScript', icon:'🎭', pct:0, color:'purple', tag:'Iniciado', priority:3,
         chapters:'5/12 caps', hours:'8h', exam:'Jul 2',
         chapList: [
           {name:'Setup y configuración',done:false},{name:'API tests con request fixture',done:false},
@@ -1034,7 +1034,7 @@ function app() {
         ]
       },
       {
-        id:'sf', name:'Apex/Salesforce', icon:'☁', pct:0, color:'orange', tag:'Pendiente', priority:5,
+        id:'sf', name:'Apex/Salesforce', defaultLang:'Apex', icon:'☁', pct:0, color:'orange', tag:'Pendiente', priority:5,
         chapters:'3/15 caps', hours:'5h', exam:'Jul 20',
         chapList: [
           {name:'Dev Org setup + SF CLI',done:false},{name:'Apex basics',done:false},
@@ -1048,7 +1048,7 @@ function app() {
         ]
       },
       {
-        id:'postman', name:'Postman', icon:'📮', pct:0, color:'green', tag:'Avanzado', priority:2,
+        id:'postman', name:'Postman', defaultLang:'JavaScript', icon:'📮', pct:0, color:'green', tag:'Avanzado', priority:2,
         chapters:'17/20 caps', hours:'22h', exam:null,
         chapList: [
           {name:'Colecciones y workspaces',done:false},{name:'Variables de entorno',done:false},
@@ -1240,7 +1240,7 @@ function app() {
     doReset(s){ s.chapList.forEach(ch=>ch.done=false); s.pct=0; this.resetTarget=null; this.saveProgress(); },
 
     // ── AI Guide View ──
-    aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null, quiz: null, keyConcept: '', labExpress: null, projectEvolution: null },
+    aiGuide: { subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null, quiz: null, keyConcept: '', labExpress: null, projectEvolution: null, language: 'JavaScript' },
     _guideSession: 0,
 
     async _loadCacheFromSupabase(key) {
@@ -1278,10 +1278,14 @@ function app() {
         this.aiGuide.projectEvolution = embedded.pe;
       }
 
+      // Set language from subject default
+      this.aiGuide.language = subject.defaultLang || 'JavaScript';
+
       this.navigate('ai-guide');
       localStorage.setItem('stos_ai_guide', JSON.stringify({
         subjectId: subject.id, chapterIndex,
-        quizOnly
+        quizOnly,
+        language: this.aiGuide.language
       }));
       try { localStorage.setItem('stos_panel', 'dash'); } catch(e) {}
 
@@ -1319,6 +1323,7 @@ function app() {
               subjectName: subject.name,
               chapterName: chapter.name,
               subjectReason: subject.reason || '',
+              language: this.aiGuide.language,
               embeddedGuide: this.aiGuide.labExpress ? {
                 keyConcept: this.aiGuide.keyConcept,
                 labExpress: this.aiGuide.labExpress,
@@ -1343,7 +1348,7 @@ function app() {
         tasks.push(
           fetch('/api/quiz', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0 }),
+            body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0, language: this.aiGuide.language }),
           })
           .then(r => r.json())
           .then(data => {
@@ -1404,6 +1409,7 @@ function app() {
           subjectName: subject.name,
           chapterName: chapter.name,
           subjectReason: subject.reason || '',
+          language: this.aiGuide.language,
           embeddedGuide: labExpress ? { keyConcept, labExpress, projectEvolution } : null
         }),
       })
@@ -1452,6 +1458,8 @@ function app() {
           this.aiGuide.labExpress = embedded.le;
           this.aiGuide.projectEvolution = embedded.pe;
         }
+        // Restore language from saved state
+        this.aiGuide.language = g.language || subject.defaultLang || 'JavaScript';
         const cachedQ = localStorage.getItem(quizKey);
         if (cachedQ) {
           this.aiGuide.quiz.questions = JSON.parse(cachedQ);
