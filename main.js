@@ -1174,7 +1174,7 @@ function app() {
           {name:'Pact contract tests',done:false},{name:'WireMock stubs',done:false},
           {name:'CI/CD — GitHub Actions gate',done:false},{name:'k6 performance gates',done:false},
           {name:'API design patterns',done:false},{name:'GraphQL testing',done:false},
-          {name:'gRPC testing',done:false},{name:'Examen final',done:false},
+          {name:'gRPC testing',done:false},{name:'Final Exam',done:false},
         ]
       },
       {
@@ -1237,7 +1237,7 @@ function app() {
       },
       {
         id:'k6', name:'Performance Engineering (K6)', defaultLang:'JavaScript', icon:'chart-bar', pct:0, color:'red', tag:'New', priority:6,
-        chapters:'0/8 caps', hours:'0h', exam:null,
+        chapters:'0/8 ch', hours:'0h', exam:null,
         chapList: [
           {name:'K6 Setup & VU Concepts',done:false},{name:'Smoke Testing',done:false},
           {name:'Load Testing',done:false},{name:'Stress Testing',done:false},
@@ -1246,7 +1246,7 @@ function app() {
         ]
       },
       {
-        id:'sql', name:'SQL & Backend Validation', defaultLang:'SQL', icon:'database', pct:0, color:'yellow', tag:'New', priority:7,
+        id:'sql', name:'SQL & Backend Validation', defaultLang:'SQL', icon:'database', pct:0, color:'amber', tag:'New', priority:7,
         chapters:'0/8 ch', hours:'0h', exam:null,
         chapList: [
           {name:'SQL Fundamentals & SELECT',done:false},{name:'JOINs & Relationships',done:false},
