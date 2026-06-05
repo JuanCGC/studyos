@@ -7,17 +7,35 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { subjectName, chapterName, subjectReason = '' } = req.body || {};
+  const { subjectName, chapterName, subjectReason = '', embeddedGuide } = req.body || {};
   if (!subjectName || !chapterName) return res.status(400).json({ error: 'subjectName and chapterName required' });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not set' });
 
+  let labContext = '';
+  if (embeddedGuide) {
+    const parts = [];
+    if (embeddedGuide.keyConcept) parts.push(`Concepto clave: ${embeddedGuide.keyConcept}`);
+    if (embeddedGuide.labExpress) parts.push(`Lab Express — ${embeddedGuide.labExpress.title}:\n${embeddedGuide.labExpress.body}`);
+    if (embeddedGuide.projectEvolution) parts.push(`Project Evolution — ${embeddedGuide.projectEvolution.title}:\n${embeddedGuide.projectEvolution.body}`);
+    if (parts.length) {
+      labContext = `\n\nLABORATORIOS ASOCIADOS (debes correlacionar los ejercicios con este contenido):\n${parts.join('\n\n')}`;
+    }
+  }
+
   const prompt = `Eres un instructor técnico senior especializado en SDET (Software Development Engineer in Test).
 Genera una guía de estudio PRÁCTICA para el capítulo "${chapterName}" de la materia "${subjectName}".
-${subjectReason ? `Contexto del tema: ${subjectReason}` : ''}
+${subjectReason ? `Contexto del tema: ${subjectReason}` : ''}${labContext}
 
 FILOSOFÍA: Menos teoría, más código. Cada concepto debe ir seguido inmediatamente de un ejercicio real.
+
+INSTRUCCIÓN CLAVE — CORRELACIÓN CON LABORATORIOS:
+- Los ejercicios en "sections" (código) y "exercises" DEBEN estar correlacionados con los laboratorios asociados.
+- Si hay un Lab Express, los ejercicios de código deben practicar exactamente lo que el Lab Express enseña.
+- Si hay un Project Evolution, los ejercicios deben construir skills que se aplican directamente en ese proyecto.
+- Los hints y pasos de los ejercicios deben referenciar los laboratorios cuando sea relevante.
+- Si los laboratorios usan herramientas específicas (Postman, Playwright, Selenium, etc.), los ejercicios deben usar las mismas.
 
 Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
 {
