@@ -1424,7 +1424,7 @@ function app() {
       .catch(e => { if (this._guideSession === session) this.aiGuide.error = e.message; })
       .finally(() => { if (this._guideSession === session) this.aiGuide.loading = false; });
     },
-    _restoreAIGuide() {
+    async _restoreAIGuide() {
       if (this.view !== 'ai-guide') return;
       const saved = localStorage.getItem('stos_ai_guide');
       if (!saved) { this._leaveAIGuide(); return; }
@@ -1435,7 +1435,8 @@ function app() {
         const chapter = subject.chapList[g.chapterIndex];
         const cacheKey = `guide_${g.subjectId}_${g.chapterIndex}`;
         const quizKey  = `quiz_${g.subjectId}_${g.chapterIndex}`;
-        const cached = localStorage.getItem(cacheKey);
+        let cached = localStorage.getItem(cacheKey);
+        if (!cached) cached = await this._loadCacheFromSupabase(cacheKey);
         const alreadyDone = chapter.done === true;
         if (!cached && !g.quizOnly) { this._leaveAIGuide(); return; }
         this.aiGuide = {
@@ -1460,7 +1461,8 @@ function app() {
         }
         // Restore language from saved state
         this.aiGuide.language = g.language || subject.defaultLang || 'JavaScript';
-        const cachedQ = localStorage.getItem(quizKey);
+        let cachedQ = localStorage.getItem(quizKey);
+        if (!cachedQ) cachedQ = await this._loadCacheFromSupabase(quizKey);
         if (cachedQ) {
           this.aiGuide.quiz.questions = JSON.parse(cachedQ);
           this.aiGuide.quiz.loading = false;
@@ -1575,15 +1577,15 @@ function app() {
       // Restore ai-guide state after subjects are finalised
       if (window._sb) {
         await this.loadProgress();
-        this._restoreAIGuide();
+        await this._restoreAIGuide();
       } else {
-        this._restoreAIGuide();
+        await this._restoreAIGuide();
         window.addEventListener('supabase-ready', async () => {
           await this.loadProgress();
           if (!this.profileName && window._user?.user_metadata?.full_name) {
             this.profileName = window._user.user_metadata.full_name;
           }
-          this._restoreAIGuide();
+          await this._restoreAIGuide();
         }, { once: true });
       }
       this.$watch('subjects', () => this._debounceSave(), { deep: true });
@@ -1593,6 +1595,9 @@ function app() {
       this.$watch('weekGoal', () => this._saveSettings());
       this.$watch('pomosGoal', () => this._saveSettings());
       this.$watch('currentWeek', () => this._saveSettings());
+      window.addEventListener('beforeunload', () => {
+        if (window._sb && window._user) this.saveProgress();
+      });
     },
 
     _saveTimer: null,
