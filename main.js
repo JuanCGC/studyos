@@ -1315,7 +1315,16 @@ function app() {
         tasks.push(
           fetch('/api/generate-guide', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, subjectReason: subject.reason || '' }),
+            body: JSON.stringify({
+              subjectName: subject.name,
+              chapterName: chapter.name,
+              subjectReason: subject.reason || '',
+              embeddedGuide: this.aiGuide.labExpress ? {
+                keyConcept: this.aiGuide.keyConcept,
+                labExpress: this.aiGuide.labExpress,
+                projectEvolution: this.aiGuide.projectEvolution
+              } : null
+            }),
           })
           .then(r => r.json())
           .then(data => {
@@ -1371,6 +1380,44 @@ function app() {
       }
     },
 
+
+    async regenerateGuide() {
+      const { subject, chapter, chapterIndex, labExpress, keyConcept, projectEvolution } = this.aiGuide;
+      if (!subject) return;
+      const cacheKey = `guide_${subject.id}_${chapterIndex}`;
+
+      localStorage.removeItem(cacheKey);
+      try {
+        if (window._sb && window._user) {
+          await window._sb.from('guide_cache').delete().eq('user_id', window._user.id).eq('cache_key', cacheKey);
+        }
+      } catch(e) {}
+
+      this.aiGuide.content = null;
+      this.aiGuide.loading = true;
+      this.aiGuide.error = '';
+
+      const session = ++this._guideSession;
+      fetch('/api/generate-guide', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjectName: subject.name,
+          chapterName: chapter.name,
+          subjectReason: subject.reason || '',
+          embeddedGuide: labExpress ? { keyConcept, labExpress, projectEvolution } : null
+        }),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (this._guideSession !== session) return;
+        if (data.error) throw new Error(data.error);
+        this.aiGuide.content = data.guide;
+        try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch(e) {}
+        this._saveCacheToSupabase(cacheKey, data.guide);
+      })
+      .catch(e => { if (this._guideSession === session) this.aiGuide.error = e.message; })
+      .finally(() => { if (this._guideSession === session) this.aiGuide.loading = false; });
+    },
     _restoreAIGuide() {
       if (this.view !== 'ai-guide') return;
       const saved = localStorage.getItem('stos_ai_guide');

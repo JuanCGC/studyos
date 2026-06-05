@@ -1201,7 +1201,14 @@
               <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;" x-text="aiGuide.quizOnly?'📝 Quiz':'✨ Guía IA'"></span>
               <div class="detail-title" style="font-size:18px;" x-text="aiGuide.chapter?.name"></div>
             </div>
-            <span style="font-size:12px;font-family:var(--mono);color:var(--t4)" x-text="aiGuide.subject?.name"></span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button x-show="aiGuide.content &amp;&amp; !aiGuide.quizOnly" @click="regenerateGuide()"
+                style="font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.08);color:#fbbf24;cursor:pointer;font-family:var(--mono);font-weight:600;transition:all .15s;white-space:nowrap"
+                onmouseover="this.style.background='rgba(251,191,36,.15)'"
+                onmouseout="this.style.background='rgba(251,191,36,.08)'"
+              >↻ Regenerar</button>
+              <span style="font-size:12px;font-family:var(--mono);color:var(--t4)" x-text="aiGuide.subject?.name"></span>
+            </div>
           </div>
 
           <!-- Loading -->
