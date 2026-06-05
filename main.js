@@ -592,10 +592,21 @@ function go(id) {
   document.querySelectorAll('.sb-item').forEach(n => {
     n.classList.toggle('active', n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'"));
   });
+  const sb = document.getElementById('sidebar');
+  if (sb && sb.classList.contains('open')) sb.classList.remove('open');
+  const ov = document.getElementById('sidebar-overlay');
+  if (ov && ov.classList.contains('open')) ov.classList.remove('open');
   const panel = document.getElementById('panel-guide');
   if (panel) panel.scrollTo(0, 0);
   const crumb = document.getElementById('guide-crumb');
   if (crumb) crumb.textContent = id.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+}
+
+function toggleGuideSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  if (sb) sb.classList.toggle('open');
+  if (ov) ov.classList.toggle('open');
 }
 
 function toggleGroup(id) {
@@ -1278,8 +1289,8 @@ function app() {
         this.aiGuide.projectEvolution = embedded.pe;
       }
 
-      // Set language from subject default
-      this.aiGuide.language = subject.defaultLang || 'JavaScript';
+      // Set language from global preference or subject default
+      this.aiGuide.language = localStorage.getItem('stos_ai_language') || subject.defaultLang || 'JavaScript';
 
       this.navigate('ai-guide');
       localStorage.setItem('stos_ai_guide', JSON.stringify({
@@ -1387,6 +1398,7 @@ function app() {
 
 
     async regenerateGuide() {
+      localStorage.setItem('stos_ai_language', this.aiGuide.language);
       const { subject, chapter, chapterIndex, labExpress, keyConcept, projectEvolution } = this.aiGuide;
       if (!subject) return;
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
@@ -1459,8 +1471,8 @@ function app() {
           this.aiGuide.labExpress = embedded.le;
           this.aiGuide.projectEvolution = embedded.pe;
         }
-        // Restore language from saved state
-        this.aiGuide.language = g.language || subject.defaultLang || 'JavaScript';
+        // Restore language from global preference or saved state
+        this.aiGuide.language = localStorage.getItem('stos_ai_language') || g.language || subject.defaultLang || 'JavaScript';
         let cachedQ = localStorage.getItem(quizKey);
         if (!cachedQ) cachedQ = await this._loadCacheFromSupabase(quizKey);
         if (cachedQ) {

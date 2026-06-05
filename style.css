@@ -1,4 +1,4 @@
-/* ── DASHBOARD CSS (primary) ── */
+﻿/* ── DASHBOARD CSS (primary) ── */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -81,6 +81,11 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100
 /* ── VIEW TRANSITION ── */
 .view{animation:fadeUp .25s ease both}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SKELETON SHIMMER ── */
+@keyframes shimmer{0%{background-position:-400px 0}to{background-position:400px 0}}
+.sk-el{background:linear-gradient(90deg,rgba(255,255,255,.03) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.03) 75%);background-size:800px 100%;animation:shimmer 1.8s ease-in-out infinite;border-radius:8px}
+.sk-card{padding:20px 24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:24px}
 
 /* ── SECTION HEADERS ── */
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -668,9 +673,33 @@ textarea.note:focus { border-color:var(--blue); }
 
 }
 #panel-guide .app { display:block; }
-#panel-guide .sidebar { display:none!important; }
+#panel-guide .sidebar { display:flex; }
+#panel-guide .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:99 }
+#panel-guide .sidebar-overlay.open { display:block }
+
+.guide-hamburger {
+  display:none; width:36px; height:36px; border-radius:8px; border:1px solid rgba(59,130,246,.3);
+  background:rgba(59,130,246,.1); color:var(--blue2); font-size:16px; cursor:pointer;
+  align-items:center; justify-content:center; transition:all .15s; flex-shrink:0; line-height:1;
+}
+.guide-hamburger:hover { background:rgba(59,130,246,.2); }
+@media(max-width:900px){
+  .guide-hamburger { display:flex; }
+  #panel-guide .sidebar { transform:translateX(-100%); transition:transform .25s ease }
+  #panel-guide .sidebar.open { transform:translateX(0) }
+  #panel-guide .main { margin-left:0 }
+}
 #panel-guide .main { margin-left:0!important; }
 #panel-guide .topbar { display:none!important; }
+
+/* ── UNIFIED BUTTONS ── */
+.btn-p{display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:10px;border:none;background:var(--blue3);color:#fff;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;font-family:var(--font);text-decoration:none;white-space:nowrap}
+.btn-p:hover{background:var(--blue);box-shadow:0 2px 12px rgba(59,130,246,.25);transform:translateY(-1px)}
+.btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-s{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:1px solid var(--border2);background:var(--layer);color:var(--t2);font-size:13px;cursor:pointer;transition:all .15s;font-family:var(--font);text-decoration:none;white-space:nowrap}
+.btn-s:hover{background:var(--layer2);color:var(--t1);border-color:var(--border2)}
+.btn-d{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#f87171;font-size:13px;cursor:pointer;transition:all .15s;font-family:var(--font);text-decoration:none;white-space:nowrap}
+.btn-d:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.5)}
 
 /* ── UNIFIED EXTRAS ── */
 
