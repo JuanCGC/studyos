@@ -427,6 +427,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100
 
 
 /* ── GUIDE CSS (scoped to panel-guide) ── */
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+@keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-5px);opacity:1} }
 #panel-guide {
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -530,7 +532,6 @@ body { background:var(--bg); color:var(--txt); font-family:var(--sans); line-hei
 /* ─── SECTION ───────────────────────────────── */
 .section { display:none; }
 .section.active { display:block; animation:fadeIn .2s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
 /* ─── CARDS ─────────────────────────────────── */
 .card {
@@ -930,7 +931,6 @@ textarea.note:focus { border-color:var(--blue); }
 }
 .imsg-typing span:nth-child(2) { animation-delay: .2s; }
 .imsg-typing span:nth-child(3) { animation-delay: .4s; }
-@keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-5px);opacity:1} }
 
 .interview-input-wrap {
   display: flex; gap: 10px; align-items: flex-end;
