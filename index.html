@@ -8,21 +8,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./style.css">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 </head>
 <body>
 
 <!-- ═══ TOP MODE TABS ═══ -->
 <div class="mode-tabs">
   <div style="display:flex;align-items:center;gap:10px;margin-right:24px;padding-right:24px;border-right:1px solid var(--border)">
-    <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--green));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px">📚</div>
+    <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--green));border-radius:8px;display:flex;align-items:center;justify-content:center"><i class="ph ph-book-open" style="font-size:17px;color:#fff"></i></div>
     <span style="font-size:17px;font-weight:700;letter-spacing:-0.01em">Study<span style="color:var(--blue2)">OS</span></span>
   </div>
   <button class="mode-tab" data-panel="dash" onclick="switchPanel('dash')">
     <span>⊞</span> Dashboard
   </button>
   <button class="mode-tab" data-panel="guide" onclick="switchPanel('guide')">
-    <span>📖</span> Guía SDET
-    <span class="mode-badge">19 secciones</span>
+    <i class="ph ph-book-open"></i> SDET Guide
+    <span class="mode-badge">19 sections</span>
   </button>
   <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
     <div style="font-size:11px;color:var(--t4);font-family:var(--mono)" id="pct-display">0%</div>
@@ -46,40 +47,40 @@
     <span class="nav-label">General</span>
     <template x-for="item in navMain" :key="item.id">
       <div class="nav-item" :class="view===item.id?'active':''" @click="navigate(item.id)">
-        <span class="nav-icon" x-text="item.icon"></span>
+        <i class="ph nav-icon" :class="'ph-'+item.icon"></i>
         <span x-text="item.label"></span>
       </div>
     </template>
 
-    <span class="nav-label">Materias</span>
+    <span class="nav-label">Subjects</span>
     <template x-for="s in subjects" :key="s.id">
       <div class="nav-item" :class="view==='subject-'+s.id?'active':''" @click="navigate('subject-'+s.id)">
-        <span class="nav-icon" x-text="s.icon"></span>
+        <i class="ph nav-icon" :class="'ph-'+s.icon"></i>
         <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="s.name"></span>
         <span style="flex-shrink:0;font-size:10px;font-family:var(--mono)" :style="chapPct(s)>0?'color:var(--'+s.color+'2)':'color:var(--t4)'" x-text="chapPct(s)+'%'"></span>
       </div>
     </template>
 
-    <span class="nav-label">Herramientas</span>
+    <span class="nav-label">Tools</span>
     <div class="nav-item" :class="view==='challenges'?'active':''" @click="navigate('challenges')">
-      <span class="nav-icon">🏆</span> Challenges
+      <i class="ph nav-icon ph-trophy"></i> Challenges
     </div>
     <div class="nav-item" :class="view==='interview'?'active':''" @click="navigate('interview')">
-      <span class="nav-icon">🎤</span> Entrevista IA
+      <i class="ph nav-icon ph-microphone"></i> AI Interview
     </div>
 
-    <span class="nav-label">Cuenta</span>
+    <span class="nav-label">Account</span>
     <div class="nav-item" :class="view==='settings'?'active':''" @click="navigate('settings')">
-      <span class="nav-icon">⚙</span> Ajustes
+      <i class="ph nav-icon ph-gear"></i> Settings
     </div>
     <div class="nav-item" @click="logout()" style="color:var(--t4)">
-      <span class="nav-icon">🚪</span> Cerrar sesión
+      <i class="ph nav-icon ph-sign-out"></i> Sign out
     </div>
 
     <div class="sb-bottom">
       <div class="today-pill">
         <div class="d" x-text="todayStr"></div>
-        <div x-text="'Semana '+currentWeek+' de estudio'"></div>
+        <div x-text="'Week '+currentWeek+' of study'"></div>
       </div>
     </div>
   </aside>
@@ -90,11 +91,11 @@
     <!-- TOPBAR -->
     <div class="topbar">
       <div class="flex aic g8">
-        <span style="font-size:18px">👋</span>
-        <h1>Buen día, <span x-text="userName"></span></h1>
+        <i class="ph ph-hand-waving" style="font-size:18px"></i>
+        <h1>Good day, <span x-text="userName"></span></h1>
       </div>
       <div class="topbar-right">
-        <div class="streak">🔥 <span x-text="streak+' días'"></span></div>
+        <div class="streak"><i class="ph ph-fire"></i> <span x-text="streak+' days'"></span></div>
         <div class="avatar">J</div>
       </div>
     </div>
@@ -109,26 +110,26 @@
           <div class="ruta-banner">
             <div class="ruta-header">
               <div class="ruta-title">
-                <span class="ruta-icon">🧭</span>
+                <span class="ruta-icon"><i class="ph ph-compass"></i></span>
                 <div>
-                  <div class="ruta-label">Ruta de Aprendizaje</div>
-                  <div class="ruta-sub">Actualizada según tu progreso</div>
+                  <div class="ruta-label">Learning Path</div>
+                  <div class="ruta-sub">Updated based on your progress</div>
                 </div>
               </div>
-              <div style="display:flex;align-items:center;gap:10px">
-                <span class="chip blue">Siguientes temas</span>
+              <div class="flex aic g10">
+                <span class="chip blue">Next topics</span>
                 <button
                   class="ai-suggest-btn"
                   @click="fetchSuggestions()"
                   :disabled="aiLoading"
                 >
-                  <span x-show="!aiLoading">✨ Expandir stack con IA</span>
-                  <span x-show="aiLoading">⏳ Generando...</span>
+                  <span x-show="!aiLoading"><i class="ph ph-sparkle"></i> Expand stack with AI</span>
+                  <span x-show="aiLoading">⏳ Generating...</span>
                 </button>
               </div>
             </div>
             <div x-show="aiError" class="ai-error" x-text="'Error: ' + aiError"></div>
-            <div class="ruta-cards">
+            <div class="ruta-cards stagger">
               <template x-for="(item, idx) in nextChapters" :key="item.id">
                 <div class="ruta-card" @click="navigate('subject-'+item.id)">
                   <div class="ruta-card-top">
@@ -139,7 +140,7 @@
                     </div>
                   </div>
                   <div class="ruta-subject">
-                    <span x-text="item.icon"></span>
+                    <i class="ph" :class="'ph-'+item.icon"></i>
                     <span x-text="item.subject"></span>
                   </div>
                   <div class="ruta-chap" x-text="item.title"></div>
@@ -157,28 +158,28 @@
           <!-- Stats -->
           <div class="stats-row mb22">
             <div class="scard blue">
-              <div class="si">📖</div>
+              <div class="si"><i class="ph ph-book-open"></i></div>
               <div class="sv blue" x-text="totalHours+'h'"></div>
-              <div class="slb">Horas esta semana</div>
+              <div class="slb">Hours this week</div>
               <div class="sdelta">↑ +3h vs anterior</div>
             </div>
             <div class="scard green">
-              <div class="si">✅</div>
+              <div class="si"><i class="ph ph-check-circle"></i></div>
               <div class="sv green" x-text="doneTasks+'/'+tasks.length"></div>
-              <div class="slb">Tareas completadas</div>
+              <div class="slb">Tasks completed</div>
               <div class="sdelta">↑ +2 hoy</div>
             </div>
             <div class="scard orange">
-              <div class="si">🎯</div>
+              <div class="si"><i class="ph ph-crosshair"></i></div>
               <div class="sv orange" x-text="subjects.filter(s=>chapPct(s)>0).length"></div>
-              <div class="slb">Materias en curso</div>
+              <div class="slb">Active subjects</div>
               <div class="sdelta" style="color:var(--orange2)">De un total de <span x-text="subjects.length"></span></div>
             </div>
             <div class="scard purple">
-              <div class="si">🍅</div>
+              <div class="si"><i class="ph ph-timer"></i></div>
               <div class="sv purple" x-text="pomosToday"></div>
-              <div class="slb">Pomodoros hoy</div>
-              <div class="sdelta" style="color:var(--purple2)" x-text="'Meta: '+pomosGoal"></div>
+              <div class="slb">Pomodoros today</div>
+              <div class="sdelta" style="color:var(--purple2)" x-text="'Goal: '+pomosGoal"></div>
             </div>
           </div>
 
@@ -187,22 +188,22 @@
             <!-- Progress -->
             <div class="card">
               <div class="sh">
-                <span class="st">Progreso General</span>
-                <span class="sl" @click="navigate('subjects')">Ver detalle →</span>
+                  <span class="st">Overall Progress</span>
+                <span class="sl" @click="navigate('subjects')">View details →</span>
               </div>
               <div style="margin-bottom:18px">
                 <div class="flex aic jbs" style="margin-bottom:7px">
-                  <span class="txt-sm c-t4">Avance total del semestre</span>
+                  <span class="txt-sm c-t4">Total semester progress</span>
                   <span style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--blue2)" x-text="overallPct+'%'"></span>
                 </div>
                 <div class="track thick"><div class="fill blue" :style="'width:'+overallPct+'%'"></div></div>
               </div>
-              <div class="subj-list">
+              <div class="subj-list stagger">
                 <template x-for="s in subjects" :key="s.id">
                   <div class="subj-item" style="cursor:pointer" @click="navigate('subject-'+s.id)">
                     <div class="subj-top">
                       <div class="subj-name">
-                        <span x-text="s.icon"></span>
+                        <i class="ph" :class="'ph-'+s.icon"></i>
                         <span x-text="s.name"></span>
                         <span class="badge" :class="s.color" x-text="getSubjectTag(s)"></span>
                       </div>
@@ -239,9 +240,9 @@
               <!-- Upcoming deadlines placeholder -->
               <div class="card card-sm" style="flex:1">
                 <div class="sh">
-                  <span class="st">Próximas fechas</span>
+                  <span class="st">Upcoming dates</span>
                 </div>
-                <div class="c-t4 txt-sm" style="padding:10px 0">Sin fechas próximas.</div>
+                <div class="c-t4 txt-sm" style="padding:10px 0">No upcoming dates.</div>
               </div>
             </div>
           </div>
@@ -251,8 +252,8 @@
             <!-- Pomodoro mini -->
             <div class="card">
               <div class="sh mb14">
-                <span class="st">Temporizador</span>
-                <span class="chip" :class="pomoPhase==='work'?'blue':'green'" x-text="pomoPhase==='work'?'Trabajo':'Descanso'"></span>
+                <span class="st">Timer</span>
+                <span class="chip" :class="pomoPhase==='work'?'blue':'green'" x-text="pomoPhase==='work'?'Focus':'Break'"></span>
               </div>
               <div class="pomo-wrap">
                 <div class="pomo-tabs">
@@ -273,7 +274,7 @@
                 </div>
                 <div class="pomo-btns">
                   <button class="pbtn" @click="resetTimer">↺</button>
-                  <button class="pbtn" :class="running?'stop':'go'" @click="toggleTimer" x-text="running?'⏸ Pausar':'▶ Iniciar'"></button>
+                  <button class="pbtn" :class="running?'stop':'go'" @click="toggleTimer" x-text="running?'⏸ Pause':'▶ Start'"></button>
                 </div>
                 <div class="pomo-dots">
                   <template x-for="(x,i) in [0,1,2,3]" :key="i">
@@ -283,7 +284,7 @@
               </div>
               <div class="div"></div>
               <div class="flex aic jbs txt-sm">
-                <span class="c-t4">Sesiones completas</span>
+                <span class="c-t4">Completed sessions</span>
                 <span class="mono c-blue" x-text="donePomos+'/4'"></span>
               </div>
             </div>
@@ -291,12 +292,12 @@
             <!-- Hours chart -->
             <div class="card">
               <div class="sh mb14">
-                <span class="st">Horas de Estudio</span>
-                <span class="txt-xs mono c-t4">esta semana</span>
+                <span class="st">Study Hours</span>
+                <span class="txt-xs mono c-t4">this week</span>
               </div>
               <div class="flex aic jbs">
                 <span style="font-size:24px;font-weight:700;font-family:var(--mono);color:var(--blue2)" x-text="totalHours+'h'"></span>
-                <span class="txt-xs mono c-t4" x-text="'Meta: '+weekGoal+'h'"></span>
+                <span class="txt-xs mono c-t4" x-text="'Goal: '+weekGoal+'h'"></span>
               </div>
               <div class="hchart">
                 <template x-for="(h,i) in weekHours" :key="i">
@@ -307,13 +308,13 @@
                   </div>
                 </template>
               </div>
-              <div class="flex aic jbs" style="margin-bottom:6px">
-                <span class="txt-xs c-t4">Progreso meta semanal</span>
+              <div class="flex aic jbs mb6">
+                <span class="txt-xs c-t4">Weekly goal progress</span>
                 <span class="txt-xs mono c-green" x-text="Math.min(100,Math.round(totalHours/weekGoal*100))+'%'"></span>
               </div>
               <div class="track"><div class="fill green" :style="'width:'+Math.min(100,Math.round(totalHours/weekGoal*100))+'%'"></div></div>
               <div class="div"></div>
-              <span class="st" style="display:block;margin-bottom:8px">Actividad 4 semanas</span>
+              <span class="st" style="display:block;margin-bottom:8px">4-Week Activity</span>
               <div class="hlabels">
                 <template x-for="d in ['L','M','X','J','V','S','D']">
                   <div class="hl" x-text="d"></div>
@@ -329,10 +330,10 @@
             <!-- Tasks -->
             <div class="card">
               <div class="sh mb14">
-                <span class="st">Tareas Pendientes</span>
-                <span class="sl" @click="navigate('tasks')">Ver todas →</span>
+                <span class="st">Pending Tasks</span>
+                <span class="sl" @click="navigate('tasks')">View all →</span>
               </div>
-              <div class="task-list">
+              <div class="task-list stagger">
                 <template x-for="(t,i) in tasks.slice(0,5)" :key="t.id">
                   <div class="task-item" :class="t.done?'done':''" @click="toggleTask(i)">
                     <div class="tcheck" :class="t.done?'on':''"><span x-show="t.done">✓</span></div>
@@ -344,7 +345,7 @@
               </div>
               <div class="div"></div>
               <div class="flex aic jbs txt-sm">
-                <span class="c-t4" x-text="doneTasks+' de '+tasks.length+' completadas'"></span>
+                <span class="c-t4" x-text="doneTasks+' of '+tasks.length+' completed'"></span>
                 <span class="mono c-green" x-text="Math.round(doneTasks/tasks.length*100)+'%'"></span>
               </div>
               <div class="track" style="margin-top:7px">
@@ -359,21 +360,21 @@
       <div x-show="view==='pomodoro'" x-cloak>
         <div class="view pomo-view">
           <div class="sh mb20">
-            <span class="st">Temporizador Pomodoro</span>
-            <span class="chip" :class="pomoPhase==='work'?'blue':'green'" x-text="pomoPhase==='work'?'Enfoque':'Descanso'"></span>
+            <span class="st">Pomodoro Timer</span>
+            <span class="chip" :class="pomoPhase==='work'?'blue':'green'" x-text="pomoPhase==='work'?'Focus':'Break'"></span>
           </div>
           <!-- ── Focus selector ── -->
           <div class="card" style="max-width:480px;margin:0 auto 20px;padding:16px 18px">
-            <div style="font-size:11px;color:var(--t4);font-family:var(--mono);letter-spacing:.08em;margin-bottom:10px">¿QUÉ ESTÁS ESTUDIANDO?</div>
+            <div style="font-size:11px;color:var(--t4);font-family:var(--mono);letter-spacing:.08em;margin-bottom:10px">WHAT ARE YOU STUDYING?</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <select x-model="pomoFocusSubjectId" @change="pomoFocusChapterName=''" style="flex:1;min-width:160px;background:var(--layer);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;font-size:14px;color:var(--t1);font-family:var(--font);outline:none;cursor:pointer">
-                <option value="">Seleccionar materia...</option>
+                <option value="">Select subject...</option>
                 <template x-for="s in subjects" :key="s.id">
-                  <option :value="s.id" x-text="s.icon+' '+s.name"></option>
+                  <option :value="s.id" x-text="s.name"></option>
                 </template>
               </select>
               <select x-show="pomoFocusSubjectId" x-model="pomoFocusChapterName" style="flex:1;min-width:160px;background:var(--layer);border:1px solid var(--border2);border-radius:8px;padding:9px 10px;font-size:14px;color:var(--t1);font-family:var(--font);outline:none;cursor:pointer">
-                <option value="">Seleccionar capítulo...</option>
+                <option value="">Select chapter...</option>
                 <template x-for="(ch,i) in (pomoFocusSubject?.chapList||[])" :key="i">
                   <option :value="ch.name" x-text="String(i+1).padStart(2,'0')+'. '+ch.name" :disabled="ch.done"></option>
                 </template>
@@ -401,7 +402,7 @@
           </div>
           <div class="pomo-btns" style="justify-content:center;margin-bottom:14px">
             <button class="pbtn" @click="resetTimer">↺ Reset</button>
-            <button class="pbtn" :class="running?'stop':'go'" @click="toggleTimer" x-text="running?'⏸ Pausar':'▶ Iniciar'"></button>
+            <button class="pbtn" :class="running?'stop':'go'" @click="toggleTimer" x-text="running?'⏸ Pause':'▶ Start'"></button>
           </div>
           <div class="pomo-dots" style="margin-bottom:24px">
             <template x-for="(x,i) in [0,1,2,3]" :key="i">
@@ -409,26 +410,26 @@
             </template>
           </div>
           <div class="pomo-stat-row">
-            <div class="pomo-scard"><div class="pomo-sv" x-text="pomosToday"></div><div class="pomo-sl">Hoy</div></div>
-            <div class="pomo-scard"><div class="pomo-sv" x-text="donePomos+'/4'"></div><div class="pomo-sl">Esta ronda</div></div>
-            <div class="pomo-scard"><div class="pomo-sv" x-text="Math.round(pomosToday*25/60)+'h'"></div><div class="pomo-sl">Tiempo total</div></div>
+            <div class="pomo-scard"><div class="pomo-sv" x-text="pomosToday"></div><div class="pomo-sl">Today</div></div>
+            <div class="pomo-scard"><div class="pomo-sv" x-text="donePomos+'/4'"></div><div class="pomo-sl">This round</div></div>
+            <div class="pomo-scard"><div class="pomo-sv" x-text="Math.round(pomosToday*25/60)+'h'"></div><div class="pomo-sl">Total time</div></div>
           </div>
           <div class="sh">
-            <span class="st">Registro del día</span>
+            <span class="st">Today's Log</span>
           </div>
           <div class="pomo-log">
             <template x-for="log in pomoLog" :key="log.id">
               <div class="plog-item" style="flex-direction:column;align-items:flex-start;gap:4px">
                 <div style="display:flex;align-items:center;gap:8px;width:100%">
                   <span x-text="log.label"></span>
-                  <span class="badge" :class="log.type==='work'?'blue':'green'" x-text="log.type==='work'?'Enfoque':'Descanso'"></span>
+                  <span class="badge" :class="log.type==='work'?'blue':'green'" x-text="log.type==='work'?'Focus':'Break'"></span>
                   <span class="plog-time" style="margin-left:auto" x-text="log.time"></span>
                 </div>
-                <div x-show="log.focus" style="font-size:12px;color:var(--blue2);font-family:var(--mono)" x-text="'📖 '+log.focus"></div>
+                <div x-show="log.focus" style="font-size:12px;color:var(--blue2);font-family:var(--mono)"><i class="ph ph-book-open"></i> <span x-text="log.focus"></span></div>
               </div>
             </template>
             <div x-show="!pomoLog.length" class="txt-sm c-t4" style="text-align:center;padding:20px">
-              Aún no hay sesiones registradas hoy
+              No sessions recorded yet today
             </div>
           </div>
         </div>
@@ -438,29 +439,29 @@
       <div x-show="view==='tasks'" x-cloak>
         <div class="view">
           <div class="sh mb20">
-            <span class="st">Todas las Tareas</span>
-            <span class="chip green" x-text="doneTasks+'/'+tasks.length+' completadas'"></span>
+            <span class="st">All Tasks</span>
+            <span class="chip green" x-text="doneTasks+'/'+tasks.length+' completed'"></span>
           </div>
           <div class="card mb20">
             <div class="tadd-row" style="margin-bottom:14px">
-              <input class="tadd-input" x-model="newTask" @keydown.enter="addTask" placeholder="+ Nueva tarea...">
-              <button class="btn-p" style="padding:8px 14px;border-radius:8px" @click="addTask">Agregar</button>
+              <input class="tadd-input" x-model="newTask" @keydown.enter="addTask" placeholder="+ New task...">
+              <button class="btn-p" style="padding:8px 14px;border-radius:8px" @click="addTask">Add</button>
             </div>
             <div class="flex aic g8" style="margin-bottom:14px;flex-wrap:wrap">
               <template x-for="f in ['all','pending','done']" :key="f">
                 <button class="pomo-tab" style="flex:none;padding:5px 14px" :class="taskFilter===f?'active':''" @click="taskFilter=f"
-                  x-text="f==='all'?'Todas':(f==='pending'?'Pendientes':'Completadas')"></button>
+                  x-text="f==='all'?'All':(f==='pending'?'Pending':'Completed')"></button>
               </template>
             </div>
-            <div class="task-list">
+            <div class="task-list stagger">
               <template x-for="(t,i) in filteredTasks" :key="t.id">
                 <div class="task-item" :class="t.done?'done':''" @click="toggleTask(tasks.indexOf(t))">
                   <div class="tcheck" :class="t.done?'on':''"><span x-show="t.done">✓</span></div>
                   <span class="ttxt" :class="t.done?'done':''" x-text="t.text"></span>
                   <span class="badge" :class="t.subject?t.subject.color:'blue'" x-show="t.subject" x-text="t.subject?t.subject.name:''"></span>
                   <span class="tpri" :class="t.pri==='high'?'phi':(t.pri==='medium'?'pmd':'plo')"
-                    x-text="t.pri==='high'?'Alta':(t.pri==='medium'?'Media':'Baja')"></span>
-                  <button @click.stop="deleteTask(t.id)" title="Eliminar tarea"
+                    x-text="t.pri==='high'?'High':(t.pri==='medium'?'Medium':'Low')"></span>
+                  <button @click.stop="deleteTask(t.id)" title="Delete task"
                     style="background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:5px;font-size:13px;color:var(--t4);opacity:0;transition:all .15s;flex-shrink:0"
                     onmouseover="this.style.color='#f87171';this.style.opacity='1'"
                     onmouseout="this.style.color='var(--t4)';this.style.opacity='0'"
@@ -485,7 +486,7 @@
             <button class="calnav" style="font-size:20px;padding:5px 12px" @click="nextMonth">›</button>
           </div>
           <div class="cal-full-grid mb20">
-            <template x-for="d in ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']">
+            <template x-for="d in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']">
               <div class="cal-full-dl" x-text="d"></div>
             </template>
             <template x-for="c in calCells" :key="c.key">
@@ -505,17 +506,17 @@
       <div x-show="view==='subjects'" x-cloak>
         <div class="view">
           <div class="sh mb20">
-            <span class="st">Todas las Materias</span>
-            <span class="chip blue" x-text="overallPct+'% promedio'"></span>
+            <span class="st">All Subjects</span>
+            <span class="chip blue" x-text="overallPct+'% average'"></span>
           </div>
           <div x-show="subjects.length" :style="'display:grid;grid-template-columns:repeat('+Math.min(subjects.length,4)+',1fr);gap:14px'">
             <template x-for="s in subjects" :key="s.id">
               <div class="card" style="cursor:pointer" @click="navigate('subject-'+s.id)">
-                <div class="flex aic jbs" style="margin-bottom:12px">
+                <div class="flex aic jbs mb12">
                   <div class="flex aic g8">
-                    <span style="font-size:22px" x-text="s.icon"></span>
+                    <i class="ph" style="font-size:22px" :class="'ph-'+s.icon"></i>
                     <div>
-                      <div style="font-size:13px;font-weight:600" x-text="s.name"></div>
+                      <div class="fs13 fw6" x-text="s.name"></div>
                       <span class="badge" :class="s.color" x-text="getSubjectTag(s)"></span>
                     </div>
                   </div>
@@ -528,10 +529,10 @@
                 </div>
               </div>
             </template>
-          <div x-show="!subjects.length" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 32px;text-align:center;gap:16px">
-            <div style="font-size:52px">📚</div>
-            <div style="font-size:18px;font-weight:700;color:var(--t1)">No hay materias aún</div>
-            <div style="font-size:14px;color:var(--t4);line-height:1.6">Agrega materias desde Ajustes o la sección de Calendario para empezar a seguir tu progreso</div>
+          <div x-show="!subjects.length" class="flex-col aic jcc ta-center" style="padding:60px 32px;gap:16px">
+            <div style="font-size:52px"><i class="ph ph-book-open"></i></div>
+            <div style="font-size:18px;font-weight:700;color:var(--t1)">No subjects yet</div>
+            <div style="font-size:14px;color:var(--t4);line-height:1.6">Add subjects from Settings or the Calendar section to start tracking your progress</div>
           </div>
         </div>
       </div>
@@ -543,9 +544,9 @@
 
             <!-- Header -->
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-              <button class="btn-s" @click="navigate('subjects')">← Volver</button>
+              <button class="btn-s" @click="navigate('subjects')">← Back</button>
               <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
-                <span style="font-size:26px;flex-shrink:0" x-text="s.icon"></span>
+                <i class="ph" style="font-size:26px;flex-shrink:0" :class="'ph-'+s.icon"></i>
                 <div style="font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.02em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" x-text="s.name"></div>
                 <span class="badge" :class="s.color" x-text="getSubjectTag(s)" style="flex-shrink:0"></span>
                 <!-- AI badge -->
@@ -553,52 +554,52 @@
               </div>
               <!-- Action buttons right-aligned -->
               <div style="display:flex;gap:8px;margin-left:auto;flex-shrink:0">
-                <button class="btn-s" @click="confirmReset(s)" style="border-color:rgba(251,146,60,.25);color:rgba(251,146,60,.7);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600">↺ Resetear</button>
-                <button class="btn-d" @click="confirmDelete(s)" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600">✕ Eliminar</button>
+                <button class="btn-s" @click="confirmReset(s)" style="border-color:rgba(251,146,60,.25);color:rgba(251,146,60,.7);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600">↺ Reset</button>
+                <button class="btn-d" @click="confirmDelete(s)" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600">✕ Delete</button>
               </div>
             </div>
 
             <!-- Confirm reset banner -->
-            <div x-show="resetTarget===s.id" x-transition style="margin-bottom:16px;padding:14px 16px;border-radius:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <span style="font-size:13px;color:#fca5a5">¿Desmarcar todos los capítulos de <strong x-text="s.name"></strong>?</span>
+            <div x-show="resetTarget===s.id" x-transition class="flex aic jbs g12" style="margin-bottom:16px;padding:14px 16px;border-radius:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25)">
+              <span style="font-size:13px;color:#fca5a5">Uncheck all chapters of <strong x-text="s.name"></strong>?</span>
               <div class="flex aic g8">
-                <button style="padding:6px 14px;border-radius:7px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.15);color:#f87171;font-size:12px;cursor:pointer;font-family:var(--font)" @click="doReset(s)">Sí, resetear</button>
-                <button style="padding:6px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--layer);color:var(--t2);font-size:12px;cursor:pointer;font-family:var(--font)" @click="resetTarget=null">Cancelar</button>
+                <button style="padding:6px 14px;border-radius:7px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.15);color:#f87171;font-size:12px;cursor:pointer;font-family:var(--font)" @click="doReset(s)">Yes, reset</button>
+                <button style="padding:6px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--layer);color:var(--t2);font-size:12px;cursor:pointer;font-family:var(--font)" @click="resetTarget=null">Cancel</button>
               </div>
             </div>
 
             <!-- Confirm delete banner -->
-            <div x-show="deleteTarget===s.id" x-transition style="margin-bottom:16px;padding:14px 16px;border-radius:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <span style="font-size:13px;color:#fca5a5">¿Eliminar <strong x-text="s.name"></strong>? Esta acción no se puede deshacer.</span>
+            <div x-show="deleteTarget===s.id" x-transition class="flex aic jbs g12" style="margin-bottom:16px;padding:14px 16px;border-radius:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25)">
+              <span style="font-size:13px;color:#fca5a5">Delete <strong x-text="s.name"></strong>? This cannot be undone.</span>
               <div class="flex aic g8">
-                <button class="btn-d" @click="doDelete(s)" style="padding:6px 14px;border-radius:7px;font-size:12px">Sí, eliminar</button>
-                <button class="btn-s" @click="deleteTarget=null" style="padding:6px 14px;border-radius:7px;font-size:12px">Cancelar</button>
+                <button class="btn-d" @click="doDelete(s)" style="padding:6px 14px;border-radius:7px;font-size:12px">Yes, delete</button>
+                <button class="btn-s" @click="deleteTarget=null" style="padding:6px 14px;border-radius:7px;font-size:12px">Cancel</button>
               </div>
             </div>
 
             <!-- Metric cards -->
             <div class="detail-grid mb20">
-              <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:6px">
-                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Progreso total</div>
+              <div class="flex-col g6" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px;">
+                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Total Progress</div>
                 <div style="font-size:32px;font-weight:800;letter-spacing:-.03em" :style="'color:var(--'+s.color+'2)'" x-text="chapPct(s)+'%'"></div>
                 <div style="height:4px;background:var(--layer);border-radius:2px;margin-top:4px"><div :style="'width:'+chapPct(s)+'%;background:var(--'+s.color+');border-radius:2px;height:100%;transition:width .4s'"></div></div>
               </div>
-              <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:6px">
-                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Capítulos completados</div>
+              <div class="flex-col g6" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px;">
+                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Chapters Completed</div>
                 <div style="font-size:32px;font-weight:800;letter-spacing:-.03em;color:var(--green2)" x-text="s.chapList.filter(c=>c.done).length+'/'+s.chapList.length"></div>
-                <div style="font-size:12px;color:var(--t4);font-family:var(--mono)" x-text="s.chapList.length - s.chapList.filter(c=>c.done).length + ' restantes'"></div>
+                <div style="font-size:12px;color:var(--t4);font-family:var(--mono)" x-text="s.chapList.length - s.chapList.filter(c=>c.done).length + ' remaining'"></div>
               </div>
-              <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:6px">
-                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Pendientes</div>
+              <div class="flex-col g6" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 24px;">
+                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Pending</div>
                 <div style="font-size:32px;font-weight:800;letter-spacing:-.03em;color:var(--blue2)" x-text="s.chapList.filter(c=>!c.done).length"></div>
-                <div style="font-size:12px;color:var(--t4);font-family:var(--mono)" x-text="'de '+s.chapList.length+' capítulos'"></div>
+                <div style="font-size:12px;color:var(--t4);font-family:var(--mono)" x-text="'of '+s.chapList.length+' chapters'"></div>
               </div>
             </div>
 
             <!-- Progress bar -->
             <div style="margin-bottom:24px">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                <span style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Progreso general</span>
+              <div class="flex aic jbs mb8">
+                <span style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Overall Progress</span>
                 <span style="font-size:12px;font-family:var(--mono);font-weight:700" :style="'color:var(--'+s.color+'2)'" x-text="chapPct(s)+'%'"></span>
               </div>
               <div class="track thick">
@@ -607,18 +608,18 @@
             </div>
 
             <!-- Chapter list header -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-              <span style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Capítulos del curso</span>
-              <span style="font-size:11px;font-family:var(--mono);color:var(--t4)" x-text="s.chapList.filter(c=>c.done).length+' de '+s.chapList.length+' completados'"></span>
+            <div class="flex aic jbs mb12">
+              <span style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)">Course Chapters</span>
+              <span style="font-size:11px;font-family:var(--mono);color:var(--t4)" x-text="s.chapList.filter(c=>c.done).length+' of '+s.chapList.length+' completed'"></span>
             </div>
 
             <!-- AI hint -->
             <div x-show="s.aiSuggested" style="margin-bottom:14px;padding:10px 14px;border-radius:8px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.18);font-size:12px;color:#c084fc;font-family:var(--mono)">
-              ✦ Materia generada por IA — clic en ✨ junto a cada capítulo para generar guía de estudio con Gemini.
+              ✦ AI-generated subject — click ✨ next to each chapter to generate a study guide.
             </div>
 
             <!-- Chapter rows -->
-            <div style="display:flex;flex-direction:column;gap:4px">
+            <div class="flex-col g4 stagger">
               <template x-for="(ch,i) in s.chapList" :key="i">
                 <div>
                   <div class="chap-item" :class="ch.done?'done':''"
@@ -626,31 +627,31 @@
                     @click="ch.done?(ch.done=false,syncSubjectPct(s)):openAIGuide(s,ch,i,false)"
                     onmouseover="this.style.background='rgba(255,255,255,.03)'" onmouseout="if(!this.classList.contains('done'))this.style.background=''">
                     <!-- Checkbox -->
-                    <div class="tcheck" :class="ch.done?'on':''" :title="ch.done?'Desmarcar':'Completa el quiz para marcar como hecho'">
+                    <div class="tcheck" :class="ch.done?'on':''" :title="ch.done?'Unmark':'Complete the quiz to mark as done'">
                       <span x-show="ch.done">✓</span>
                       <span x-show="!ch.done" style="font-size:10px;opacity:.4">○</span>
                     </div>
                     <!-- Chapter number -->
                     <span style="min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:11px;font-weight:700;font-family:var(--mono);color:var(--t4);flex-shrink:0" x-text="String(i+1).padStart(2,'0')"></span>
                     <!-- Chapter name -->
-                    <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" style="cursor:pointer;flex:1" @click.stop="openAIGuide(s,ch,i,false)" title="Generar guía + quiz con IA"></span>
+                    <span class="chap-name" :class="ch.done?'done':''" x-text="ch.name" style="cursor:pointer;flex:1" @click.stop="openAIGuide(s,ch,i,false)" title="Generate guide + quiz with AI"></span>
                     <!-- Icons -->
-                    <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="Ver sección en guía">📖</span>
+                    <span class="chap-link-icon" x-show="!!CHAP_MAP[ch.name]" @click.stop="goChapter(ch.name,s.id)" title="View section in guide"><i class="ph ph-book-open"></i></span>
                     <!-- ✨ only for non-CHAP_MAP chapters (CHAP_MAP sections already have quiz) -->
-                    <span x-show="!CHAP_MAP[ch.name]" @click.stop="openAIGuide(s,ch,i,false)" :title="s.aiSuggested?'Generar guía + quiz con IA':'Generar quiz'" style="font-size:13px;color:var(--blue2);margin-left:2px;flex-shrink:0;cursor:pointer;opacity:.7;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">✨</span>
+                    <span x-show="!CHAP_MAP[ch.name]" @click.stop="openAIGuide(s,ch,i,false)" :title="s.aiSuggested?'Generate guide + quiz with AI':'Generate quiz'" style="font-size:13px;color:var(--blue2);margin-left:2px;flex-shrink:0;cursor:pointer;opacity:.7;transition:opacity .15s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'"><i class="ph ph-sparkle"></i></span>
                     <!-- Status badge -->
                     <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;flex-shrink:0;font-family:var(--mono)"
                       :style="ch.done?'color:var(--green2);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.15)':'color:rgba(251,191,36,.8);background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.15)'"
-                      x-text="ch.done?'Completado':'Pendiente'"></span>
+                      x-text="ch.done?'Completed':'Pending'"></span>
                     <!-- Notes button — modern pencil icon -->
-                    <button @click.stop="toggleNotes(s,i)" :title="isNotesOpen(s,i)?'Cerrar notas':'Mis notas'"
+                    <button @click.stop="toggleNotes(s,i)" :title="isNotesOpen(s,i)?'Close notes':'My notes'"
                       style="background:none;border:1px solid;border-radius:7px;cursor:pointer;padding:3px 7px;font-size:12px;flex-shrink:0;transition:all .15s;margin-left:2px;font-family:var(--mono);line-height:1"
                       :style="isNotesOpen(s,i)?'color:var(--blue2);border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.08)':(ch.notes&&ch.notes.trim()?'color:var(--blue2);border-color:rgba(59,130,246,.2);background:transparent':'color:var(--t4);border-color:rgba(255,255,255,.06);background:transparent')"
                     >✎</button>
                   </div>
                   <div x-show="isNotesOpen(s,i)" style="margin:6px 0 8px 52px">
-                    <textarea x-model="ch.notes" @click.stop placeholder="Notas, dudas, conceptos clave de este capítulo..." style="width:100%;min-height:140px;max-height:600px;background:var(--layer2);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--t1);font-family:var(--font);resize:vertical;outline:none;line-height:1.7;transition:border-color .15s;box-sizing:border-box;display:block" @focus="$event.target.style.borderColor='rgba(59,130,246,.4)'" @blur="$event.target.style.borderColor='rgba(255,255,255,.08)'"></textarea>
-                    <div style="font-size:10px;color:var(--t4);font-family:var(--mono);margin-top:4px;display:flex;align-items:center;gap:5px">💾 Guardado automáticamente · arrastra la esquina para agrandar</div>
+                    <textarea x-model="ch.notes" @click.stop placeholder="Notes, doubts, key concepts from this chapter..." style="width:100%;min-height:140px;max-height:600px;background:var(--layer2);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--t1);font-family:var(--font);resize:vertical;outline:none;line-height:1.7;transition:border-color .15s;box-sizing:border-box;display:block" @focus="$event.target.style.borderColor='rgba(59,130,246,.4)'" @blur="$event.target.style.borderColor='rgba(255,255,255,.08)'"></textarea>
+                    <div style="font-size:10px;color:var(--t4);font-family:var(--mono);margin-top:4px;display:flex;align-items:center;gap:5px">💾 Auto-saved · drag corner to resize</div>
                   </div>
                 </div>
               </template>
@@ -663,57 +664,57 @@
       <!-- ── SETTINGS ── -->
       <div x-show="view==='settings'" x-cloak>
         <div class="view">
-          <div class="sh mb20"><span class="st">Ajustes</span></div>
+          <div class="sh mb20"><span class="st">Settings</span></div>
           <div class="settings-grid">
             <div class="card">
-              <div class="txt-sm fw7" style="margin-bottom:14px">🍅 Pomodoro</div>
+              <div class="txt-sm fw7" style="margin-bottom:14px"><i class="ph ph-timer"></i> Pomodoro</div>
               <div class="setting-item" style="margin-bottom:10px;background:transparent;border:none;padding:0;display:block">
-                <div class="flex aic jbs" style="margin-bottom:6px"><span>Duración de enfoque</span><span class="mono" x-text="pomoSettings.work+' min'"></span></div>
+                <div class="flex aic jbs mb6"><span>Focus Duration</span><span class="mono" x-text="pomoSettings.work+' min'"></span></div>
                 <input type="range" class="srange" min="15" max="60" step="5" x-model="pomoSettings.work" @change="applyPomoSettings" style="width:100%">
               </div>
               <div class="setting-item" style="background:transparent;border:none;padding:0;display:block">
-                <div class="flex aic jbs" style="margin-bottom:6px"><span>Descanso corto</span><span class="mono" x-text="pomoSettings.short+' min'"></span></div>
+                <div class="flex aic jbs mb6"><span>Short Break</span><span class="mono" x-text="pomoSettings.short+' min'"></span></div>
                 <input type="range" class="srange" min="3" max="15" step="1" x-model="pomoSettings.short" @change="applyPomoSettings" style="width:100%">
               </div>
             </div>
             <div class="card">
-              <div class="txt-sm fw7" style="margin-bottom:14px">🎯 Metas</div>
-              <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="txt-sm fw7" style="margin-bottom:14px"><i class="ph ph-crosshair"></i> Goals</div>
+              <div class="flex-col g12">
                 <div>
-                  <div class="txt-sm c-t4" style="margin-bottom:5px">Meta horas semanales</div>
+                  <div class="txt-sm c-t4" style="margin-bottom:5px">Weekly hours goal</div>
                   <input class="sinput" type="number" x-model="weekGoal" min="1" max="80">
                 </div>
                 <div>
-                  <div class="txt-sm c-t4" style="margin-bottom:5px">Pomodoros meta por día</div>
+                  <div class="txt-sm c-t4" style="margin-bottom:5px">Daily pomodoro goal</div>
                   <input class="sinput" type="number" x-model="pomosGoal" min="1" max="20">
                 </div>
               </div>
             </div>
             <div class="card">
-              <div class="txt-sm fw7" style="margin-bottom:14px">👤 Perfil</div>
-              <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch">
+              <div class="txt-sm fw7" style="margin-bottom:14px">👤 Profile</div>
+              <div class="flex-col g10" style="align-items:stretch">
                 <div>
-                  <div class="txt-sm c-t4" style="margin-bottom:5px">Nombre</div>
-                  <input class="sinput" type="text" x-model="profileName" placeholder="Tu nombre" @keydown.enter="saveProfile()">
+                  <div class="txt-sm c-t4" style="margin-bottom:5px">Name</div>
+                  <input class="sinput" type="text" x-model="profileName" placeholder="Your name" @keydown.enter="saveProfile()">
                 </div>
                 <div>
-                  <div class="txt-sm c-t4" style="margin-bottom:5px">Semestre actual</div>
+                  <div class="txt-sm c-t4" style="margin-bottom:5px">Current week</div>
                   <input class="sinput" type="number" x-model="currentWeek" min="1" max="20">
                 </div>
                 <button class="btn-p" @click="saveProfile()" :disabled="profileSaving"
                   :style="(profileSaved&&!profileSaving)?'background:var(--green);color:#fff;align-self:flex-start;margin-top:4px':'align-self:flex-start;margin-top:4px'"
-                  x-text="profileSaving ? 'Guardando...' : (profileSaved ? '✓ Guardado' : 'Guardar perfil')"></button>
+                  x-text="profileSaving ? 'Saving...' : (profileSaved ? '✓ Saved' : 'Save Profile')"></button>
               </div>
             </div>
             <div class="card">
-              <div class="txt-sm fw7" style="margin-bottom:14px">🔔 Notificaciones</div>
-              <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="txt-sm fw7" style="margin-bottom:14px">🔔 Notifications</div>
+              <div class="flex-col g10">
                 <div class="setting-item">
-                  <div><div class="setting-label">Alarma Pomodoro</div><div class="setting-sub">Sonido al terminar sesión</div></div>
+                  <div><div class="setting-label">Pomodoro Alarm</div><div class="setting-sub">Sound when session ends</div></div>
                   <button class="toggle" :class="settings.alarmOn?'on':'off'" @click="settings.alarmOn=!settings.alarmOn"></button>
                 </div>
                 <div class="setting-item">
-                  <div><div class="setting-label">Modo focus</div><div class="setting-sub">Ocultar distracciones</div></div>
+                  <div><div class="setting-label">Focus Mode</div><div class="setting-sub">Hide distractions</div></div>
                   <button class="toggle" :class="settings.focusMode?'on':'off'" @click="settings.focusMode=!settings.focusMode"></button>
                 </div>
               </div>
@@ -725,16 +726,16 @@
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
               <div style="width:36px;height:36px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div>
               <div>
-                <div style="font-size:15px;font-weight:700;color:var(--t1)">CV — Análisis con IA</div>
+                <div style="font-size:15px;font-weight:700;color:var(--t1)">CV — AI Analysis</div>
                 <div style="font-size:12px;color:var(--t4);font-family:var(--mono)">Powered by Gemini</div>
               </div>
             </div>
-            <div x-show="!cvAnalysis" style="display:flex;flex-direction:column;gap:14px">
-              <div style="font-size:14px;color:var(--t3);line-height:1.7">Sube tu CV para que Gemini analice tu stack, detecte gaps y recomiende materias personalizadas.</div>
+            <div x-show="!cvAnalysis" class="flex-col g14">
+              <div style="font-size:14px;color:var(--t3);line-height:1.7">Upload your CV so Gemini can analyze your stack, detect gaps, and recommend personalized subjects.</div>
               <label class="cv-upload-label">
                 <input type="file" accept=".pdf" style="display:none" @change="handleCVFile($event)">
-                <span x-text="cvFilename || 'Seleccionar PDF...'"></span>
-                <span class="cv-upload-btn">Elegir archivo</span>
+                <span x-text="cvFilename || 'Select PDF...'"></span>
+                <span class="cv-upload-btn">Choose file</span>
               </label>
               <div x-show="cvError" style="color:#f87171;font-size:13px;font-family:var(--mono)" x-text="cvError"></div>
               <button
@@ -742,28 +743,28 @@
                 style="align-self:flex-start"
                 @click="analyzeCV()"
                 :disabled="!cvFile || cvAnalyzing"
-                x-text="cvAnalyzing ? '⏳ Analizando...' : '✨ Analizar con Gemini'"
+                x-text="cvAnalyzing ? '⏳ Analyzing...' : '✧ Analyze with Gemini'"
               ></button>
             </div>
             <div x-show="cvAnalysis">
               <!-- Header row -->
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)">
-                <div style="display:flex;align-items:center;gap:8px">
+              <div class="flex aic jbs mb24" style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+                <div class="flex aic g8">
                   <span style="font-size:13px;color:var(--t4)">📎</span>
                   <span style="font-size:13px;color:var(--t3);font-family:var(--mono)" x-text="cvFilename"></span>
                 </div>
-                <button class="btn-s" @click="cvAnalysis=null;cvFile=null;cvFilename=''" style="padding:5px 12px;border-radius:8px;font-size:12px">↺ Cambiar CV</button>
+                <button class="btn-s" @click="cvAnalysis=null;cvFile=null;cvFilename=''" style="padding:5px 12px;border-radius:8px;font-size:12px">↺ Change CV</button>
               </div>
 
               <!-- Resumen -->
               <div style="margin-bottom:28px">
-                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:10px">Resumen</div>
+                <div class="ttu fs11 fw7 c-t4 ls-1 mono mb10">Summary</div>
                 <div style="font-size:14px;color:var(--t2);line-height:1.75;padding:16px 18px;background:rgba(59,130,246,.04);border-left:3px solid rgba(59,130,246,.3);border-radius:0 10px 10px 0" x-text="cvAnalysis?.experience_summary"></div>
               </div>
 
               <!-- Skills -->
               <div style="margin-bottom:28px">
-                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:12px">Skills detectados</div>
+                <div class="ttu fs11 fw7 c-t4 ls-1 mono mb12">Detected Skills</div>
                 <div style="display:flex;flex-wrap:wrap;gap:7px">
                   <template x-for="sk in (cvAnalysis?.skills || [])" :key="sk">
                     <span style="font-size:12px;font-family:var(--mono);color:var(--t2);background:var(--layer);border:1px solid var(--border2);padding:4px 10px;border-radius:6px;line-height:1.4" x-text="sk"></span>
@@ -773,7 +774,7 @@
 
               <!-- Interview questions -->
               <div>
-                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:14px">Preguntas frecuentes de entrevista</div>
+                <div class="ttu fs11 fw7 c-t4 ls-1 mono mb14">Frequent Interview Questions</div>
                 <div style="display:flex;flex-direction:column">
                   <template x-for="(q,i) in (cvAnalysis?.interview_questions || [])" :key="i">
                     <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;cursor:pointer;transition:all .15s;border-bottom:1px solid var(--border)" :style="i===0?'border-top:1px solid var(--border)':''" @click="startInterviewWithQuestion(q)" onmouseover="this.style.paddingLeft='8px'" onmouseout="this.style.paddingLeft='0'">
@@ -794,30 +795,30 @@
 
           <!-- Header row: title + select + button -->
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap">
-            <div style="font-size:18px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.06em">Entrevista IA</div>
+            <div style="font-size:18px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.06em">AI Interview</div>
             <div style="display:flex;gap:10px;align-items:center">
               <select class="sinput" x-model="interviewTopic" style="min-width:160px;padding:7px 12px;border-radius:9px">
-                <option value="">Tema libre</option>
+                <option value="">Free topic</option>
                 <template x-for="s in subjects" :key="s.id">
                   <option :value="s.name" x-text="s.name"></option>
                 </template>
               </select>
               <!-- Reiniciar button — rounded, gradient -->
-              <button class="btn-p" @click="startInterview()" x-text="interviewMessages.length ? 'Reiniciar' : 'Iniciar sesión'"></button>
+              <button class="btn-p" @click="startInterview()" x-text="interviewMessages.length ? 'Restart' : 'Start Session'"></button>
             </div>
           </div>
 
           <!-- Chat card — full width -->
           <div class="card" style="min-height:340px;display:flex;flex-direction:column;padding:0;overflow:hidden;margin-bottom:16px">
             <div style="padding:14px 20px;border-bottom:1px solid var(--border)">
-              <div style="font-size:13px;font-weight:600;color:var(--t2)">Guía de Inicio de Entrevista</div>
+              <div class="fs13 fw6 c-t2">Interview Starter Guide</div>
             </div>
             <!-- Empty state -->
-            <div x-show="interviewMessages.length === 0" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:48px 32px;text-align:center">
-              <div style="font-size:52px;filter:drop-shadow(0 4px 16px rgba(59,130,246,.3))">🎤</div>
+            <div x-show="interviewMessages.length === 0" class="flex-col aic jcc g20 ta-center" style="padding:48px 32px">
+              <div style="font-size:52px;filter:drop-shadow(0 4px 16px rgba(59,130,246,.3))"><i class="ph ph-microphone"></i></div>
               <div>
-                <div style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:8px">Selecciona un tema y presiona Iniciar sesión</div>
-                <div style="font-size:13px;color:var(--t4);line-height:1.6">El entrevistador usará el contexto de tu CV</div>
+                <div style="font-size:18px;font-weight:700;color:var(--t1);margin-bottom:8px">Select a topic and press Start Session</div>
+                <div style="font-size:13px;color:var(--t4);line-height:1.6">The interviewer will use your CV context</div>
               </div>
             </div>
             <!-- Messages -->
@@ -846,7 +847,7 @@
               <div style="position:relative;display:flex;align-items:flex-end">
                 <textarea
                   x-model="interviewUserInput"
-                  placeholder="Escribe tu respuesta..."
+                  placeholder="Type your answer..."
                   @keydown.ctrl.enter="sendInterviewMessage()"
                   rows="3"
                   style="flex:1;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 50px 12px 16px;font-size:14px;color:var(--t1);font-family:var(--font);resize:none;outline:none;line-height:1.6;transition:border-color .2s,box-shadow .2s;box-sizing:border-box;display:block"
@@ -858,7 +859,7 @@
                   style="position:absolute;right:8px;bottom:8px;width:34px;height:34px;padding:0;font-size:17px;border-radius:10px;justify-content:center;z-index:2;line-height:1"
                 >↑</button>
               </div>
-              <div style="font-size:11px;color:var(--t4);font-family:var(--mono);margin-top:6px;opacity:.6">Ctrl+Enter para enviar</div>
+              <div style="font-size:11px;color:var(--t4);font-family:var(--mono);margin-top:6px;opacity:.6">Ctrl+Enter to send</div>
             </div>
           </div>
 
@@ -867,7 +868,7 @@
 
             <!-- Suggestions card -->
             <div class="card" style="padding:18px 20px">
-              <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:12px">Sugerencias de Temas</div>
+              <div class="ttu fs11 fw7 c-t4 ls-1 mono mb12">Topic Suggestions</div>
               <div style="display:flex;flex-wrap:wrap;gap:8px">
                 <template x-for="s in subjects" :key="s.id">
                   <button @click="interviewTopic=s.name"
@@ -875,7 +876,7 @@
                     style="font-size:13px;padding:7px 16px;border-radius:999px;border:1px solid;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;gap:7px"
                     onmouseover="if(this.style.background.indexOf('59,130,246')<0){this.style.borderColor='rgba(255,255,255,.25)';this.style.background='rgba(255,255,255,.07)';this.style.color='var(--t2)'}"
                     onmouseout="if(this.style.background.indexOf('59,130,246')<0){this.style.borderColor='rgba(255,255,255,.14)';this.style.background='rgba(255,255,255,.03)';this.style.color='var(--t3)'}">
-                    <span x-text="s.icon" style="font-size:14px"></span><span x-text="s.name"></span>
+                    <i class="ph" style="font-size:14px" :class="'ph-'+s.icon"></i><span x-text="s.name"></span>
                   </button>
                 </template>
               </div>
@@ -888,7 +889,7 @@
                 <div style="font-size:16px;line-height:1">📄</div>
               </div>
               <div style="min-width:0">
-                <div style="font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" x-text="'CV de '+(profileName||'candidato')"></div>
+                <div style="font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" x-text="'CV of '+(profileName||'candidate')"></div>
                 <div style="font-size:11px;color:var(--t4);font-family:var(--mono);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" x-text="cvFilename||''"></div>
               </div>
             </div>
@@ -896,17 +897,17 @@
 
           <!-- History table -->
           <div x-show="interviewHistory.length > 0" class="card" style="padding:0;overflow:hidden">
-            <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-              <div style="font-size:13px;font-weight:700;color:var(--t1)">Historial de Entrevistas</div>
-              <button @click="interviewHistory=[];localStorage.removeItem('stos_interview_history')" style="font-size:11px;color:var(--t4);background:none;border:none;cursor:pointer;font-family:var(--mono)">Limpiar</button>
+            <div class="flex aic jbs" style="padding:14px 20px;border-bottom:1px solid var(--border)">
+              <div style="font-size:13px;font-weight:700;color:var(--t1)">Interview History</div>
+              <button @click="interviewHistory=[];localStorage.removeItem('stos_interview_history')" style="font-size:11px;color:var(--t4);background:none;border:none;cursor:pointer;font-family:var(--mono)">Clear</button>
             </div>
             <table style="width:100%;border-collapse:collapse">
               <thead>
                 <tr style="border-bottom:1px solid var(--border)">
-                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Fecha</th>
-                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Tema</th>
-                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Duración</th>
-                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Scontario</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Date</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Topic</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Duration</th>
+                  <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">Score</th>
                 </tr>
               </thead>
               <tbody>
@@ -935,7 +936,7 @@
 
           <!-- Header -->
           <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap">
-            <div style="font-size:18px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.06em">🏆 Challenges</div>
+            <div style="font-size:18px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.06em"><i class="ph ph-trophy"></i> Challenges</div>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <!-- Topic select -->
               <select class="sinput" x-model="challengeTopic" style="min-width:160px;padding:7px 12px;border-radius:9px" @change="challengeTopicCustom=''">
@@ -967,7 +968,7 @@
               </div>
               <!-- Generate button -->
               <button class="btn-p" @click="generateExercise()" :disabled="challengeGenerating">
-                <span x-show="!challengeGenerating">✨ Generate</span>
+                <span x-show="!challengeGenerating"><i class="ph ph-sparkle"></i> Generate</span>
                 <span x-show="challengeGenerating">⏳ Generating…</span>
               </button>
             </div>
@@ -980,14 +981,14 @@
           <div x-show="challengeGenerating" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div class="card" style="min-height:420px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
               <div style="font-size:32px">⏳</div>
-              <div style="font-size:14px;font-family:var(--mono);color:var(--t4)">Generating exercise with Gemini…</div>
+              <div style="font-size:14px;font-family:var(--mono);color:var(--t4)">Generating exercise…</div>
             </div>
             <div class="card" style="min-height:420px"></div>
           </div>
 
           <!-- Empty state -->
-          <div x-show="!challengeGenerating && !currentExercise" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:80px 32px;text-align:center">
-            <div style="font-size:60px;filter:drop-shadow(0 4px 20px rgba(99,102,241,.3))">🏆</div>
+          <div x-show="!challengeGenerating && !currentExercise" class="flex-col aic jcc g20 ta-center" style="padding:80px 32px">
+            <div style="font-size:60px;filter:drop-shadow(0 4px 20px rgba(99,102,241,.3))"><i class="ph ph-trophy"></i></div>
             <div>
               <div style="font-size:20px;font-weight:700;color:var(--t1);margin-bottom:8px">Select a topic and generate your first challenge</div>
               <div style="font-size:14px;color:var(--t4);line-height:1.6">Gemini will create SDET-themed coding exercises<br>that run in a real sandbox via Judge0</div>
@@ -998,7 +999,7 @@
           <div x-show="currentExercise && !challengeGenerating" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
 
             <!-- LEFT: Problem -->
-            <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="flex-col g14">
 
               <!-- Title + meta -->
               <div class="card" style="padding:20px 24px">
@@ -1017,8 +1018,8 @@
 
               <!-- Test Cases -->
               <div class="card" style="padding:18px 20px">
-                <div style="font-size:11px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:14px">Test Cases</div>
-                <div style="display:flex;flex-direction:column;gap:10px">
+                <div class="ttu fs11 fw7 c-t4 ls-1 mono mb14">Test Cases</div>
+                <div class="flex-col g10">
                   <template x-for="(tc, i) in (currentExercise?.testCases||[])" :key="i">
                     <div style="background:var(--layer);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
                       <div style="font-size:11px;font-weight:700;color:var(--t4);font-family:var(--mono);margin-bottom:6px" x-text="'Test '+(i+1)+': '+(tc.label||'')"></div>
@@ -1053,12 +1054,12 @@
             </div><!-- /left -->
 
             <!-- RIGHT: Editor + Output -->
-            <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="flex-col g14">
 
               <!-- Code editor -->
               <div class="card" style="padding:0;overflow:hidden">
                 <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-                  <div style="display:flex;gap:6px">
+                  <div class="flex g6">
                     <div style="width:12px;height:12px;border-radius:50%;background:#f87171"></div>
                     <div style="width:12px;height:12px;border-radius:50%;background:#fbbf24"></div>
                     <div style="width:12px;height:12px;border-radius:50%;background:var(--green2)"></div>
@@ -1098,7 +1099,7 @@
                 <!-- Results state -->
                 <div x-show="!challengeResult?.error">
                   <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-                    <div style="font-size:28px" x-text="challengeResult?.passed===challengeResult?.total && challengeResult?.total>0?'🎉':'📊'"></div>
+                    <div style="font-size:28px"><i class="ph" :class="challengeResult?.passed===challengeResult?.total && challengeResult?.total>0?'ph-celebrate':'ph-chart-bar'"></i></div>
                     <div>
                       <div style="font-size:16px;font-weight:700"
                         :style="challengeResult?.passed===challengeResult?.total && challengeResult?.total>0?'color:var(--green2)':'color:var(--orange2,#fb923c)'"
@@ -1106,11 +1107,11 @@
                       <div x-show="challengeResult?.time" style="font-size:11px;font-family:var(--mono);color:var(--t4)" x-text="'Time: '+challengeResult?.time+'s'"></div>
                     </div>
                   </div>
-                  <div style="display:flex;flex-direction:column;gap:8px">
+                  <div class="flex-col g8">
                     <template x-for="(r, ri) in (challengeResult?.results||[])" :key="ri">
                       <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:9px"
                         :style="r.s==='PASS'?'background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.18)':(r.s==='ERROR'?'background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.18)':'background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.18)')">
-                        <span style="font-size:14px;flex-shrink:0" x-text="r.s==='PASS'?'✅':(r.s==='ERROR'?'💥':'❌')"></span>
+                        <i class="ph" style="font-size:14px;flex-shrink:0" :class="r.s==='PASS'?'ph-check-circle':(r.s==='ERROR'?'ph-skull':'ph-x-circle')"></i>
                         <div style="font-size:12px;font-family:var(--mono);flex:1;min-width:0">
                           <div style="font-weight:700;margin-bottom:3px"
                             :style="r.s==='PASS'?'color:var(--green2)':(r.s==='ERROR'?'color:#f87171':'color:var(--orange2,#fb923c)')"
@@ -1133,7 +1134,7 @@
 
           <!-- History table -->
           <div x-show="challengeHistory.length > 0 && !challengeGenerating" class="card" style="padding:0;overflow:hidden;margin-top:20px">
-            <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="flex aic jbs" style="padding:14px 20px;border-bottom:1px solid var(--border)">
               <div style="font-size:13px;font-weight:700;color:var(--t1)">Challenge History</div>
               <button @click="challengeHistory=[];localStorage.removeItem('stos_challenge_history')"
                 style="font-size:11px;color:var(--t4);background:none;border:none;cursor:pointer;font-family:var(--mono)">Clear</button>
@@ -1181,17 +1182,18 @@
 
           <!-- Header -->
           <div class="detail-header" style="flex-wrap:wrap;gap:10px;margin-bottom:20px;">
-            <button class="btn-s" @click="navigate('subject-'+(aiGuide.subject?.id||''))">← Volver</button>
+            <button class="btn-s" @click="navigate('subject-'+(aiGuide.subject?.id||''))">← Back</button>
             <div class="flex aic g8" style="flex:1;min-width:0;">
-              <span style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em;" x-text="aiGuide.quizOnly?'📝 Quiz':'✨ Guía IA'"></span>
+              <span x-show="aiGuide.quizOnly" style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em"><i class="ph ph-note-pencil"></i> Quiz</span>
+              <span x-show="!aiGuide.quizOnly" style="font-size:11px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em">✦ AI Guide</span>
               <div class="detail-title" style="font-size:18px;" x-text="aiGuide.chapter?.name"></div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
+            <div class="flex aic g8">
               <button x-show="aiGuide.content &amp;&amp; !aiGuide.quizOnly" @click="regenerateGuide()"
                 style="font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.08);color:#fbbf24;cursor:pointer;font-family:var(--mono);font-weight:600;transition:all .15s;white-space:nowrap"
                 onmouseover="this.style.background='rgba(251,191,36,.15)'"
                 onmouseout="this.style.background='rgba(251,191,36,.08)'"
-              >↻ Regenerar</button>
+              >↻ Regenerate</button>
               <select x-model="aiGuide.language"
                 style="font-size:11px;padding:4px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:var(--layer);color:var(--t2);font-family:var(--mono);cursor:pointer;outline:none"
               >
@@ -1289,7 +1291,7 @@
             <!-- Key Concept banner -->
             <div x-show="aiGuide.keyConcept" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:18px 22px">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-                <span style="font-size:16px">🎯</span>
+                <span style="font-size:16px"><i class="ph ph-crosshair"></i></span>
                 <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)">Key Concept</span>
               </div>
               <div style="font-size:14px;color:var(--t2);line-height:1.7" x-text="aiGuide.keyConcept"></div>
@@ -1302,7 +1304,7 @@
               <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:20px 22px">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
                   <span style="font-size:16px">🧪</span>
-                  <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)">Laboratorio Express</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)">Lab Express</span>
                 </div>
                 <div style="font-size:15px;font-weight:600;color:var(--orange2);margin-bottom:10px" x-text="aiGuide.labExpress?.title"></div>
                 <div style="font-size:13px;color:var(--t2);line-height:1.7;white-space:pre-wrap" x-text="aiGuide.labExpress?.body"></div>
@@ -1312,7 +1314,7 @@
               <div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:20px 22px">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
                   <span style="font-size:16px">📂</span>
-                  <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)">Evolución del Proyecto</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--t1);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)">Project Evolution</span>
                 </div>
                 <div style="font-size:15px;font-weight:600;color:var(--green2);margin-bottom:10px" x-text="aiGuide.projectEvolution?.title"></div>
                 <div style="font-size:13px;color:var(--t2);line-height:1.7;white-space:pre-wrap" x-text="aiGuide.projectEvolution?.body"></div>
@@ -1328,17 +1330,17 @@
               <div class="quiz-hdr">
                 <div class="quiz-icon">🧠</div>
                 <div>
-                  <div class="quiz-title">Verificar conocimiento</div>
-                  <div class="quiz-sub">Responde 2 de 3 correctamente para completar este capítulo</div>
+                  <div class="quiz-title">Test Your Knowledge</div>
+                  <div class="quiz-sub">Answer 2 out of 3 correctly to complete this chapter</div>
                 </div>
               </div>
 
               <!-- Loading skeleton -->
               <div x-show="aiGuide.quiz&&aiGuide.quiz.loading" style="padding:28px;background:var(--layer);border-radius:12px;border:1px solid rgba(255,255,255,.08)">
-                <div style="display:flex;flex-direction:column;gap:20px">
+                <div class="flex-col g20">
                   <div>
                     <div class="sk-el" style="height:16px;width:55%;margin-bottom:16px;border-radius:6px"></div>
-                    <div style="display:flex;flex-direction:column;gap:8px">
+                    <div class="flex-col g8">
                       <div class="sk-el" style="height:40px;width:100%;border-radius:8px"></div>
                       <div class="sk-el" style="height:40px;width:100%;border-radius:8px"></div>
                       <div class="sk-el" style="height:40px;width:65%;border-radius:8px"></div>
@@ -1347,7 +1349,7 @@
                   </div>
                   <div>
                     <div class="sk-el" style="height:16px;width:50%;margin-bottom:16px;border-radius:6px"></div>
-                    <div style="display:flex;flex-direction:column;gap:8px">
+                    <div class="flex-col g8">
                       <div class="sk-el" style="height:40px;width:100%;border-radius:8px"></div>
                       <div class="sk-el" style="height:40px;width:100%;border-radius:8px"></div>
                       <div class="sk-el" style="height:40px;width:70%;border-radius:8px"></div>
@@ -1356,7 +1358,7 @@
                   </div>
                   <div>
                     <div class="sk-el" style="height:16px;width:45%;margin-bottom:16px;border-radius:6px"></div>
-                    <div style="display:flex;flex-direction:column;gap:8px">
+                    <div class="flex-col g8">
                       <div class="sk-el" style="height:40px;width:100%;border-radius:8px"></div>
                       <div class="sk-el" style="height:40px;width:75%;border-radius:8px"></div>
                       <div class="sk-el" style="height:40px;width:100%;border-radius:8px"></div>
@@ -1368,7 +1370,7 @@
 
               <!-- Quiz error -->
               <div x-show="aiGuide.quiz&&!aiGuide.quiz.loading&&aiGuide.quiz.error&&!aiGuide.quiz.questions.length" style="padding:28px;text-align:center;background:rgba(239,68,68,.06);border-radius:12px;border:1px solid rgba(239,68,68,.2)">
-                <div style="color:#f87171;font-size:14px">No se pudo generar el quiz. Verifica tu conexión e intenta de nuevo.</div>
+                <div style="color:#f87171;font-size:14px">Could not generate the quiz. Check your connection and try again.</div>
               </div>
 
               <!-- Questions -->
@@ -1400,7 +1402,7 @@
                   </div>
                   <button class="quiz-submit" @click="submitAIQuiz()"
                     :disabled="(aiGuide.quiz?.answers||[]).some(a=>a===null||a===undefined)">
-                    Verificar respuestas →
+                    Check answers →
                   </button>
                 </div>
               </div>
@@ -1408,9 +1410,9 @@
               <!-- Results -->
               <div x-show="aiGuide.quiz&&aiGuide.quiz.submitted" style="animation:fadeUp .3s ease both">
                 <div class="quiz-result-card" :class="(aiGuide.quiz?.score||0)>=2?'quiz-result-pass':'quiz-result-fail'">
-                  <div class="quiz-result-icon" x-text="(aiGuide.quiz?.score||0)>=2?'🎉':'📚'"></div>
-                  <div class="quiz-result-title" x-text="(aiGuide.quiz?.score||0)>=2?'¡Capítulo completado!':'Necesitas repasar'"></div>
-                  <div class="quiz-result-score" x-text="(aiGuide.quiz?.score||0)+'/3 correctas'"></div>
+                  <i class="ph" :class="(aiGuide.quiz?.score||0)>=2?'ph-celebrate':'ph-book-open'" style="font-size:36px"></i>
+                  <div class="quiz-result-title" x-text="(aiGuide.quiz?.score||0)>=2?'Chapter completed!':'Review needed'"></div>
+                  <div class="quiz-result-score" x-text="(aiGuide.quiz?.score||0)+'/3 correct'"></div>
                 </div>
                 <div class="quiz-feedback">
                   <template x-for="(q, qi) in (aiGuide.quiz?.questions||[])" :key="qi">
@@ -1429,11 +1431,11 @@
                 </div>
                 <div class="quiz-actions">
                   <button x-show="(aiGuide.quiz?.score||0)>=2" class="quiz-btn-back" @click="navigate('subject-'+(aiGuide.subject?.id||''))">
-                    ← Volver a la materia
+                    ← Back to subject
                   </button>
                   <button x-show="(aiGuide.quiz?.score||0)<2" class="quiz-btn-retry"
                     @click="aiGuide.quiz.submitted=false;aiGuide.quiz.answers=Array(aiGuide.quiz.questions?.length||3).fill(null)">
-                    Intentar de nuevo
+                    Try again
                   </button>
                 </div>
               </div>
@@ -1450,7 +1452,7 @@
   <nav class="mobile-nav">
     <template x-for="item in navMain" :key="item.id">
       <button class="mob-btn" :class="view===item.id?'active':''" @click="navigate(item.id)">
-        <span class="micon" x-text="item.icon"></span>
+        <i class="ph micon" :class="'ph-'+item.icon"></i>
         <span x-text="item.label"></span>
       </button>
     </template>
@@ -1509,7 +1511,7 @@
 
     <div class="sb-section" style="margin-top:8px"><span class="sb-section-lbl">Salesforce SDET</span></div>
     <a class="sb-item" onclick="go('sf-overview')" href="#">
-      <span class="ic">☁</span> SF Overview
+      <span class="ic"><i class="ph ph-cloud"></i></span> SF Overview
       <span class="badge" style="background:rgba(239,68,68,.15);color:#ef4444;border-color:rgba(239,68,68,.3)">NEW</span>
     </a>
     <a class="sb-item" onclick="go('apex-testing')" href="#">
@@ -1561,14 +1563,14 @@
   </div>
 </nav>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleGuideSidebar()"></div>
-<button class="guide-hamburger" onclick="toggleGuideSidebar()" title="Menú de secciones">☰</button>
+<button class="guide-hamburger" onclick="toggleGuideSidebar()" title="Section menu">☰</button>
 
 <main class="main">
 
 <!-- ════════════════ DASHBOARD ════════════════ -->
 <div id="s-dashboard" class="section active">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -1623,7 +1625,7 @@
 <!-- ════════════════ API BASICS ════════════════ -->
 <div id="s-api-basics" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -1781,7 +1783,7 @@ curl -v https://jsonplaceholder.typicode.com/posts/99999
 <!-- ════════════════ API TESTING ════════════════ -->
 <div id="s-api-testing" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -1930,7 +1932,7 @@ pm.test("Response under 1000ms", () => pm.expect(pm.response.responseTime).to.be
 <!-- ════════════════ AUTH ════════════════ -->
 <div id="s-auth" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2074,7 +2076,7 @@ done
 <!-- ════════════════ CI/CD ════════════════ -->
 <div id="s-cicd" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2215,7 +2217,7 @@ export default function() {
 <!-- ════════════════ FRAMEWORKS ════════════════ -->
 <div id="s-frameworks" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2358,7 +2360,7 @@ k6 run smoke.js
 <!-- ════════════════ PROJECT 1 ════════════════ -->
 <div id="s-project1" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2373,7 +2375,7 @@ k6 run smoke.js
     <div class="callout callout-green">Base URL: <code>https://jsonplaceholder.typicode.com</code> — free, no auth, no setup needed.</div>
 
     <div class="card">
-      <div class="card-title"><span class="icon">⚙</span> Step 0 — Setup</div>
+      <div class="card-title"><i class="ph ph-gear"></i> Step 0 — Setup</div>
       <div class="code-wrap"><div class="code-label">ApiConfig.java</div>
 <pre><span class="kw">public class</span> ApiConfig {
   <span class="kw">public static void</span> init() {
@@ -2535,7 +2537,7 @@ k6 run smoke.js
 <!-- ════════════════ PROJECT 2 ════════════════ -->
 <div id="s-project2" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2549,7 +2551,7 @@ k6 run smoke.js
     <div class="callout callout-blue">Build on Project 1. Same patterns but run inside Docker with performance gates and contract tests.</div>
 
     <div class="card">
-      <div class="card-title"><span class="icon">⚙</span> Mock API — server.js</div>
+      <div class="card-title"><i class="ph ph-gear"></i> Mock API — server.js</div>
 <pre><span class="kw">const</span> express = require(<span class="str">'express'</span>); <span class="kw">const</span> app = express(); app.use(express.json());
 <span class="kw">const</span> posts = [
   { id: <span class="num">1</span>, userId: <span class="num">1</span>, title: <span class="str">'Post one'</span>,   body: <span class="str">'Body one'</span>   },
@@ -2638,7 +2640,7 @@ docker compose up --abort-on-container-exit tests</pre>
 <!-- ════════════════ CHEAT SHEET ════════════════ -->
 <div id="s-cheatsheet" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2694,7 +2696,7 @@ given().get(<span class="str">"/users/1"</span>).then().body(<span class="str">"
 <!-- ════════════════ STUDY PLAN ════════════════ -->
 <div id="s-study" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2727,7 +2729,7 @@ given().get(<span class="str">"/users/1"</span>).then().body(<span class="str">"
 <!-- ════════════════ NOTES ════════════════ -->
 <div id="s-notes" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2766,7 +2768,7 @@ given().get(<span class="str">"/users/1"</span>).then().body(<span class="str">"
 <!-- ════════════════ TRACKER ════════════════ -->
 <div id="s-tracker" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2906,7 +2908,7 @@ given().get(<span class="str">"/users/1"</span>).then().body(<span class="str">"
 <!-- ════════════════ INTERVIEW ════════════════ -->
 <div id="s-interview" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -2968,7 +2970,7 @@ test(<span class="str">'response time &lt; 500ms'</span>, ...)</pre>
 <!-- ════════════════ SF OVERVIEW ════════════════ -->
 <div id="s-sf-overview" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -3103,7 +3105,7 @@ System.debug('Total accounts: ' + accounts.size());
 <!-- ════════════════ APEX TESTING ════════════════ -->
 <div id="s-apex-testing" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -3373,7 +3375,7 @@ static void bulk_insert_usesOnlyOneDML() {
 <!-- ════════════════ PLAYWRIGHT ════════════════ -->
 <div id="s-playwright" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -3392,7 +3394,7 @@ static void bulk_insert_usesOnlyOneDML() {
     <div class="callout callout-blue">Playwright does two jobs: full browser E2E tests AND pure API tests with zero browser overhead. You can mix both in the same test file — test the API, then verify the UI reflects the result.</div>
 
     <div class="card">
-      <div class="card-title"><span class="icon">⚙</span> Setup</div>
+      <div class="card-title"><i class="ph ph-gear"></i> Setup</div>
       <pre class="solo"><span class="cm"># Create new project</span>
 npm init playwright@latest my-pw-tests
 cd my-pw-tests
@@ -3699,7 +3701,7 @@ projects: [
 <!-- ════════════════ PROJECT 3 — SF ════════════════ -->
 <div id="s-sf-project" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -3714,7 +3716,7 @@ projects: [
     <div class="callout callout-green">Use a free Salesforce Developer Edition org: <strong>developer.salesforce.com/signup</strong> — free forever, full Apex + REST API access.</div>
 
     <div class="card">
-      <div class="card-title"><span class="icon">⚙</span> What you build</div>
+      <div class="card-title"><i class="ph ph-gear"></i> What you build</div>
       <ol class="steps">
         <li>A small Apex service class (<code>AccountService.cls</code>) with CRUD + external callout logic</li>
         <li>Full @isTest test class with happy path, negative, FLS, and bulk tests</li>
@@ -3829,7 +3831,7 @@ projects: [
 <!-- ════════════════ PROJECT 4 — POSTMAN ════════════════ -->
 <div id="s-project-postman" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -3844,7 +3846,7 @@ projects: [
     <div class="callout callout-blue">Postman is the industry-standard API exploration and manual testing tool. Newman (Postman's CLI) runs your collections in CI. Together they give you: explore → manual test → automate → gate — the full SDET loop.</div>
 
     <div class="card">
-      <div class="card-title"><span class="icon">⚙</span> Setup</div>
+      <div class="card-title"><i class="ph ph-gear"></i> Setup</div>
       <pre class="solo"><span class="cm"># Install Newman CLI</span>
 npm install -g newman newman-reporter-htmlextra
 
@@ -4022,7 +4024,7 @@ jobs:
 <!-- ════════════════ PROJECT 5 — PLAYWRIGHT ════════════════ -->
 <div id="s-project-playwright" class="section">
 <div class="guide-back-bar">
-      <button class="guide-back-btn" onclick="switchPanel('dash')">← Volver al Dashboard</button>
+      <button class="guide-back-btn" onclick="switchPanel('dash')">← Back to Dashboard</button>
       <span class="guide-back-crumb" id="guide-crumb"></span>
     </div>
 
@@ -4037,7 +4039,7 @@ jobs:
     <div class="callout callout-blue">Target app: <strong>demoqa.com</strong> — free practice site with forms, tables, modals, drag-and-drop. Perfect for realistic E2E scenarios without needing to build your own app.</div>
 
     <div class="card">
-      <div class="card-title"><span class="icon">⚙</span> Project structure</div>
+      <div class="card-title"><i class="ph ph-gear"></i> Project structure</div>
       <pre class="solo">playwright-tests/
 ├── tests/
 │   ├── api/
@@ -4310,7 +4312,7 @@ function submitSQ(sectionId) {
   res.style.display = '';
   res.innerHTML =
     '<div class="quiz-result-card ' + (passed ? 'quiz-result-pass' : 'quiz-result-fail') + '">' +
-      '<div class="quiz-result-icon">' + (passed ? '🎉' : '📚') + '</div>' +
+      '<div class="quiz-result-icon">' + (passed ? '<i class=\\"ph ph-celebrate\\"></i>' : '<i class=\\"ph ph-book-open\\"></i>') + '</div>' +
       '<div class="quiz-result-title">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
       '<div class="quiz-result-score">' + score + ' de ' + d.questions.length + ' correctas</div>' +
       (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" class="quiz-btn-retry" style="margin-top:18px">Intentar de nuevo</button>' : '') +

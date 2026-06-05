@@ -1,5 +1,10 @@
 {
-  "permissions": [
-    {"permission": "*", "pattern": "*", "action": "allow"}
-  ]
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "*": "allow"
+  },
+  "provider": {
+    "ollama": {}
+  },
+  "model": "ollama/qwen2.5-coder:7b"
 }

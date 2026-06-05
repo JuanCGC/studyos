@@ -2,8 +2,29 @@
 //  UNIFIED APP — STUDYOS + SDET GUIDE
 // ═══════════════════════════════════════════════
 
-window.CHAP_MAP = {"Fundamentos HTTP y REST": "api-basics", "Status codes y headers": "api-basics", "RestAssured setup + pom.xml": "project1", "PostsTest.java — happy path": "project1", "JSON Schema validation": "api-testing", "Negative tests y boundaries": "api-testing", "Auth testing — JWT y OAuth": "auth", "Security checklist — IDOR, XSS": "auth", "Data-driven tests @ParameterizedTest": "project1", "Allure reporting": "project1", "UsersTest.java completo": "project1", "CommentsTest.java completo": "project1", "Pact contract tests": "project2", "WireMock stubs": "project2", "CI/CD — GitHub Actions gate": "cicd", "k6 performance gates": "cicd", "Pipelines y stages": "cicd", "GitHub Actions basics": "cicd", "Quality gates": "cicd", "Docker fundamentals": "project2", "Docker Compose para tests": "project2", "Matrix builds": "project2", "Environments y secrets": "cicd", "Allure + artefactos": "project2", "Setup y configuración": "playwright", "API tests con request fixture": "playwright", "E2E tests básicos": "playwright", "Page Object Model": "playwright", "Hybrid API + UI tests": "playwright", "Visual regression testing": "project-playwright", "Network interception": "project-playwright", "Cross-browser testing": "project-playwright", "Debugging y traces": "playwright", "GitHub Actions integration": "cicd", "demoqa.com proyecto completo": "project-playwright", "Dev Org setup + SF CLI": "sf-overview", "Apex basics": "apex-testing", "@isTest y @TestSetup": "apex-testing", "HttpCalloutMock": "apex-testing", "System.runAs() y FLS": "apex-testing", "Governor limits testing": "apex-testing", "Debug logs reading": "apex-testing", "LWC Jest tests": "apex-testing", "Batch Apex testing": "apex-testing", "Platform Events testing": "sf-project", "Flow testing en Apex": "sf-project", "SF CLI CI/CD pipeline": "sf-project", "Multi-org regression": "sf-project", "Copado basics": "sf-project", "Colecciones y workspaces": "project-postman", "Variables de entorno": "project-postman", "pm.test assertions": "project-postman", "Pre-request scripts": "project-postman", "Schema validation": "api-testing", "Chaining con env variables": "project-postman", "Collection Runner": "project-postman", "Data-driven con CSV": "project-postman", "Newman CLI": "project-postman", "HTML reports": "project-postman", "GitHub Actions + Newman": "project-postman", "Monitors": "project-postman", "Mock servers": "project-postman", "API documentation": "frameworks", "Flows (nuevo)": "project-postman", "Contract testing": "project2", "Performance testing": "cicd", "Negative test folder": "project-postman", "Advanced scripting": "project-postman", "Examen final": "cheatsheet", "API design patterns": "api-testing", "GraphQL testing": "frameworks", "gRPC testing": "frameworks"};
+window.CHAP_MAP = {"HTTP & REST Fundamentals": "api-basics", "Status Codes & Headers": "api-basics", "RestAssured setup + pom.xml": "project1", "PostsTest.java — happy path": "project1", "JSON Schema validation": "api-testing", "Negative tests & boundaries": "api-testing", "Auth testing — JWT & OAuth": "auth", "Security checklist — IDOR, XSS": "auth", "Data-driven tests @ParameterizedTest": "project1", "Allure reporting": "project1", "UsersTest.java Complete": "project1", "CommentsTest.java Complete": "project1", "Pact contract tests": "project2", "WireMock stubs": "project2", "CI/CD — GitHub Actions gate": "cicd", "k6 performance gates": "cicd", "Pipelines & Stages": "cicd", "GitHub Actions basics": "cicd", "Quality gates": "cicd", "Docker fundamentals": "project2", "Docker Compose for Tests": "project2", "Matrix builds": "project2", "Environments & Secrets": "cicd", "Allure + Artifacts": "project2", "Setup & Configuration": "playwright", "API Tests with Request Fixture": "playwright", "Basic E2E Tests": "playwright", "Page Object Model": "playwright", "Hybrid API + UI tests": "playwright", "Visual regression testing": "project-playwright", "Network interception": "project-playwright", "Cross-browser testing": "project-playwright", "Debugging & Traces": "playwright", "GitHub Actions integration": "cicd", "demoqa.com Full Project": "project-playwright", "Dev Org setup + SF CLI": "sf-overview", "Apex basics": "apex-testing", "@isTest & @TestSetup": "apex-testing", "HttpCalloutMock": "apex-testing", "System.runAs() & FLS": "apex-testing", "Governor limits testing": "apex-testing", "Debug logs reading": "apex-testing", "LWC Jest tests": "apex-testing", "Batch Apex testing": "apex-testing", "Platform Events testing": "sf-project", "Flow Testing in Apex": "sf-project", "SF CLI CI/CD pipeline": "sf-project", "Multi-org regression": "sf-project", "Copado basics": "sf-project", "Collections & Workspaces": "project-postman", "Environment Variables": "project-postman", "pm.test assertions": "project-postman", "Pre-request scripts": "project-postman", "Schema validation": "api-testing", "Chaining with Env Variables": "project-postman", "Collection Runner": "project-postman", "Data-Driven with CSV": "project-postman", "Newman CLI": "project-postman", "HTML reports": "project-postman", "GitHub Actions + Newman": "project-postman", "Monitors": "project-postman", "Mock servers": "project-postman", "API documentation": "frameworks", "Flows (new)": "project-postman", "Contract testing": "project2", "Performance testing": "cicd", "Negative test folder": "project-postman", "Advanced scripting": "project-postman", "Final Exam": "cheatsheet", "API design patterns": "api-testing", "GraphQL testing": "frameworks", "gRPC testing": "frameworks"};
 const CHAP_MAP = window.CHAP_MAP;
+window.CHAP_MAP['Data-Driven Testing with External JSON'] = 'playwright';
+window.CHAP_MAP['Multi-Tenant Config Engine'] = 'playwright';
+window.CHAP_MAP['Harness Pipelines Fundamentals'] = 'cicd';
+window.CHAP_MAP['Quality Gates in Harness'] = 'cicd';
+window.CHAP_MAP['Harness CD Pipeline'] = 'cicd';
+window.CHAP_MAP['K6 Setup & VU Concepts'] = 'cicd';
+window.CHAP_MAP['Smoke Testing'] = 'cicd';
+window.CHAP_MAP['Load Testing'] = 'cicd';
+window.CHAP_MAP['Stress Testing'] = 'cicd';
+window.CHAP_MAP['Soak Testing'] = 'cicd';
+window.CHAP_MAP['Thresholds & Metrics'] = 'cicd';
+window.CHAP_MAP['K6 in CI/CD'] = 'cicd';
+window.CHAP_MAP['Final Project: Black Friday'] = 'cicd';
+window.CHAP_MAP['SQL Fundamentals & SELECT'] = 'api-basics';
+window.CHAP_MAP['JOINs & Relationships'] = 'api-basics';
+window.CHAP_MAP['GROUP BY & HAVING'] = 'api-basics';
+window.CHAP_MAP['Subqueries & CTEs'] = 'api-basics';
+window.CHAP_MAP['Data Integrity Validation'] = 'api-basics';
+window.CHAP_MAP['Duplicate & Orphan Detection'] = 'api-basics';
+window.CHAP_MAP['Post-Automation Audit'] = 'api-basics';
+window.CHAP_MAP['Final Project: DB Audit'] = 'api-basics';
 
 // ═══════════════════════════════════════════════════════════════
 //  EMBEDDED STUDY GUIDES — Lab Express + Project Evolution
@@ -12,572 +33,727 @@ const CHAP_MAP = window.CHAP_MAP;
 const EMBEDDED_GUIDES = {
   // ── API TESTING ──────────────────────────────────────────
   'api_0':{
-    kc:'Estructura de Requests, Responses, Headers, query params y verbos HTTP (GET, POST, PUT, DELETE)',
-    le:{title:'Consumo de Endpoints Públicos de Moneda',
-      body:'Usa curl y Postman contra exchangerate-api.com.\n1. curl -I https://api.exchangerate-api.com/v4/latest/USD → validar 200 + Content-Type\n2. curl ... | jq \'.rates | length\' → debe ser > 10\n3. En Postman: GET, ver body, headers, pretty print\n4. URL inválida: /v4/latest/INVALID → esperar 404'},
-    pe:{title:'Endpoints de Cuentas y Balances',
-      body:'Colección base Postman + RestAssured para el proyecto bancario.\n1. POST /accounts → 201, accountId, accountType:"SAVINGS", balance:0\n2. GET /accounts/{id} → 200, coincide con creación\n3. GET /balances?accountId={id} → 200, availableBalance, currentBalance\n4. GET /accounts/99999 → 404\n5. Variables Postman: base_url, account_id, token'}
+    kc:'Request structure, Responses, Headers, query params and HTTP verbs (GET, POST, PUT, DELETE)',
+    le:{title:'Public Currency Endpoint Consumption',
+      body:'Use curl and Postman against exchangerate-api.com.\n1. curl -I https://api.exchangerate-api.com/v4/latest/USD → validate 200 + Content-Type\n2. curl ... | jq \'.rates | length\' → must be > 10\n3. In Postman: GET, view body, headers, pretty print\n4. Invalid URL: /v4/latest/INVALID → expect 404'},
+    pe:{title:'Accounts and Balances Endpoints',
+      body:'Base Postman collection + RestAssured for the banking project.\n1. POST /accounts → 201, accountId, accountType:"SAVINGS", balance:0\n2. GET /accounts/{id} → 200, matches creation\n3. GET /balances?accountId={id} → 200, availableBalance, currentBalance\n4. GET /accounts/99999 → 404\n5. Postman variables: base_url, account_id, token'}
   },
   'api_1':{
-    kc:'Aserciones rígidas de tipos de datos, obligatoriedad de campos y validación estricta de JSON Schema',
-    le:{title:'Validador de Tipos Aislado',
-      body:'Schema JSON para perfil de usuario vs GET /users/1 de JSONPlaceholder.\n1. Schema con id(int), name(string), email(pattern), address(object)\n2. additionalProperties: false\n3. Validar con GET /users/1 → debe pasar\n4. Cambiar email a type:number → validación falla'},
-    pe:{title:'Validación de Contrato del Historial de Transacciones',
-      body:'Suite que verifica GET /transactions cumpla esquema.\n1. Schema: transactionId(pattern), amount(number), currency(enum), type(enum), timestamp(format:date-time)\n2. Validar GET /transactions contra schema\n3. Validar GET /transactions?status=PENDING\n4. Schema para array: type:array, items con $ref'}
+    kc:'Strict data type assertions, required fields and strict JSON Schema validation',
+    le:{title:'Isolated Type Validator',
+      body:'JSON Schema for user profile vs GET /users/1 from JSONPlaceholder.\n1. Schema with id(int), name(string), email(pattern), address(object)\n2. additionalProperties: false\n3. Validate with GET /users/1 → must pass\n4. Change email to type:number → validation fails'},
+    pe:{title:'Transaction History Contract Validation',
+      body:'Suite that verifies GET /transactions complies with schema.\n1. Schema: transactionId(pattern), amount(number), currency(enum), type(enum), timestamp(format:date-time)\n2. Validate GET /transactions against schema\n3. Validate GET /transactions?status=PENDING\n4. Schema for array: type:array, items with $ref'}
   },
   'api_2':{
-    kc:'Configuración de proyecto Maven con RestAssured, request/response specs, logging, base URI',
-    le:{title:'Maven + RestAssured Mínimo',
-      body:'Proyecto Maven desde cero con RestAssured, JUnit 5, test simple.\n1. mvn archetype:generate -DgroupId=com.banking -DartifactId=banking-api-test\n2. pom.xml: rest-assured 5.5.0, junit-jupiter 5.11.0, json-schema-validator\n3. Test: GET /posts/1 → status 200\n4. Agregar filtros de request/response logging'},
-    pe:{title:'Configuración del Proyecto Bancario',
-      body:'ApiConfig.java con specs reutilizables.\n1. RequestSpecBuilder con baseURI, ContentType JSON, logging\n2. ResponseSpecBuilder con tiempo máximo\n3. Extraer config a variable de entorno BASE_URL'}
+    kc:'Maven project setup with RestAssured, request/response specs, logging, base URI',
+    le:{title:'Maven + RestAssured Minimal',
+      body:'Maven project from scratch with RestAssured, JUnit 5, simple test.\n1. mvn archetype:generate -DgroupId=com.banking -DartifactId=banking-api-test\n2. pom.xml: rest-assured 5.5.0, junit-jupiter 5.11.0, json-schema-validator\n3. Test: GET /posts/1 → status 200\n4. Add request/response logging filters'},
+    pe:{title:'Banking Project Configuration',
+      body:'ApiConfig.java with reusable specs.\n1. RequestSpecBuilder with baseURI, ContentType JSON, logging\n2. ResponseSpecBuilder with max timeout\n3. Extract config to BASE_URL environment variable'}
   },
   'api_3':{
-    kc:'Tests de happy path para endpoints CRUD usando RestAssured given/when/then',
-    le:{title:'CRUD Happy Path contra JSONPlaceholder',
-      body:'Tests GET, POST, PUT, PATCH, DELETE contra /posts.\n1. GET /posts → 200 + 100 items\n2. GET /posts/1 → 200 + id=1\n3. POST /posts → 201 + id generado\n4. PUT /posts/1 → 200 + datos actualizados\n5. DELETE /posts/1 → 200'},
-    pe:{title:'CRUD de Cuentas Bancarias',
-      body:'Tests happy path para cuentas bancarias.\n1. POST /accounts → 201\n2. GET /accounts/{id} → 200\n3. PUT /accounts/{id} cambiar tipo\n4. PATCH /accounts/{id} actualizar nickname\n5. DELETE /accounts/{id} → 200'}
+    kc:'Happy path tests for CRUD endpoints using RestAssured given/when/then',
+    le:{title:'CRUD Happy Path against JSONPlaceholder',
+      body:'Tests GET, POST, PUT, PATCH, DELETE against /posts.\n1. GET /posts → 200 + 100 items\n2. GET /posts/1 → 200 + id=1\n3. POST /posts → 201 + generated id\n4. PUT /posts/1 → 200 + updated data\n5. DELETE /posts/1 → 200'},
+    pe:{title:'Bank Account CRUD',
+      body:'Happy path tests for bank accounts.\n1. POST /accounts → 201\n2. GET /accounts/{id} → 200\n3. PUT /accounts/{id} change type\n4. PATCH /accounts/{id} update nickname\n5. DELETE /accounts/{id} → 200'}
   },
   'api_4':{
-    kc:'Validación programática de schemas JSON en RestAssured con matchesJsonSchemaInClasspath',
+    kc:'Programmatic JSON Schema validation in RestAssured with matchesJsonSchemaInClasspath',
     le:{title:'Schema Validator',
-      body:'1. Crear schema post.json con additionalProperties: false\n2. matchesJsonSchemaInClasspath("schemas/post.json")\n3. Romper schema intencionalmente → test falla'},
-    pe:{title:'Schemas del Core Bancario',
-      body:'Validar cada endpoint contra su schema: Account, Transaction, User, Balance. Todos con additionalProperties: false'}
+      body:'1. Create post.json schema with additionalProperties: false\n2. matchesJsonSchemaInClasspath("schemas/post.json")\n3. Break schema intentionally → test fails'},
+    pe:{title:'Banking Core Schemas',
+      body:'Validate each endpoint against its schema: Account, Transaction, User, Balance. All with additionalProperties: false'}
   },
   'api_5':{
-    kc:'Pruebas de límites, valores frontera, datos inválidos y esperar códigos 4xx',
+    kc:'Boundary tests, edge values, invalid data and expecting 4xx codes',
     le:{title:'Negative Playground',
-      body:'Tests con IDs negativos, strings vacíos, body malformado contra JSONPlaceholder.\n1. IDs negativos → 404\n2. Body vacío {} → 400/422\n3. Campos extra → según API'},
+      body:'Tests with negative IDs, empty strings, malformed body against JSONPlaceholder.\n1. Negative IDs → 404\n2. Empty body {} → 400/422\n3. Extra fields → depends on API'},
     pe:{title:'Negative Banking',
-      body:'Tests: saldo insuficiente, monto negativo, transferencia a cuenta inexistente, tipos incorrectos.'}
+      body:'Tests: insufficient balance, negative amount, transfer to non-existent account, wrong types.'}
   },
   'api_6':{
-    kc:'Flujo de autenticación JWT, obtención de tokens, uso en headers Authorization, refresh tokens',
-    le:{title:'Token Flow en Postman',
-      body:'Usar reqres.in para registrar usuario, extraer token, pasarlo al siguiente request.\n1. POST /api/register → extraer token con pm.environment.set()\n2. GET protegido con Authorization: Bearer {{token}}'},
-    pe:{title:'Autenticación Bancaria',
-      body:'Tests: login obtiene JWT, endpoint sin token → 401, token expirado → 401, token válido → 200, refresh token'}
+    kc:'JWT authentication flow, token retrieval, use in Authorization headers, refresh tokens',
+    le:{title:'Token Flow in Postman',
+      body:'Use reqres.in to register user, extract token, pass to next request.\n1. POST /api/register → extract token with pm.environment.set()\n2. Protected GET with Authorization: Bearer {{token}}'},
+    pe:{title:'Banking Authentication',
+      body:'Tests: login gets JWT, endpoint without token → 401, expired token → 401, valid token → 200, refresh token'}
   },
   'api_7':{
-    kc:'Detección de Insecure Direct Object References y Cross-Site Scripting en payloads',
-    le:{title:'IDOR Simulado',
-      body:'User A crea recurso, User B intenta acceder. JSONPlaceholder no protege, pero el test documenta el concepto.'},
-    pe:{title:'Security Hardening Bancario',
-      body:'Tests: usuario no ve cuenta de otro (IDOR), endpoint rechaza <script> (XSS), SQLi en params, rate limiting 429'}
+    kc:'Detection of Insecure Direct Object References and Cross-Site Scripting in payloads',
+    le:{title:'Simulated IDOR',
+      body:'User A creates resource, User B tries to access. JSONPlaceholder does not protect, but the test documents the concept.'},
+    pe:{title:'Banking Security Hardening',
+      body:'Tests: user cannot see another account (IDOR), endpoint rejects <script> (XSS), SQLi in params, rate limiting 429'}
   },
   'api_8':{
-    kc:'Tests parametrizados con @CsvSource, @ValueSource, @MethodSource en JUnit 5',
+    kc:'Parameterized tests with @CsvSource, @ValueSource, @MethodSource in JUnit 5',
     le:{title:'Parametrized Playground',
-      body:'Test con 10 IDs de posts diferentes validando status 200 en todos.\n@ValueSource(ints = {1,2,3,4,5,6,7,8,9,10})'},
+      body:'Test with 10 different post IDs validating status 200 on all.\n@ValueSource(ints = {1,2,3,4,5,6,7,8,9,10})'},
     pe:{title:'Data-Driven Banking',
-      body:'Test parametrizado con 20 cuentas, todas balance >= 0. CSV con casos de transferencia (origen, destino, monto, expectedStatus)'}
+      body:'Parameterized test with 20 accounts, all balance >= 0. CSV with transfer cases (origin, destination, amount, expectedStatus)'}
   },
   'api_9':{
-    kc:'Configuración de Allure, anotaciones @DisplayName, @Feature, @Story, reportes visuales',
+    kc:'Allure configuration, @DisplayName, @Feature, @Story annotations, visual reports',
     le:{title:'Allure Quickstart',
-      body:'Agregar Allure a proyecto Maven, generar reporte local.\nmvn allure:serve'},
-    pe:{title:'Reporte Bancario Completo',
-      body:'Anotar todos los tests con @Feature("Accounts"), @Story("Create Account"). Reporte unificado en CI/CD como artefacto.'}
+      body:'Add Allure to Maven project, generate local report.\nmvn allure:serve'},
+    pe:{title:'Complete Banking Report',
+      body:'Annotate all tests with @Feature("Accounts"), @Story("Create Account"). Unified report in CI/CD as artifact.'}
   },
   'api_10':{
-    kc:'Tests para endpoints con relaciones entre recursos y campos anidados',
-    le:{title:'UsersTest contra JSONPlaceholder',
-      body:'GET /users, validar nested address/company, filtrar por username, GET /users/1/posts'},
-    pe:{title:'Clientes del Banco',
-      body:'Tests GET/POST /customers, validar documentos anidados (address, contactInfo), búsqueda por email, paginación'}
+    kc:'Tests for endpoints with resource relationships and nested fields',
+    le:{title:'UsersTest against JSONPlaceholder',
+      body:'GET /users, validate nested address/company, filter by username, GET /users/1/posts'},
+    pe:{title:'Bank Customers',
+      body:'Tests GET/POST /customers, validate nested documents (address, contactInfo), search by email, pagination'}
   },
   'api_11':{
-    kc:'Validación de listas, filtros por query param, formato de campos',
-    le:{title:'CommentsTest contra JSONPlaceholder',
-      body:'GET /comments (500), GET /comments?postId=1, validar email pattern'},
-    pe:{title:'Auditoría de Transacciones',
-      body:'GET /transactions con filtros por fecha, tipo, monto; paginación; ordenamiento'}
+    kc:'List validation, query param filters, field formats',
+    le:{title:'CommentsTest against JSONPlaceholder',
+      body:'GET /comments (500), GET /comments?postId=1, validate email pattern'},
+    pe:{title:'Transaction Audit',
+      body:'GET /transactions with filters by date, type, amount; pagination; ordering'}
   },
   'api_12':{
-    kc:'Consumer-Driven Contracts con Pact para validar acuerdos entre servicios',
+    kc:'Consumer-Driven Contracts with Pact to validate agreements between services',
     le:{title:'Pact Hello World',
-      body:'Consumer test para servicio de pagos simulado, generar contrato Pact.\n@Pact(consumer="TaskFlowAPI", provider="PaymentsService")'},
-    pe:{title:'Contrato Bancario con Credit Score Service',
-      body:'Definir interacciones, generar contrato, publicar en Pact Broker, verificar del lado provider'}
+      body:'Consumer test for simulated payment service, generate Pact contract.\n@Pact(consumer="TaskFlowAPI", provider="PaymentsService")'},
+    pe:{title:'Banking Contract with Credit Score Service',
+      body:'Define interactions, generate contract, publish to Pact Broker, verify on provider side'}
   },
   'api_13':{
-    kc:'Virtualización de servicios externos con WireMock para tests aislados',
+    kc:'Virtualization of external services with WireMock for isolated tests',
     le:{title:'WireMock Standalone',
-      body:'Levantar WireMock en Docker, crear stub JSON, probar con curl.\ndocker run -p 8081:8080 wiremock/wiremock'},
-    pe:{title:'Stubbing del Credit Bureau',
-      body:'Simular respuestas del buró de crédito: score alto (aprobado), score bajo (rechazado), timeout'}
+      body:'Start WireMock in Docker, create JSON stub, test with curl.\ndocker run -p 8081:8080 wiremock/wiremock'},
+    pe:{title:'Credit Bureau Stubbing',
+      body:'Simulate credit bureau responses: high score (approved), low score (rejected), timeout'}
   },
   'api_14':{
-    kc:'Pipeline de tests automatizados con quality gates en GitHub Actions',
-    le:{title:'GHA Mínimo',
-      body:'Workflow que corre mvn clean test en cada push.\n.github/workflows/test.yml'},
-    pe:{title:'Pipeline Bancario con Gates',
+    kc:'Automated test pipeline with quality gates in GitHub Actions',
+    le:{title:'Minimal GHA',
+      body:'Workflow that runs mvn clean test on every push.\n.github/workflows/test.yml'},
+    pe:{title:'Banking Pipeline with Gates',
       body:'Stages: unit → integration → contract → security → performance. Gates: coverage ≥ 80%, 0 security, p95 < 500ms'}
   },
   'api_15':{
-    kc:'Pruebas de carga, estrés, thresholds y performance gates en CI/CD con k6',
+    kc:'Load, stress, threshold and performance gates in CI/CD with k6',
     le:{title:'k6 Smoke Test',
-      body:'Script 1 VU contra JSONPlaceholder con threshold p95 < 200ms. k6 run smoke.js'},
+      body:'1 VU script against JSONPlaceholder with p95 < 200ms threshold. k6 run smoke.js'},
     pe:{title:'Performance Banking',
-      body:'Smoke test endpoints críticos, stress test 100 VUs concurrentes. Thresholds: p95 < 500ms, error rate < 1%'}
+      body:'Smoke test critical endpoints, stress test 100 concurrent VUs. Thresholds: p95 < 500ms, error rate < 1%'}
   },
   'api_16':{
-    kc:'Patrones de diseño de APIs REST: HATEOAS, paginación, versionado, idempotencia',
+    kc:'REST API design patterns: HATEOAS, pagination, versioning, idempotency',
     le:{title:'Idempotency Test',
-      body:'Mismo POST dos veces → IDs diferentes (no idempotente). Mismo PUT dos veces → mismo resultado.'},
-    pe:{title:'Idempotencia Bancaria',
-      body:'Tests: POST /transactions con idempotency-key, paginación HATEOAS, versionado /v1/ vs /v2/'}
+      body:'Same POST twice → different IDs (not idempotent). Same PUT twice → same result.'},
+    pe:{title:'Banking Idempotency',
+      body:'Tests: POST /transactions with idempotency-key, HATEOAS pagination, versioning /v1/ vs /v2/'}
   },
   'api_17':{
-    kc:'Testing de APIs GraphQL: queries, mutations, validación de schemas',
+    kc:'GraphQL API testing: queries, mutations, schema validation',
     le:{title:'GraphQL Playground',
-      body:'Query a https://countries.trevorblades.com pidiendo nombre, código y continente de países.\n{ countries { name code continent { name } } }'},
-    pe:{title:'GraphQL Bancario',
-      body:'Tests para query de cuentas, mutation de transferencia, validación de errores GraphQL, fragmentos reutilizables'}
+      body:'Query https://countries.trevorblades.com requesting name, code and continent of countries.\n{ countries { name code continent { name } } }'},
+    pe:{title:'Banking GraphQL',
+      body:'Tests for account query, transfer mutation, GraphQL error validation, reusable fragments'}
   },
   'api_18':{
-    kc:'Fundamentos de gRPC, protocol buffers, tests con gRPC client',
+    kc:'gRPC fundamentals, protocol buffers, tests with gRPC client',
     le:{title:'gRPC Hello World',
-      body:'Usar grpcurl contra API gRPC pública para listar servicios y hacer un RPC.'},
-    pe:{title:'gRPC para Transacciones Internas',
-      body:'Probar endpoint gRPC interno de validación de transacciones con diferentes payloads.'}
+      body:'Use grpcurl against public gRPC API to list services and make an RPC.'},
+    pe:{title:'gRPC for Internal Transactions',
+      body:'Test internal gRPC transaction validation endpoint with different payloads.'}
   },
   'api_19':{
-    kc:'Suite completa bancaria con todos los patrones de testing',
-    le:{title:'Mini-Banking Test en 30 min',
-      body:'Crear schema, happy path, negative test, auth test, data-driven test.'},
-    pe:{title:'Cierre del Proyecto Bancario',
-      body:'Suite completa pasando en CI/CD, Allure report, cobertura ≥ 80%, README final con badges.'}
+    kc:'Complete banking suite with all testing patterns',
+    le:{title:'Mini-Banking Test in 30 min',
+      body:'Create schema, happy path, negative test, auth test, data-driven test.'},
+    pe:{title:'Banking Project Closeout',
+      body:'Full suite passing in CI/CD, Allure report, coverage ≥ 80%, final README with badges.'}
   },
 
   // ── CI/CD ──────────────────────────────────────────────
   'cicd_0':{
-    kc:'Sintaxis de archivos de configuración de workflows, triggers (push, pull_request) y runners virtuales',
-    le:{title:'Pipeline Hola Mundo',
-      body:'Workflow con 3 stages (build, test, deploy) cada uno con un echo.\n.github/workflows/pipeline.yml'},
-    pe:{title:'Stages del Pipeline Logístico',
+    kc:'Workflow configuration file syntax, triggers (push, pull_request) and virtual runners',
+    le:{title:'Hello World Pipeline',
+      body:'Workflow with 3 stages (build, test, deploy) each with an echo.\n.github/workflows/pipeline.yml'},
+    pe:{title:'Logistics Pipeline Stages',
       body:'build → test → contract → security → performance → deploy → notify'}
   },
   'cicd_1':{
     kc:'GitHub Actions: jobs, steps, actions, triggers, runners',
     le:{title:'Hello World Workflow',
-      body:'.github/workflows/hello.yml con trigger push, checkout, echo.\nname: Mi primer pipeline\non: [push]\njobs:\n  hello:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: echo "Pipeline corriendo en $(date)"'},
-    pe:{title:'Pipeline Base de Integración',
-      body:'Workflow en push a main, configura Node.js, instala deps, corre tests.\nIncluye caché de node_modules y upload de reportes.'}
+      body:'.github/workflows/hello.yml with trigger push, checkout, echo.\nname: My first pipeline\non: [push]\njobs:\n  hello:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: echo "Pipeline running on $(date)"'},
+    pe:{title:'Integration Base Pipeline',
+      body:'Workflow on push to main, sets up Node.js, installs deps, runs tests.\nIncludes node_modules cache and report upload.'}
   },
   'cicd_2':{
-    kc:'Quality gates como barreras de calidad en pipelines que bloquean el merge si no se cumplen',
-    le:{title:'Gate Simulado',
-      body:'Job que evalúa condición y falla si no se cumple.\nrun: test 1 -eq 1 → pasa, test 1 -eq 2 → falla'},
-    pe:{title:'Gates del Pipeline Logístico',
-      body:'Coverage ≥ 80%, Tests pasando 100%, Performance p95 < 500ms, Security scan pass. Cada gate es un job separado.'}
+    kc:'Quality gates as quality barriers in pipelines that block merge if not met',
+    le:{title:'Simulated Gate',
+      body:'Job that evaluates a condition and fails if not met.\nrun: test 1 -eq 1 → passes, test 1 -eq 2 → fails'},
+    pe:{title:'Logistics Pipeline Gates',
+      body:'Coverage ≥ 80%, Tests passing 100%, Performance p95 < 500ms, Security scan pass. Each gate is a separate job.'}
   },
   'cicd_3':{
-    kc:'Docker: imágenes, contenedores, Dockerfile, multi-stage builds',
+    kc:'Docker: images, containers, Dockerfile, multi-stage builds',
     le:{title:'Docker Hello World',
-      body:'Dockerfile simple con Nginx, build, run.\ndocker build -t my-nginx .\ndocker run -p 8080:80 my-nginx'},
-    pe:{title:'Dockerfile para API de Logística',
-      body:'Multi-stage: build con Maven, run con JRE slim, healthcheck configurado.'}
+      body:'Simple Dockerfile with Nginx, build, run.\ndocker build -t my-nginx .\ndocker run -p 8080:80 my-nginx'},
+    pe:{title:'Dockerfile for Logistics API',
+      body:'Multi-stage: build with Maven, run with JRE slim, healthcheck configured.'}
   },
   'cicd_4':{
-    kc:'Docker Compose para orquestar múltiples servicios en tests de integración',
-    le:{title:'Docker Compose Mínimo',
-      body:'Servicio API + Postgres, levantar con docker compose up.\ndocker compose up -d'},
-    pe:{title:'Compose de Logística',
-      body:'api + mysql + wiremock + redis interconectados para tests de integración.'}
+    kc:'Docker Compose for orchestrating multiple services in integration tests',
+    le:{title:'Minimal Docker Compose',
+      body:'API service + Postgres, start with docker compose up.\ndocker compose up -d'},
+    pe:{title:'Logistics Compose',
+      body:'api + mysql + wiremock + redis interconnected for integration tests.'}
   },
   'cicd_5':{
-    kc:'Matrix builds para ejecutar tests en múltiples versiones/plataformas en paralelo',
-    le:{title:'Matrix Hola Mundo',
-      body:'Matrix de OS [ubuntu, windows] + node [18, 20].\nstrategy:\n  matrix:\n    os: [ubuntu-latest, windows-latest]\n    node: [18, 20]'},
-    pe:{title:'Matrix Logístico',
-      body:'JDK [17, 21] + browser [chromium, firefox] para suite E2E + API.'}
+    kc:'Matrix builds to run tests across multiple versions/platforms in parallel',
+    le:{title:'Hello World Matrix',
+      body:'Matrix of OS [ubuntu, windows] + node [18, 20].\nstrategy:\n  matrix:\n    os: [ubuntu-latest, windows-latest]\n    node: [18, 20]'},
+    pe:{title:'Logistics Matrix',
+      body:'JDK [17, 21] + browser [chromium, firefox] for E2E + API suite.'}
   },
   'cicd_6':{
-    kc:'GitHub Environments, secrets management, variables de entorno protegidas',
+    kc:'GitHub Environments, secrets management, protected environment variables',
     le:{title:'Secrets Demo',
-      body:'Workflow que usa secret MY_SECRET y lo muestra (con masking).\n${{ secrets.MY_SECRET }}'},
-    pe:{title:'Secrets del Pipeline Logístico',
-      body:'API_KEY, DB_URL, SLACK_WEBHOOK, PACT_BROKER_TOKEN configurados en GitHub Environments con protección.'}
+      body:'Workflow that uses secret MY_SECRET and displays it (with masking).\n${{ secrets.MY_SECRET }}'},
+    pe:{title:'Logistics Pipeline Secrets',
+      body:'API_KEY, DB_URL, SLACK_WEBHOOK, PACT_BROKER_TOKEN configured in GitHub Environments with protection.'}
   },
   'cicd_7':{
-    kc:'Artefactos de build: upload, download, persistencia entre jobs',
-    le:{title:'Allure Artefacto',
-      body:'Workflow que corre tests Maven, sube allure-results como artefacto.\nuses: actions/upload-artifact@v4'},
-    pe:{title:'Artefactos Completos',
-      body:'allure-results, playwright-report, newman-report, k6-json. Todos subidos con retention de 30 días.'}
+    kc:'Build artifacts: upload, download, persistence between jobs',
+    le:{title:'Allure Artifact',
+      body:'Workflow that runs Maven tests, uploads allure-results as artifact.\nuses: actions/upload-artifact@v4'},
+    pe:{title:'Complete Artifacts',
+      body:'allure-results, playwright-report, newman-report, k6-json. All uploaded with 30-day retention.'}
   },
   'cicd_8':{
-    kc:'Pruebas de carga/estrés/soak con k6 y thresholds en CI/CD',
-    le:{title:'k6 en GHA',
-      body:'Workflow que instala k6, corre smoke.js, verifica thresholds.\nk6 run smoke.js'},
+    kc:'Load/stress/soak testing with k6 and thresholds in CI/CD',
+    le:{title:'k6 in GHA',
+      body:'Workflow that installs k6, runs smoke.js, verifies thresholds.\nk6 run smoke.js'},
     pe:{title:'Performance Stage',
-      body:'Scripts smoke + stress + soak. Todos ejecutados en CI. Gate bloquea si p95 > 500ms.'}
+      body:'Smoke + stress + soak scripts. All executed in CI. Gate blocks if p95 > 500ms.'}
   },
   'cicd_9':{
-    kc:'Contract testing con Pact en pipeline CI/CD, verificación provider-side',
-    le:{title:'Pact en CI',
-      body:'Workflow que corre tests Pact y verifica contratos.\nmvn test -Dtest=*Pact*'},
+    kc:'Contract testing with Pact in CI/CD pipeline, provider-side verification',
+    le:{title:'Pact in CI',
+      body:'Workflow that runs Pact tests and verifies contracts.\nmvn test -Dtest=*Pact*'},
     pe:{title:'Contract Stage',
-      body:'Consumer tests publican contratos, provider tests los verifican, Pact Broker como fuente de verdad.'}
+      body:'Consumer tests publish contracts, provider tests verify them, Pact Broker as source of truth.'}
   },
   'cicd_10':{
-    kc:'Integración con Slack: notificaciones automáticas de pipelines',
+    kc:'Slack integration: automatic pipeline notifications',
     le:{title:'Slack Hello',
-      body:'Workflow con Slack notification enviando "Pipeline started".\nuses: slackapi/slack-github-action@v2'},
-    pe:{title:'Notificaciones del Pipeline Logístico',
-      body:'Slack por stage (success/failure), mención @channel en fallos críticos.'}
+      body:'Workflow with Slack notification sending "Pipeline started".\nuses: slackapi/slack-github-action@v2'},
+    pe:{title:'Logistics Pipeline Notifications',
+      body:'Slack per stage (success/failure), @channel mention on critical failures.'}
   },
   'cicd_11':{
-    kc:'Ephemeral environments creados por PR, destruidos al mergear',
+    kc:'Ephemeral environments created by PR, destroyed on merge',
     le:{title:'Review App',
-      body:'Workflow que crea entorno temporal en cada PR con mensaje de bienvenida.'},
-    pe:{title:'Ephemeral Logístico',
-      body:'Por PR: deploy API+DB+mock a entorno temporal, correr tests, destruir al mergear.'}
+      body:'Workflow that creates temporary environment on each PR with welcome message.'},
+    pe:{title:'Logistics Ephemeral',
+      body:'Per PR: deploy API+DB+mock to temporary environment, run tests, destroy on merge.'}
   },
   'cicd_12':{
-    kc:'Multi-org deployment con approvals manuales y rollback automático',
-    le:{title:'Deploy Multi-Env',
-      body:'Workflow con environment: [dev, staging, prod] y approval gates.\nenvironment:\n  name: production\n  url: https://api.example.com'},
-    pe:{title:'Deploy Logístico Multi-Región',
-      body:'Despliegue a US/EU/ASIA con approvals manuales en prod, rollback automático en fallo.'}
+    kc:'Multi-org deployment with manual approvals and automatic rollback',
+    le:{title:'Multi-Env Deploy',
+      body:'Workflow with environment: [dev, staging, prod] and approval gates.\nenvironment:\n  name: production\n  url: https://api.example.com'},
+    pe:{title:'Multi-Region Logistics Deploy',
+      body:'Deploy to US/EU/ASIA with manual approvals in prod, automatic rollback on failure.'}
   },
   'cicd_13':{
-    kc:'Pipeline CI/CD completo con stages, gates, artefactos, notificaciones y deploy',
-    le:{title:'Pipeline Completo en 30 min',
-      body:'4 stages con gates, artefactos, notificaciones Slack.'},
-    pe:{title:'Cierre del Pipeline Logístico',
-      body:'Pipeline completo pasando, documentación con badges, SLA de deploy < 10 min.'}
+    kc:'Complete CI/CD pipeline with stages, gates, artifacts, notifications and deploy',
+    le:{title:'Complete Pipeline in 30 min',
+      body:'4 stages with gates, artifacts, Slack notifications.'},
+    pe:{title:'Logistics Pipeline Closeout',
+      body:'Full pipeline passing, documentation with badges, deploy SLA < 10 min.'}
+  },
+
+  // ── CI/CD (Harness) ─────────────────────────────────────
+  'cicd_14':{
+    kc:'Harness Pipelines configuration, Harness Delegates, and automated quality barriers based on output metrics',
+    le:{title:'Basic Pipeline in Harness Cloud',
+      body:'Configure a basic pipeline in Harness Cloud that connects to an external repo and runs syntax validation (Linting).\n1. Create Harness account, connect example repo\n2. Pipeline with stage: git clone → run linter\n3. Add output variable with lint result\n4. Run pipeline and verify logs'},
+    pe:{title:'CD Pipeline with Quality Gates in Harness',
+      body:'Design a continuous delivery (CD) pipeline in Harness that runs your Playwright suite on each change and stops deployment if checks fail.\n1. Trigger on push to main\n2. Stage build → test (Playwright suite)\n3. Quality Gate: % of tests passed ≥ 95%\n4. If gate fails → cancel, notify Slack\n5. If gate passes → deploy to staging environment'}
+  },
+  'cicd_15':{
+    kc:'Integration of performance tests as Quality Gates within Harness pipelines',
+    le:{title:'Harness + K6 Gate',
+      body:'Pipeline that runs K6 smoke test and blocks if p95 exceeds SLA.\n1. Stage with K6 run step\n2. Extract metrics from JSON output\n3. Manual approval step if performance is marginal'},
+    pe:{title:'Complete Pipeline with Multiple Gates',
+      body:'CD pipeline with 3 gates: lint → test (Playwright) → performance (K6).\nEach gate is an independent step with evaluable barrier.\nAutomatic rollback if any later gate fails.'}
+  },
+  'cicd_16':{
+    kc:'Progressive deploy strategies in Harness: canary, blue/green, feature flags',
+    le:{title:'Canary Deploy',
+      body:'Harness pipeline with canary deploy: 10% → 50% → 100%.\nEach phase with health check and automatic rollback.'},
+    pe:{title:'Corporate Deploy Strategy',
+      body:'Combine canary + feature flags + quality gates.\nComplete pipeline with manual approval for production.'}
   },
 
   // ── PLAYWRIGHT ──────────────────────────────────────────
   'playwright_0':{
-    kc:'Inicialización de proyectos Playwright, configuración de navegadores (chromium/firefox/webkit), playwright.config.ts y primera corrida',
-    le:{title:'Hola Mundo Browser',
-      body:'1. npm init playwright@latest en carpeta temporal\n2. playwright.config.ts con browserName:"chromium", headless:true\n3. tests/hola-mundo.spec.ts: navegar a example.com, validar título\n4. npx playwright test → pass'},
-    pe:{title:'Inicialización del Proyecto E-Commerce',
-      body:'1. Crear ecommerce-platform/e2e-tests/\n2. npm init playwright@latest\n3. Configurar 3 browsers en projects\n4. baseURL: http://localhost:3000\n5. global-setup.ts con verificación del server'}
+    kc:'Playwright project initialization, browser configuration (chromium/firefox/webkit), playwright.config.ts and first run',
+    le:{title:'Hello World Browser',
+      body:'1. npm init playwright@latest in temp folder\n2. playwright.config.ts with browserName:"chromium", headless:true\n3. tests/hello-world.spec.ts: navigate to example.com, validate title\n4. npx playwright test → pass'},
+    pe:{title:'E-Commerce Project Initialization',
+      body:'1. Create ecommerce-platform/e2e-tests/\n2. npm init playwright@latest\n3. Configure 3 browsers in projects\n4. baseURL: http://localhost:3000\n5. global-setup.ts with server verification'}
   },
   'playwright_1':{
-    kc:'Uso de request fixture de Playwright para testear APIs REST sin navegador, APIRequestContext',
-    le:{title:'Catálogo de Productos desde API Pública',
-      body:'request fixture contra https://fakestoreapi.com/products.\n1. GET /products → status 200\n2. 20 productos\n3. Cada uno con id, title, price(number), category'},
-    pe:{title:'API Tests del Catálogo Interno',
-      body:'Suite contra endpoints REST de la tienda.\n1. GET /api/products → 200, array\n2. GET /api/products/1 → 200, body.id === 1\n3. GET /api/products/999 → 404\n4. GET /api/categories → 200\n5. ApiHelper class con métodos reutilizables'}
+    kc:'Using Playwright request fixture to test REST APIs without browser, APIRequestContext',
+    le:{title:'Product Catalog from Public API',
+      body:'request fixture against https://fakestoreapi.com/products.\n1. GET /products → status 200\n2. 20 products\n3. Each with id, title, price(number), category'},
+    pe:{title:'Internal Catalog API Tests',
+      body:'Suite against store REST endpoints.\n1. GET /api/products → 200, array\n2. GET /api/products/1 → 200, body.id === 1\n3. GET /api/products/999 → 404\n4. GET /api/categories → 200\n5. ApiHelper class with reusable methods'}
   },
   'playwright_2':{
-    kc:'Locators por accesibilidad (getByRole, getByText), acciones asíncronas (click, fill) y aserciones auto-retry (toBeVisible, toHaveText)',
-    le:{title:'Formulario de Registro Aislado',
-      body:'Navegar a https://demoqa.com/register.\n1. Click submit sin datos → errores visibles\n2. Llenar solo username → error en campos vacíos\n3. Llenar todo → submit → éxito/captcha'},
-    pe:{title:'Flujo de Checkout y Carrito',
-      body:'Script E2E completo de compra.\n1. Navegar a /products\n2. Buscar producto\n3. Agregar al carrito\n4. Validar subtotal, impuesto, total\n5. Confirmar pedido\n6. Validar mensaje "Pedido confirmado"'}
+    kc:'Accessibility-based locators (getByRole, getByText), async actions (click, fill) and auto-retry assertions (toBeVisible, toHaveText)',
+    le:{title:'Isolated Registration Form',
+      body:'Navigate to https://demoqa.com/register.\n1. Click submit with no data → visible errors\n2. Fill only username → error on empty fields\n3. Fill everything → submit → success/captcha'},
+    pe:{title:'Checkout and Cart Flow',
+      body:'Complete E2E purchase script.\n1. Navigate to /products\n2. Search product\n3. Add to cart\n4. Validate subtotal, tax, total\n5. Confirm order\n6. Validate "Order confirmed" message'}
   },
   'playwright_3':{
-    kc:'Abstracción de interfaces, encapsulamiento de selectores en clases POM, métodos limpios de interacción',
-    le:{title:'POM Modular de Login',
-      body:'Clase LoginPage con goto(), login(email, password), isLoggedIn(), getErrorMessage().\nTest que consume la clase para login inválido.'},
-    pe:{title:'Arquitectura de Páginas de la Tienda',
-      body:'CatalogPage, CartPage, CheckoutPage, OrderConfirmationPage.\nRefactorizar checkout.spec.ts para usar POMs.\nMétodos: search(), addToCart(), getItems(), fillShipping(), confirmOrder()'}
+    kc:'Interface abstraction, selector encapsulation in POM classes, clean interaction methods',
+    le:{title:'Modular Login POM',
+      body:'LoginPage class with goto(), login(email, password), isLoggedIn(), getErrorMessage().\nTest consuming the class for invalid login.'},
+    pe:{title:'Store Page Architecture',
+      body:'CatalogPage, CartPage, CheckoutPage, OrderConfirmationPage.\nRefactor checkout.spec.ts to use POMs.\nMethods: search(), addToCart(), getItems(), fillShipping(), confirmOrder()'}
   },
   'playwright_4':{
-    kc:'Inyección de estados de sesión, bypass de autenticación por Storage State, preparación de precondiciones por backend',
-    le:{title:'Bypass de Login por auth.json',
-      body:'1. npx playwright codegen --save-storage=auth.json\n2. Test con storageState: \'auth.json\'\n3. Navegador arranca autenticado sin login'},
-    pe:{title:'Inyección de Inventario Completo para Compra',
-      body:'1. beforeAll: POST /api/cart con 5 productos\n2. Guardar storageState\n3. Navegar directo a /checkout/review\n4. Validar 5 productos y total correcto'}
+    kc:'Session state injection, authentication bypass via Storage State, backend precondition preparation',
+    le:{title:'Login Bypass via auth.json',
+      body:'1. npx playwright codegen --save-storage=auth.json\n2. Test with storageState: \'auth.json\'\n3. Browser starts authenticated without login'},
+    pe:{title:'Full Inventory Injection for Purchase',
+      body:'1. beforeAll: POST /api/cart with 5 products\n2. Save storageState\n3. Navigate directly to /checkout/review\n4. Validate 5 products and correct total'}
   },
   'playwright_5':{
-    kc:'Capturas de pantalla con toHaveScreenshot(), manejo de maxDiffPixels y threshold, actualización de baselines',
-    le:{title:'Screenshot de Componente Aislado',
-      body:'Navegar a https://demoqa.com/buttons.\nexpect(page.locator(".main-header")).toHaveScreenshot("header.png")\nModificar zoom → test falla'},
-    pe:{title:'Catálogo Visual del E-Commerce',
-      body:'Visual regression para homepage, listing, detalle, carrito vacío/lleno, confirmación.\n--update-snapshots para actualizar baselines.'}
+    kc:'Screenshots with toHaveScreenshot(), maxDiffPixels and threshold handling, baseline updates',
+    le:{title:'Isolated Component Screenshot',
+      body:'Navigate to https://demoqa.com/buttons.\nexpect(page.locator(".main-header")).toHaveScreenshot("header.png")\nModify zoom → test fails'},
+    pe:{title:'E-Commerce Visual Catalog',
+      body:'Visual regression for homepage, listing, detail, empty/full cart, confirmation.\n--update-snapshots to update baselines.'}
   },
   'playwright_6':{
-    kc:'page.route(), modificación de requests/responses en vuelo, simulación de fallos de red, stub de APIs externas',
-    le:{title:'Interceptor de API Pública',
-      body:'Interceptar fakestoreapi.com/products, devolver [] vacío.\npage.route(\'**/products\', route => route.fulfill({body: \'[]\'}))\nValidar mensaje "No hay productos"'},
-    pe:{title:'Simulación de Gateway de Pagos',
-      body:'POST /api/payments/process interceptado.\nCaso éxito → 200 "approved"\nCaso rechazo → 402 "Fondos insuficientes"\nCaso timeout → route.abort(\'timedout\')'}
+    kc:'page.route(), in-flight request/response modification, network failure simulation, external API stubbing',
+    le:{title:'Public API Interceptor',
+      body:'Intercept fakestoreapi.com/products, return empty [].\npage.route(\'**/products\', route => route.fulfill({body: \'[]\'}))\nValidate "No products" message'},
+    pe:{title:'Payment Gateway Simulation',
+      body:'POST /api/payments/process intercepted.\nSuccess case → 200 "approved"\nRejection case → 402 "Insufficient funds"\nTimeout case → route.abort(\'timedout\')'}
   },
   'playwright_7':{
-    kc:'Ejecución de la misma suite en chromium, firefox y webkit; detección de diferencias de rendering; proyectos en config',
-    le:{title:'Detector de Diferencias',
-      body:'Screenshot de example.com en chromium y firefox.\nComparar outputs y documentar diferencias.'},
-    pe:{title:'Suite Cross-Browser Completa',
-      body:'3 proyectos en config: chromium, firefox, webkit.\nRetries: 2 solo para webkit.\nEjecutar login, checkout, catálogo en los 3.'}
+    kc:'Running the same suite in chromium, firefox and webkit; rendering difference detection; projects in config',
+    le:{title:'Difference Detector',
+      body:'Screenshot of example.com in chromium and firefox.\nCompare outputs and document differences.'},
+    pe:{title:'Complete Cross-Browser Suite',
+      body:'3 projects in config: chromium, firefox, webkit.\nRetries: 2 only for webkit.\nRun login, checkout, catalog on all 3.'}
   },
   'playwright_8':{
-    kc:'Trace Viewer, modo inspector (--debug), page.pause(), logging de acciones, generación con codegen',
-    le:{title:'Trace de un Test Fallido',
-      body:'Test que falla intencionalmente con trace: \'on\'.\nnpx playwright show-trace test-results/.../trace.zip\nExplorar timeline, network, console, DOM snapshot'},
-    pe:{title:'Debugging del Flujo de Pago',
-      body:'trace: \'on-first-retry\' en prod.\npage.pause() durante desarrollo.\nnpx playwright codegen http://localhost:3000/checkout'}
+    kc:'Trace Viewer, inspector mode (--debug), page.pause(), action logging, codegen generation',
+    le:{title:'Failed Test Trace',
+      body:'Test that intentionally fails with trace: \'on\'.\nnpx playwright show-trace test-results/.../trace.zip\nExplore timeline, network, console, DOM snapshot'},
+    pe:{title:'Payment Flow Debugging',
+      body:'trace: \'on-first-retry\' in prod.\npage.pause() during development.\nnpx playwright codegen http://localhost:3000/checkout'}
   },
   'playwright_9':{
-    kc:'Integración de Playwright en CI/CD, playwright.yml, cache de navegadores, reportes HTML como artefactos',
-    le:{title:'Pipeline Playwright Mínimo',
-      body:'.github/workflows/playwright.yml con action oficial.\nnpx playwright install --with-deps\nnpx playwright test\nUpload playwright-report/'},
-    pe:{title:'Pipeline E-Commerce Completo',
-      body:'Matrix de browsers: [chromium, firefox, webkit].\nCache de ~/.cache/ms-playwright.\nReporte HTML + Slack notification.'}
+    kc:'Playwright CI/CD integration, playwright.yml, browser cache, HTML reports as artifacts',
+    le:{title:'Minimal Playwright Pipeline',
+      body:'.github/workflows/playwright.yml with official action.\nnpx playwright install --with-deps\nnpx playwright test\nUpload playwright-report/'},
+    pe:{title:'Complete E-Commerce Pipeline',
+      body:'Browser matrix: [chromium, firefox, webkit].\nCache ~/.cache/ms-playwright.\nHTML report + Slack notification.'}
   },
   'playwright_10':{
-    kc:'Aplicación integrada de todos los conceptos de Playwright contra un solo sitio objetivo (demoqa.com)',
-    le:{title:'Automation de Elements y Forms',
-      body:'Tests para Text Box, Check Box, Radio Button, Web Tables en demoqa.com.\nPOM por sección. Validar mensajes de salida.'},
-    pe:{title:'No aplica directamente al proyecto E-Commerce',
-      body:'Este capítulo es complementario. Úsalo como práctica integradora final.'}
+    kc:'Integrated application of all Playwright concepts against a single target site (demoqa.com)',
+    le:{title:'Elements and Forms Automation',
+      body:'Tests for Text Box, Check Box, Radio Button, Web Tables on demoqa.com.\nPOM per section. Validate output messages.'},
+    pe:{title:'Not directly applicable to E-Commerce project',
+      body:'This chapter is complementary. Use it as a final integrative practice.'}
   },
   'playwright_11':{
-    kc:'Integración total: los 4 tipos de tests (API, E2E, visual, hybrid), CI/CD, reportes',
-    le:{title:'Mini-Suite Completa en 30 min',
-      body:'Suite que cubra API test + E2E + visual + network contra un sitio a elección.'},
-    pe:{title:'Cierre del Proyecto E-Commerce',
-      body:'Suite completa del e-commerce, reporte Allure + HTML, pipeline GHA en 3 browsers, README final.'}
+    kc:'Total integration: all 4 test types (API, E2E, visual, hybrid), CI/CD, reports',
+    le:{title:'Complete Mini-Suite in 30 min',
+      body:'Suite covering API test + E2E + visual + network against a site of choice.'},
+    pe:{title:'E-Commerce Project Closeout',
+      body:'Full e-commerce suite, Allure + HTML report, GHA pipeline on 3 browsers, final README.'}
+  },
+
+  // ── PLAYWRIGHT (New) ────────────────────────────────────
+  'playwright_12':{
+    kc:'Support for Continuous Delivery through data-driven repeatable tests, advanced fixture control and isolated parallelism',
+    le:{title:'Data-Driven Script with External JSON',
+      body:'Create an isolated data-driven.spec.ts that consumes dynamic external JSON to iterate user flows without duplicating code.\n1. Create data/test-users.json with 5+ profiles (admin, user, guest, etc.)\n2. test.each(data)(`Flow as $username`, async () => {...})\n3. Each profile navigates login → specific action → logout\n4. Add invalid data case (malformed email, short password)\n5. Run with --workers=4 and verify isolation'},
+    pe:{title:'Multi-Tenant Configuration Engine',
+      body:'Implement a multi-tenant configuration engine in your current framework to support parameterized executions by environment variables.\n1. Create config/loader.ts that reads process.env.TENANT + JSON per tenant\n2. Profiles: dev, staging, prod with different URLs and credentials\n3. Global fixture that loads config before each suite (workerScope)\n4. Tests using tenant-specific selectors and data\n5. Reports with tenant and environment metadata'}
+  },
+  'playwright_13':{
+    kc:'Corporate framework design with data isolation, parameterized fixture strategies and multi-tenant execution',
+    le:{title:'Multi-Tenant Fixtures',
+      body:'Extend Playwright base fixture to support per-tenant data.\n1. test.use({ storageState: \`./auth/\${tenant}.json\` })\n2. tenantPage fixture that configures cookies, language, currency\n3. Complete suite against 2 tenants in parallel\n4. Validate Tenant A data does not contaminate Tenant B'},
+    pe:{title:'Corporate Data-Driven Suite',
+      body:'Refactor all existing POMs to accept data-driven configs.\n1. Page objects with constructor receiving TenantConfig\n2. Test runners parameterized by tenant + feature\n3. JSON of expectations per scenario (expected results)\n4. CI integration to run all tenants in matrix'}
   },
 
   // ── SALESFORCE ──────────────────────────────────────────
   'sf_0':{
-    kc:'Creación de scratch orgs, Salesforce CLI, deploy de metadatos, configuración de Dev Hub',
-    le:{title:'Crear Scratch Org',
+    kc:'Scratch org creation, Salesforce CLI, metadata deployment, Dev Hub configuration',
+    le:{title:'Create Scratch Org',
       body:'sf org create scratch --definition-file config/dev-scratch.json --alias TestOrg\nsf project deploy start\nsf apex run test'},
-    pe:{title:'Setup del ERP',
-      body:'Crear Dev Hub, scratch org con objetos personalizados: Cliente__c, Contrato__c, Comision__c. Deploy del modelo de datos.'}
+    pe:{title:'ERP Setup',
+      body:'Create Dev Hub, scratch org with custom objects: Customer__c, Contract__c, Commission__c. Deploy data model.'}
   },
   'sf_1':{
-    kc:'Estructuras de datos nativas (List, Set, Map), clases, modificadores de acceso y colecciones tipadas en Apex',
-    le:{title:'Calculadora de Descuentos',
-      body:'Clase Apex con métodos estáticos que procesan colecciones de precios, aplican descuentos según rango, retornan totales.'},
-    pe:{title:'Modelo de Clientes Corporativos',
-      body:'ClienteService con métodos: calcularCategoria(ingresos), validarRFC(rfc), asignarLimiteCredito(clienteId). Clases de dominio.'}
+    kc:'Native data structures (List, Set, Map), classes, access modifiers and typed collections in Apex',
+    le:{title:'Discount Calculator',
+      body:'Apex class with static methods that process price collections, apply discounts by range, return totals.'},
+    pe:{title:'Corporate Customer Model',
+      body:'CustomerService with methods: calculateCategory(revenue), validateRFC(rfc), assignCreditLimit(customerId). Domain classes.'}
   },
   'sf_2':{
-    kc:'Anotación @isTest, métodos test, @TestSetup para datos reutilizables en pruebas Apex',
+    kc:'@isTest annotation, test methods, @TestSetup for reusable data in Apex tests',
     le:{title:'@isTest Hello',
-      body:'Clase de test con método que prueba suma de 2 números. System.assertEquals(4, sumar(2,2)).'},
-    pe:{title:'TestSetup de Contratos',
-      body:'@TestSetup que crea 5 contratos en diferentes estados. Tests que verifican consultas por estado, fechas de expiración, montos.'}
+      body:'Test class with method testing sum of 2 numbers. System.assertEquals(4, add(2,2)).'},
+    pe:{title:'Contract TestSetup',
+      body:'@TestSetup that creates 5 contracts in different states. Tests verifying queries by state, expiration dates, amounts.'}
   },
   'sf_3':{
-    kc:'HttpCalloutMock para simular llamadas HTTP externas en tests Apex',
-    le:{title:'Callout Mock Simple',
-      body:'Clase que hace GET a API externa. HttpCalloutMock que devuelve 200 con JSON fijo. Test.setMock(HttpCalloutMock.class, new MyMock()).'},
-    pe:{title:'Sincronización con API Bancaria',
-      body:'SyncClientesBatch que envía clientes al core bancario. Mock para éxito, rechazo (422), timeout.'}
+    kc:'HttpCalloutMock to simulate external HTTP calls in Apex tests',
+    le:{title:'Simple Callout Mock',
+      body:'Class that does GET to external API. HttpCalloutMock returning 200 with fixed JSON. Test.setMock(HttpCalloutMock.class, new MyMock()).'},
+    pe:{title:'Banking API Sync',
+      body:'SyncCustomersBatch that sends customers to banking core. Mock for success, rejection (422), timeout.'}
   },
   'sf_4':{
-    kc:'System.runAs() para probar permisos, FLS (Field-Level Security) en tests Apex',
+    kc:'System.runAs() for permission testing, FLS (Field-Level Security) in Apex tests',
     le:{title:'runAs Demo',
-      body:'Test que usa System.runAs(usuarioSinPermisos) y verifica que DML falle con System.DmlException.'},
-    pe:{title:'FLS en Contratos',
-      body:'Tests: usuario sin permiso a Monto__c no puede verlo. Admin sí. Permiso parcial solo edita campos permitidos.'}
+      body:'Test using System.runAs(userWithoutPermissions) and verifying DML fails with System.DmlException.'},
+    pe:{title:'FLS on Contracts',
+      body:'Tests: user without permission to Amount__c cannot see it. Admin can. Partial permission only edits allowed fields.'}
   },
   'sf_5':{
-    kc:'Governor limits en Apex: SOQL 100, DML 150, CPU time, heap size. Cómo testearlos.',
+    kc:'Governor limits in Apex: SOQL 100, DML 150, CPU time, heap size. How to test them.',
     le:{title:'Limits Inspector',
-      body:'Test que hace 101 SOQL en loop y captura System.LimitException. Ver límites actuales con Limits.getQueries().'},
+      body:'Test that does 101 SOQL in loop and catches System.LimitException. Check current limits with Limits.getQueries().'},
     pe:{title:'Bulk Contract Processing',
-      body:'Batch que procesa 10,000 contratos. Test verifica: SOQL 100, DML 150, CPU time, heap size con 200 registros.'}
+      body:'Batch processing 10,000 contracts. Test verifies: SOQL 100, DML 150, CPU time, heap size with 200 records.'}
   },
   'sf_6':{
-    kc:'System.debug(), niveles de log, depuración viendo logs en Setup → Logs',
+    kc:'System.debug(), log levels, debugging via Setup → Logs',
     le:{title:'System.debug Logger',
-      body:'Clase con System.debug() en niveles DEBUG, INFO, WARN, ERROR. Test la ejecuta, revisar logs en Setup → Logs.'},
-    pe:{title:'Debug del Pipeline de Comisiones',
-      body:'Método complejo que calcula comisiones con logs en cada paso. Test genera logs para depurar error de redondeo.'}
+      body:'Class with System.debug() at DEBUG, INFO, WARN, ERROR levels. Test executes it, review logs in Setup → Logs.'},
+    pe:{title:'Commission Pipeline Debug',
+      body:'Complex method calculating commissions with logs at each step. Test generates logs to debug rounding error.'}
   },
   'sf_7':{
-    kc:'Jest para LWC: configuración, mocks de servicios wire, testing de componentes Lightning',
-    le:{title:'Jest para LWC Hello',
-      body:'Inicializar Jest en proyecto LWC. Test que renderiza helloWorld y verifica texto. npm run test:unit'},
-    pe:{title:'Jest para ContractList LWC',
-      body:'Componente que lista contratos del cliente. Tests: render con datos mock, vacío, click abre detalle, formato moneda.'}
+    kc:'Jest for LWC: configuration, wire service mocks, Lightning component testing',
+    le:{title:'Jest for LWC Hello',
+      body:'Initialize Jest in LWC project. Test that renders helloWorld and verifies text. npm run test:unit'},
+    pe:{title:'Jest for ContractList LWC',
+      body:'Component listing customer contracts. Tests: render with mock data, empty, click opens detail, currency format.'}
   },
   'sf_8':{
-    kc:'Database.Batchable, métodos start/execute/finish, testing de procesos batch en Apex',
+    kc:'Database.Batchable, start/execute/finish methods, testing batch processes in Apex',
     le:{title:'Batch Hello',
-      body:'Database.Batchable que actualiza todos los Account con un campo. Test que verifica ejecución con Database.executeBatch().'},
-    pe:{title:'Batch de Vencimiento de Contratos',
-      body:'Batch que encuentra contratos por vencer (30 días), cambia estado a "Renovación Pendiente", crea tarea. Test con 200 registros.'}
+      body:'Database.Batchable that updates all Account with a field. Test verifying execution with Database.executeBatch().'},
+    pe:{title:'Contract Expiration Batch',
+      body:'Batch that finds contracts about to expire (30 days), changes status to "Renewal Pending", creates task. Test with 200 records.'}
   },
   'sf_9':{
-    kc:'Platform Events: publicación y suscripción, testing end-to-end de flujos event-driven',
+    kc:'Platform Events: publication and subscription, end-to-end testing of event-driven flows',
     le:{title:'Platform Event Pub/Sub',
-      body:'Publicar Order_Event__e con orderId. Listener que lo recibe y debuggea. EventBus.publish().'},
-    pe:{title:'Evento de Contrato Renovado',
-      body:'Publicar Contract_Renewed__e cuando se renueva. Subscriber actualiza comisión. Test end-to-end del flujo completo.'}
+      body:'Publish Order_Event__e with orderId. Listener that receives it and debugs. EventBus.publish().'},
+    pe:{title:'Renewed Contract Event',
+      body:'Publish Contract_Renewed__e when renewed. Subscriber updates commission. End-to-end test of full flow.'}
   },
   'sf_10':{
-    kc:'Flow + Apex actions: invocar Apex desde Flow builder, testing del Apex invocado',
+    kc:'Flow + Apex actions: invoke Apex from Flow builder, testing the invoked Apex',
     le:{title:'Flow + Apex',
-      body:'Flow simple que llama a Apex action que valida email. Test unitario del método Apex.'},
-    pe:{title:'Flow de Aprobación de Crédito',
-      body:'Flow que evalúa solicitud, llama a Apex para verificar buró. Tests: aprobación automática, rechazo, revisión manual.'}
+      body:'Simple Flow calling Apex action that validates email. Unit test of the Apex method.'},
+    pe:{title:'Credit Approval Flow',
+      body:'Flow that evaluates request, calls Apex to verify bureau. Tests: auto-approval, rejection, manual review.'}
   },
   'sf_11':{
-    kc:'Pipeline CI/CD con SF CLI: auth JWT, deploy, run tests, coverage gate',
-    le:{title:'SF CLI en GHA',
-      body:'Workflow mínimo: auth con JWT, deploy source, run Apex tests. sf org login jwt, sf project deploy start, sf apex run test'},
-    pe:{title:'Pipeline ERP Completo',
+    kc:'CI/CD Pipeline with SF CLI: JWT auth, deploy, run tests, coverage gate',
+    le:{title:'SF CLI in GHA',
+      body:'Minimal workflow: JWT auth, deploy source, run Apex tests. sf org login jwt, sf project deploy start, sf apex run test'},
+    pe:{title:'Complete ERP Pipeline',
       body:'Jobs: deploy scratch org → run Apex tests → run LWC Jest → coverage gate > 75% → deploy staging → notify Slack.'}
   },
   'sf_12':{
-    kc:'Multi-org regression: ejecutar suite de tests en múltiples organizaciones simultáneamente',
-    le:{title:'Multi-Org básico',
-      body:'Workflow que corre tests en 2 scratch orgs diferentes en paralelo.'},
-    pe:{title:'Regression Multi-Org ERP',
-      body:'Suite completa en: scratch org (dev), sandbox (staging), producción (solo selectos). Comparar resultados.'}
+    kc:'Multi-org regression: run test suite across multiple organizations simultaneously',
+    le:{title:'Basic Multi-Org',
+      body:'Workflow running tests on 2 different scratch orgs in parallel.'},
+    pe:{title:'Multi-Org ERP Regression',
+      body:'Full suite on: scratch org (dev), sandbox (staging), production (select only). Compare results.'}
   },
   'sf_13':{
-    kc:'Copado: pipelines, commits, deployments, change sets, estrategia de release management',
+    kc:'Copado: pipelines, commits, deployments, change sets, release management strategy',
     le:{title:'Copado Fundamentals',
-      body:'Documentar: pipelines, commits, deployments, change sets vs Copado. Conceptos clave de release management.'},
-    pe:{title:'Estrategia de Deploy con Copado',
-      body:'Plan: ramas por ambiente, datasets de prueba, validación pre-deploy, rollback plan documentado.'}
+      body:'Document: pipelines, commits, deployments, change sets vs Copado. Key release management concepts.'},
+    pe:{title:'Copado Deployment Strategy',
+      body:'Plan: branches by environment, test datasets, pre-deploy validation, documented rollback plan.'}
   },
   'sf_14':{
-    kc:'Suite completa Apex + LWC + CI/CD con coverage > 75%',
-    le:{title:'Mini-Suite Apex en 30 min',
-      body:'3 tests: @TestSetup, HttpCalloutMock, System.runAs(). Todos pasando.'},
-    pe:{title:'Cierre del Proyecto ERP',
-      body:'Suite completa en CI/CD, coverage > 75%, documentación de objetos, README del proyecto externo.'}
+    kc:'Complete Apex + LWC + CI/CD suite with coverage > 75%',
+    le:{title:'Mini Apex Suite in 30 min',
+      body:'3 tests: @TestSetup, HttpCalloutMock, System.runAs(). All passing.'},
+    pe:{title:'ERP Project Closeout',
+      body:'Full suite in CI/CD, coverage > 75%, object documentation, external project README.'}
   },
 
   // ── POSTMAN ─────────────────────────────────────────────
   'postman_0':{
-    kc:'Manejo de scopes de variables (Global, Environment, Collection) y encadenamiento dinámico de requests',
-    le:{title:'Sandbox de Token Passthrough',
-      body:'2 requests: POST /login extrae token → GET /protected lo usa.\npm.environment.set("token", pm.response.json().token)\nAuthorization: Bearer {{token}}'},
-    pe:{title:'Workspace de Rutas de Entrega',
-      body:'Variables dinámicas: base_url, api_key, token, tracking_id.\nEnvironments separados: dev, staging, prod.'}
+    kc:'Variable scope management (Global, Environment, Collection) and dynamic request chaining',
+    le:{title:'Token Passthrough Sandbox',
+      body:'2 requests: POST /login extracts token → GET /protected uses it.\npm.environment.set("token", pm.response.json().token)\nAuthorization: Bearer {{token}}'},
+    pe:{title:'Delivery Routes Workspace',
+      body:'Dynamic variables: base_url, api_key, token, tracking_id.\nSeparate environments: dev, staging, prod.'}
   },
   'postman_1':{
-    kc:'pm.test(), pm.expect() para validar status, body, headers, response time en Postman',
+    kc:'pm.test(), pm.expect() to validate status, body, headers, response time in Postman',
     le:{title:'Assertions Playground',
-      body:'Tests contra JSONPlaceholder.\npm.test("Status 200", () => pm.response.to.have.status(200))\npm.expect(pm.response.json().id).to.eql(1)'},
-    pe:{title:'Assertions de la API de Logística',
-      body:'Validar estructura de rutas, paquetes, estados de entrega. Response time < 2000ms.'}
+      body:'Tests against JSONPlaceholder.\npm.test("Status 200", () => pm.response.to.have.status(200))\npm.expect(pm.response.json().id).to.eql(1)'},
+    pe:{title:'Logistics API Assertions',
+      body:'Validate route structure, packages, delivery statuses. Response time < 2000ms.'}
   },
   'postman_2':{
-    kc:'Pre-request scripts para generar datos dinámicos, timestamps, hashes, firmas',
+    kc:'Pre-request scripts to generate dynamic data, timestamps, hashes, signatures',
     le:{title:'Timestamp Generator',
-      body:'Pre-request que genera timestamp ISO, lo pone en variable.\npm.variables.set("timestamp", new Date().toISOString())'},
-    pe:{title:'Firma HMAC para Endpoints Seguros',
-      body:'Generar signature HMAC-SHA256 en pre-request.\nconst hmac = CryptoJS.HmacSHA256(data, secret)\npm.variables.set("signature", hmac.toString())'}
+      body:'Pre-request that generates ISO timestamp, sets as variable.\npm.variables.set("timestamp", new Date().toISOString())'},
+    pe:{title:'HMAC Signature for Secure Endpoints',
+      body:'Generate HMAC-SHA256 signature in pre-request.\nconst hmac = CryptoJS.HmacSHA256(data, secret)\npm.variables.set("signature", hmac.toString())'}
   },
   'postman_3':{
-    kc:'Validación de esquemas JSON en Postman usando tv4 (Tiny Validator)',
+    kc:'JSON schema validation in Postman using tv4 (Tiny Validator)',
     le:{title:'tv4 Schema Validator',
-      body:'Validar response de /posts/1 contra schema inline.\npm.test("Schema valid", () => pm.expect(tv4.validate(body, schema)).to.be.true)'},
-    pe:{title:'Validación de Esquema de Paquete',
-      body:'Schema Package: trackingNumber, weight, dimensions, origin, destination, status, estimatedDelivery'}
+      body:'Validate /posts/1 response against inline schema.\npm.test("Schema valid", () => pm.expect(tv4.validate(body, schema)).to.be.true)'},
+    pe:{title:'Package Schema Validation',
+      body:'Package schema: trackingNumber, weight, dimensions, origin, destination, status, estimatedDelivery'}
   },
   'postman_4':{
-    kc:'Chaining: extraer datos de una response y usarlos en el siguiente request',
-    le:{title:'Chain de 3 Requests',
-      body:'POST crear → extraer id → GET con ese id → extraer userId → GET user detail.\npm.environment.set("createdId", pm.response.json().id)'},
-    pe:{title:'Chaining de Envío Logístico',
+    kc:'Chaining: extract data from one response and use it in the next request',
+    le:{title:'3-Request Chain',
+      body:'POST create → extract id → GET with that id → extract userId → GET user detail.\npm.environment.set("createdId", pm.response.json().id)'},
+    pe:{title:'Logistic Shipment Chaining',
       body:'POST /shipments → trackingId → PUT /shipments/{{trackingId}}/pickup → GET /shipments/{{trackingId}}/status'}
   },
   'postman_5':{
-    kc:'Collection Runner: ejecutar colecciones completas, ver resultados agregados',
-    le:{title:'Collection Runner contra JSONPlaceholder',
-      body:'Colección de 5 requests, correr con Collection Runner, ver resultados por request.'},
-    pe:{title:'Runner de Rutas Diarias',
-      body:'50 iteraciones con data de rutas simuladas, validar tiempos de respuesta < 3000ms.'}
+    kc:'Collection Runner: run complete collections, view aggregated results',
+    le:{title:'Collection Runner against JSONPlaceholder',
+      body:'Collection of 5 requests, run with Collection Runner, view results by request.'},
+    pe:{title:'Daily Routes Runner',
+      body:'50 iterations with simulated route data, validate response times < 3000ms.'}
   },
   'postman_6':{
-    kc:'Data-driven testing con archivos CSV en Collection Runner',
+    kc:'Data-driven testing with CSV files in Collection Runner',
     le:{title:'CSV Driver',
-      body:'CSV con 10 casos de prueba (title, expectedStatus). Collection Runner con el CSV.\npm.iterationData.get("title")'},
-    pe:{title:'Data-Driven de Entregas',
-      body:'CSV con 100 envíos (origen, destino, peso, prioridad). Validar cálculo de tarifas contra expectedPrice.'}
+      body:'CSV with 10 test cases (title, expectedStatus). Collection Runner with CSV.\npm.iterationData.get("title")'},
+    pe:{title:'Delivery Data-Driven',
+      body:'CSV with 100 shipments (origin, destination, weight, priority). Validate rate calculation against expectedPrice.'}
   },
   'postman_7':{
-    kc:'Newman CLI: ejecutar colecciones Postman desde terminal, integrar en CI/CD',
+    kc:'Newman CLI: run Postman collections from terminal, integrate in CI/CD',
     le:{title:'Newman Hello World',
-      body:'Exportar colección, correr con newman.\nnewman run collection.json -e env.json --reporters cli'},
-    pe:{title:'Newman en Pipeline Logístico',
-      body:'Script que corre suite completa de logística con reporters cli, htmlextra, junit.'}
+      body:'Export collection, run with newman.\nnewman run collection.json -e env.json --reporters cli'},
+    pe:{title:'Newman in Logistics Pipeline',
+      body:'Script running full logistics suite with cli, htmlextra, junit reporters.'}
   },
   'postman_8':{
-    kc:'Newman HTML reports con htmlextra para visualización de resultados',
+    kc:'Newman HTML reports with htmlextra for result visualization',
     le:{title:'Newman HTML Report',
-      body:'Correr con --reporters htmlextra.\nnewman run collection.json -e env.json --reporters htmlextra\nAbrir el HTML generado.'},
-    pe:{title:'Reporte Unificado de Logística',
-      body:'Reporte HTML personalizado con métricas de éxito/fallo por endpoint, tiempos, gráficas.'}
+      body:'Run with --reporters htmlextra.\nnewman run collection.json -e env.json --reporters htmlextra\nOpen generated HTML.'},
+    pe:{title:'Unified Logistics Report',
+      body:'Custom HTML report with pass/fail metrics by endpoint, times, charts.'}
   },
   'postman_9':{
-    kc:'Integración de Newman en GitHub Actions para automatización de Postman',
-    le:{title:'GHA + Newman Mínimo',
-      body:'Workflow que instala Newman y corre colección.\nnpm install -g newman\nnewman run collection.json'},
-    pe:{title:'Pipeline de Logística Completo',
-      body:'GHA con matrix de entornos (staging, production). Artefactos HTML. Slack notification.'}
+    kc:'Newman integration in GitHub Actions for Postman automation',
+    le:{title:'Minimal GHA + Newman',
+      body:'Workflow that installs Newman and runs collection.\nnpm install -g newman\nnewman run collection.json'},
+    pe:{title:'Complete Logistics Pipeline',
+      body:'GHA with environment matrix (staging, production). HTML artifacts. Slack notification.'}
   },
   'postman_10':{
-    kc:'Postman Monitors: ejecución programada de colecciones en la nube',
-    le:{title:'Monitor Quick',
-      body:'Crear monitor en Postman Cloud que corra cada hora contra JSONPlaceholder. Ver resultados en dashboard.'},
-    pe:{title:'Monitor de SLA Logístico',
-      body:'Monitoreo cada 5 min de endpoints críticos: tracking status, warehouse stock, delivery ETA.'}
+    kc:'Postman Monitors: scheduled collection execution in the cloud',
+    le:{title:'Quick Monitor',
+      body:'Create Postman Cloud monitor running every hour against JSONPlaceholder. View results in dashboard.'},
+    pe:{title:'Logistics SLA Monitor',
+      body:'Monitoring every 5 min of critical endpoints: tracking status, warehouse stock, delivery ETA.'}
   },
   'postman_11':{
-    kc:'Mock Servers en Postman para simular APIs sin backend real',
-    le:{title:'Mock Server Aislado',
-      body:'Crear mock server para API de usuarios con 3 endpoints. Ejemplo de respuesta configurada en ejemplo de colección.'},
-    pe:{title:'Mock de Proveedor Externo',
-      body:'Simular API de paquetería (FedEx/DHL) con respuestas de tracking, rates, pickup.'}
+    kc:'Mock Servers in Postman to simulate APIs without real backend',
+    le:{title:'Isolated Mock Server',
+      body:'Create mock server for users API with 3 endpoints. Example response configured in collection example.'},
+    pe:{title:'External Provider Mock',
+      body:'Simulate courier API (FedEx/DHL) with tracking, rates, pickup responses.'}
   },
   'postman_12':{
-    kc:'Generación de documentación de API desde colecciones Postman',
+    kc:'API documentation generation from Postman collections',
     le:{title:'Doc Generator',
-      body:'Publicar colección como documentación en Postman web.\nWorkspace → View in web → Publish.'},
-    pe:{title:'Documentación de Logística Publicada',
-      body:'Documentación completa con ejemplos, schemas, descripciones, publicada con dominio personalizado.'}
+      body:'Publish collection as documentation on Postman web.\nWorkspace → View in web → Publish.'},
+    pe:{title:'Published Logistics Documentation',
+      body:'Complete documentation with examples, schemas, descriptions, published with custom domain.'}
   },
   'postman_13':{
-    kc:'Postman Flows: automatización visual de flujos de datos entre APIs',
-    le:{title:'Flow Visual Simple',
-      body:'Flow: GET → extraer datos → POST con esos datos. Usar nodos de output/input.'},
-    pe:{title:'Automation Flow de Reabastecimiento',
-      body:'Flow: verificar stock bajo → ordenar reposición → notificar proveedor → actualizar inventario.'}
+    kc:'Postman Flows: visual automation of data flows between APIs',
+    le:{title:'Simple Visual Flow',
+      body:'Flow: GET → extract data → POST with that data. Using output/input nodes.'},
+    pe:{title:'Restock Automation Flow',
+      body:'Flow: check low stock → order replenishment → notify supplier → update inventory.'}
   },
   'postman_14':{
-    kc:'Contract testing en Postman: validar responses contra schemas predefinidos',
+    kc:'Contract testing in Postman: validate responses against predefined schemas',
     le:{title:'Contract Check',
-      body:'Validar que response de /posts cumpla schema predefinido con tv4.'},
-    pe:{title:'Contrato de API de Inventario',
-      body:'Verificar cada endpoint contra schema contract: Product, Warehouse, StockMovement.'}
+      body:'Validate /posts response meets predefined schema with tv4.'},
+    pe:{title:'Inventory API Contract',
+      body:'Verify each endpoint against contract schema: Product, Warehouse, StockMovement.'}
   },
   'postman_15':{
-    kc:'Pruebas de performance en Postman: múltiples iteraciones, medición de tiempos',
-    le:{title:'Performance Quick',
-      body:'Collection runner con 50 iteraciones sin delay. Analizar p50/p95/p99 de cada request.'},
-    pe:{title:'Performance de Logística',
-      body:'200 iteraciones, medir p50/p95/p99 de cada endpoint, identificar cuellos de botella.'}
+    kc:'Performance testing in Postman: multiple iterations, time measurement',
+    le:{title:'Quick Performance',
+      body:'Collection runner with 50 iterations, no delay. Analyze p50/p95/p99 of each request.'},
+    pe:{title:'Logistics Performance',
+      body:'200 iterations, measure p50/p95/p99 of each endpoint, identify bottlenecks.'}
   },
   'postman_16':{
-    kc:'Carpeta dedicada de negative tests: auth inválida, body malformado, métodos incorrectos',
+    kc:'Dedicated negative tests folder: invalid auth, malformed body, incorrect methods',
     le:{title:'Negative Collection',
-      body:'Carpeta con tests de: auth inválida → 401, body malformado → 400, ID inexistente → 404, method no permitido → 405.'},
-    pe:{title:'Negative Suite de Logística',
-      body:'Peso excedido → 422, dirección inválida → 400, código postal incorrecto → 400, destinatario sin datos → 422.'}
+      body:'Folder with tests: invalid auth → 401, malformed body → 400, non-existent ID → 404, method not allowed → 405.'},
+    pe:{title:'Logistics Negative Suite',
+      body:'Exceeded weight → 422, invalid address → 400, incorrect zip code → 400, recipient without data → 422.'}
   },
   'postman_17':{
-    kc:'Scripting avanzado con CryptoJS, lodash, manipulación de objetos en Postman',
-    le:{title:'Crypto y Lodash',
-      body:'CryptoJS para hash SHA256. Lodash para manipular objetos, merge, pick, omit.'},
-    pe:{title:'Scripting Avanzado de Logística',
-      body:'Generar códigos de barras, calcular distancias entre CPs, validar firmas digitales de entrega.'}
+    kc:'Advanced scripting with CryptoJS, lodash, object manipulation in Postman',
+    le:{title:'Crypto and Lodash',
+      body:'CryptoJS for SHA256 hash. Lodash for object manipulation, merge, pick, omit.'},
+    pe:{title:'Advanced Logistics Scripting',
+      body:'Generate barcodes, calculate distances between ZIP codes, validate digital delivery signatures.'}
   },
   'postman_18':{
-    kc:'Mini-suite completa integrando chaining, data-driven, schema validation, Monitors, Mock Servers',
-    le:{title:'Mini-Suite Logística en 20 min',
-      body:'3 tests con chaining, data-driven CSV, schema validation. Todo pasando en Newman.'},
-    pe:{title:'Cierre del Proyecto Postman',
-      body:'Suite completa de logística en CI/CD con Monitors, Mock Servers, documentación publicada.'}
+    kc:'Complete mini-suite integrating chaining, data-driven, schema validation, Monitors, Mock Servers',
+    le:{title:'Logistics Mini-Suite in 20 min',
+      body:'3 tests with chaining, data-driven CSV, schema validation. All passing in Newman.'},
+    pe:{title:'Postman Project Closeout',
+      body:'Full logistics suite in CI/CD with Monitors, Mock Servers, published documentation.'}
+  },
+
+  // ── K6 (Performance Engineering) ─────────────────────────
+  'k6_0':{
+    kc:'K6 project initialization, Node.js runtime, basic options (vus, duration) and script lifecycle',
+    le:{title:'Setup and First Script',
+      body:'1. Install K6: winget install k6 or k6 install\n2. Create basic script: import http from \'k6/http\'; export default () => { http.get(\'https://test.k6.io\'); }\n3. k6 run --vus 1 --duration 10s script.js\n4. Interpret output: http_req_duration, http_reqs, vus'},
+    pe:{title:'Performance Project Configuration',
+      body:'1. Dedicated repo: performance-suite/\n2. Central options.js with defaults: thresholds, stages\n3. Separate scripts per scenario\n4. package.json with npm scripts for each test type'}
+  },
+  'k6_1':{
+    kc:'Design of 1-minute smoke tests with 5 concurrent VUs to capture baseline response speed',
+    le:{title:'Smoke Test in K6',
+      body:'Design a 1-minute Smoke Test with 5 concurrent VUs.\n1. options: { vus: 5, duration: \'1m\' }\n2. Threshold: http_req_duration < 500ms\n3. k6 run smoke.js → interpret report\n4. Establish baseline: p50, p95, p99, avg'},
+    pe:{title:'Performance Testing Strategy',
+      body:'Define complete test matrix:\n- Smoke: 1m/5vu (baseline)\n- Load: 5m/50vu (normal operation)\n- Stress: ramp to 200vu (peak)\n- Soak: 10m/30vu (endurance)\nDocument SLAs per test type.'}
+  },
+  'k6_2':{
+    kc:'Constant load models: fixed VU configuration for sustained and representative load tests',
+    le:{title:'Load Test with Constant VUs',
+      body:'Script with 50 constant VUs for 5 minutes.\noptions: { scenarios: { load: { executor: \'constant-vus\', vus: 50, duration: \'5m\' } } }\nThreshold: p95 < 1500ms, error < 1%\nMonitor http_reqs/s as capacity metric.'},
+    pe:{title:'Representative System Load',
+      body:'Analyze Google Analytics / logs to determine realistic VUs.\nScenario: typical peak hour with 50 concurrent users.\nDocument base system capacity at these levels.'}
+  },
+  'k6_3':{
+    kc:'Progressive stages and ramp configuration to simulate stress spikes and scalability',
+    le:{title:'Stress Test with Stages',
+      body:'Script with stages: 0→20vu in 2m, hold 5m, peak 50vu 1m, cooldown.\noptions: { stages: [{ duration: \'2m\', target: 20 }, { duration: \'5m\', target: 20 }, { duration: \'1m\', target: 50 }, { duration: \'2m\', target: 0 }] }\nThreshold: http_req_failed < 0.01.'},
+    pe:{title:'Black Friday Scenario',
+      body:'Emulate high concurrency peak.\nStages: 0→100vu(2m) → 100vu(3m) → 100→500vu(1m) → 500vu(2m) → 0\nThresholds: p95 < 3s, p99 < 5s, error rate < 2%\nExecutive report with scaling recommendations.'}
+  },
+  'k6_4':{
+    kc:'Sustained load (Soak) testing to detect gradual degradation, memory leaks and system fatigue',
+    le:{title:'Soak Test',
+      body:'Script with 30 VUs for 10 minutes.\noptions: { vus: 30, duration: \'10m\' }\nMonitor http_req_duration over time.\nDetect if it progressively increases (fatigue).\nThreshold: p95 < 1s sustained, no increase >10%.'},
+    pe:{title:'Corporate Soak',
+      body:'30 min soak with 50 constant VUs.\nRecord metrics every 1 minute.\nAlarm if p95 increases more than 20% between first and last minute.\nDocument degradation patterns.'}
+  },
+  'k6_5':{
+    kc:'Definition of rigid quality thresholds with multiple conditions and performance assertions',
+    le:{title:'Multiple Thresholds',
+      body:'Configure combined thresholds:\n- p95 < 1000ms\n- p99 < 2500ms\n- error rate < 1%\n- http_reqs per second > 50\nUse thresholds by tag: { \'http_req_duration{endpoint:login}\': [\'p(95)<500\'] }'},
+    pe:{title:'Project SLA Thresholds',
+      body:'Thresholds aligned with real SLA: critical endpoint p95 < 200ms, non-critical < 1s.\nCI/CD threshold that breaks build if not met.\nCustom metrics: Trend + Rate for granular error tracking.'}
+  },
+  'k6_6':{
+    kc:'K6 execution in CI/CD (GitHub Actions, Harness) with threshold validation and artifacts',
+    le:{title:'K6 in GitHub Actions',
+      body:'Workflow that installs K6, runs smoke.js, fails if thresholds not met.\nk6 run --summary-export=summary.json smoke.js\nUpload summary as artifact.'},
+    pe:{title:'Performance Gate in Pipeline',
+      body:'Integrate K6 as stage in Harness CD.\nExport summary.json, parse in script, gate evaluates p95 against SLA.\nHTML report generated with charts.\nPipeline blocks deploy if performance gate fails.'}
+  },
+  'k6_7':{
+    kc:'Complete performance suite with multiple scenarios, rigorous thresholds and unified reports',
+    le:{title:'Mini Performance Suite in 30 min',
+      body:'Smoke + load + stress with thresholds on each.\nk6 run --scenario smoke --scenario load --scenario stress full-suite.js\nConsolidated report with all metrics.'},
+    pe:{title:'Final Project: Black Friday',
+      body:'Stress suite emulating Black Friday.\nProgressive stages up to 500 VUs.\nThresholds: p95 < 3s, p99 < 5s, error < 1%.\nExecutive report + scaling recommendations.\nPipeline with blocking performance gate.'}
+  },
+
+  // ── SQL ──────────────────────────────────────────────────
+  'sql_0':{
+    kc:'Relational database structure, basic SELECT statements, WHERE, ORDER BY and LIMIT',
+    le:{title:'Fundamental Queries',
+      body:'Connect to test DB and execute base queries.\n1. SELECT * FROM orders LIMIT 10;\n2. SELECT * FROM customers WHERE country = \'MX\' ORDER BY name;\n3. SELECT COUNT(*), MIN(amount), MAX(amount), AVG(amount) FROM payments;\n4. Explore schema: SHOW TABLES; DESCRIBE orders;'},
+    pe:{title:'Audit Database Setup',
+      body:'Connect to the project test DB.\nCreate exploration queries: count records per table, map key columns.\nDocument table relationships (FK candidates).'}
+  },
+  'sql_1':{
+    kc:'JOINs (INNER, LEFT, RIGHT, FULL), table relationships, foreign keys and referential integrity',
+    le:{title:'JOINs and Relationships',
+      body:'Queries crossing related tables.\n1. INNER JOIN: orders + customers + status\n2. LEFT JOIN: find customers without orders\n3. RIGHT JOIN: products never sold\n4. FULL OUTER JOIN: detect orphan records in both directions\n5. Multiple JOINs: orders → items → products → categories'},
+    pe:{title:'Business Relationship Validation',
+      body:'Queries verifying: every order has valid customer, every order_item has parent order, every payment has associated invoice.\nScript reporting referential integrity violations.'}
+  },
+  'sql_2':{
+    kc:'GROUP BY, aggregate functions (COUNT, SUM, AVG, MIN, MAX) and filtering with HAVING',
+    le:{title:'Aggregations and Totals',
+      body:'Queries with GROUP BY for analysis.\n1. Total sales by month: SUM(amount) GROUP BY MONTH(created_at)\n2. Customers by country: COUNT(*) GROUP BY country\n3. Best-selling categories: JOIN + GROUP BY + ORDER BY DESC\n4. HAVING: customers with > 5 orders\n5. Validate totals against app UI'},
+    pe:{title:'UI vs DB Post-Test Reconciliation',
+      body:'Script that after checkout tests: reads UI reported data → queries DB → compares totals.\nDiscrepancies > 0.1% trigger alert.\nReconciliation report per individual transaction.'}
+  },
+  'sql_3':{
+    kc:'Correlated and non-correlated subqueries, Common Table Expressions (WITH)',
+    le:{title:'Subqueries and CTEs',
+      body:'Master nested queries.\n1. Subquery: customers with order above overall average\n2. CTE: WITH monthly_sales AS (...) SELECT * FROM monthly_sales\n3. Recursive CTE: category hierarchy\n4. EXISTS vs IN: performance comparison\n5. Subquery in SELECT: calculate difference from average'},
+    pe:{title:'Business Rule Validation with CTE',
+      body:'CTE calculating applied discount vs allowed discount per rule.\nDetect orders with excessive discount (>30%).\nCTE to detect anomalous customer behavior (>3σ from average).'}
+  },
+  'sql_4':{
+    kc:'Data integrity validation: constraints, triggers, consistent states and data cleansing',
+    le:{title:'Data Integrity Validation',
+      body:'Data validation queries.\n1. Find orders without valid status\n2. Payments with negative or zero amount\n3. Products without assigned category\n4. Inconsistent timestamps: updated_at < created_at\n5. Duplicate records: GROUP BY + COUNT + HAVING > 1'},
+    pe:{title:'Transactional Audit Suite',
+      body:'Complete batch of integrity queries.\nVerify: order_items without parent order, payments without order, products with price 0.\nReport classified by severity (CRITICAL, WARNING, INFO).'}
+  },
+  'sql_5':{
+    kc:'Exact and partial duplicate detection, orphan records, and inconsistent transactions',
+    le:{title:'Duplicate and Orphan Detector',
+      body:'Detection techniques.\n1. Exact duplicates: SELECT col1,col2,COUNT(*) FROM t GROUP BY col1,col2 HAVING COUNT(*) > 1\n2. Duplicates by email with different data: ROW_NUMBER() PARTITION BY email\n3. LEFT JOIN with NULL: find records without parent\n4. Transactions with start without corresponding end\n5. Auto-increment IDs with gaps'},
+    pe:{title:'Data Quality Dashboard',
+      body:'Script generating daily report: total records, orphans, duplicates, inconsistencies.\nExecutable at end of each automation suite.\nAlarm if data quality < 99.5%.'}
+  },
+  'sql_6':{
+    kc:'Post-test execution audit automation: reusable scripts, stored procedures, audit triggers',
+    le:{title:'Post-Automation Audit',
+      body:'Create audit script that runs after tests.\n1. Stored Procedure: audit_integrity() running all queries\n2. Get report: SELECT * FROM audit_results ORDER BY severity\n3. Compare stock in DB vs UI after a purchase\n4. Verify transaction IDs match between frontend and backend'},
+    pe:{title:'Automated Post-Test Integration',
+      body:'Node.js script that after Playwright suite: connects to DB → runs SQL audit → compares with expectations → fails if discrepancies found.\nPipeline blocks deploy if audit finds anomalies.'}
+  },
+  'sql_7':{
+    kc:'Complete backend validation suite: post-automation audit, reports, CI/CD gates',
+    le:{title:'Mini SQL Suite in 30 min',
+      body:'5 audit queries against test DB: duplicates, orphans, totals, anomalies, consistency.\nUnified report with findings.'},
+    pe:{title:'Final Project: DB Audit',
+      body:'Audit scripts executed after interface tests finish.\nEnsure table impacts (stock deductions, transaction IDs, customer data) exactly match what UI reported.\nPipeline blocks if discrepancies > 0.\nExecutive report with data integrity summary.'}
   }
 };
 
@@ -639,7 +815,7 @@ function saveNote() {
 }
 function copyNote() { navigator.clipboard.writeText(document.getElementById('note-area').value).catch(()=>{}); }
 function clearNote() {
-  if(!confirm('¿Borrar todas las notas?')) return;
+  if(!confirm('Delete all notes?')) return;
   const el = document.getElementById('note-area');
   if(el) el.value = '';
   try { localStorage.removeItem('sdet_notes'); } catch(e){}
@@ -693,17 +869,17 @@ function app() {
     },
 
     navMain: [
-      {id:'dashboard',icon:'⊞',label:'Dashboard'},
-      {id:'pomodoro',icon:'🍅',label:'Pomodoro'},
-      {id:'tasks',icon:'📋',label:'Tareas'},
-      {id:'calendar',icon:'📅',label:'Calendario'},
+      {id:'dashboard',icon:'squares-four',label:'Dashboard'},
+      {id:'pomodoro',icon:'timer',label:'Pomodoro'},
+      {id:'tasks',icon:'clipboard-text',label:'Tasks'},
+      {id:'calendar',icon:'calendar',label:'Calendar'},
     ],
 
     // ── Auth / user ──
     profileName: '',
     profileSaving: false,
     profileSaved: false,
-    get userName() { return this.profileName || window._user?.user_metadata?.full_name?.split(' ')[0] || window._user?.email?.split('@')[0] || 'Usuario'; },
+    get userName() { return this.profileName || window._user?.user_metadata?.full_name?.split(' ')[0] || window._user?.email?.split('@')[0] || 'User'; },
     async saveProfile() {
       this.profileSaving = true;
       try {
@@ -986,15 +1162,15 @@ function app() {
     // ── Subjects ──
     subjects: [
       {
-        id:'api', name:'API Testing', defaultLang:'Java', icon:'🔬', pct:0, color:'blue', tag:'En curso', priority:1,
-        chapters:'14/20 caps', hours:'18h', exam:'Jun 15',
+        id:'api', name:'API Testing', defaultLang:'Java', icon:'microscope', pct:0, color:'blue', tag:'In progress', priority:1,
+        chapters:'14/20 ch', hours:'18h', exam:'Jun 15',
         chapList: [
-          {name:'Fundamentos HTTP y REST',done:false},{name:'Status codes y headers',done:false},
+          {name:'HTTP & REST Fundamentals',done:false},{name:'Status Codes & Headers',done:false},
           {name:'RestAssured setup + pom.xml',done:false},{name:'PostsTest.java — happy path',done:false},
-          {name:'JSON Schema validation',done:false},{name:'Negative tests y boundaries',done:false},
-          {name:'Auth testing — JWT y OAuth',done:false},{name:'Security checklist — IDOR, XSS',done:false},
+          {name:'JSON Schema validation',done:false},          {name:'Negative tests & boundaries',done:false},
+          {name:'Auth testing — JWT & OAuth',done:false},{name:'Security checklist — IDOR, XSS',done:false},
           {name:'Data-driven tests @ParameterizedTest',done:false},{name:'Allure reporting',done:false},
-          {name:'UsersTest.java completo',done:false},{name:'CommentsTest.java completo',done:false},
+          {name:'UsersTest.java Complete',done:false},{name:'CommentsTest.java Complete',done:false},
           {name:'Pact contract tests',done:false},{name:'WireMock stubs',done:false},
           {name:'CI/CD — GitHub Actions gate',done:false},{name:'k6 performance gates',done:false},
           {name:'API design patterns',done:false},{name:'GraphQL testing',done:false},
@@ -1002,58 +1178,81 @@ function app() {
         ]
       },
       {
-        id:'cicd', name:'CI/CD', defaultLang:'YAML', icon:'🚀', pct:0, color:'green', tag:'En curso', priority:4,
-        chapters:'8/14 caps', hours:'12h', exam:null,
+        id:'cicd', name:'CI/CD → Harness', defaultLang:'YAML', icon:'rocket-launch', pct:0, color:'green', tag:'In progress', priority:4,
+        chapters:'8/17 ch', hours:'15h', exam:null,
         chapList: [
-          {name:'Pipelines y stages',done:false},{name:'GitHub Actions basics',done:false},
+          {name:'Pipelines & Stages',done:false},{name:'GitHub Actions basics',done:false},
           {name:'Quality gates',done:false},{name:'Docker fundamentals',done:false},
-          {name:'Docker Compose para tests',done:false},{name:'Matrix builds',done:false},
-          {name:'Environments y secrets',done:false},{name:'Allure + artefactos',done:false},
+          {name:'Docker Compose for Tests',done:false},{name:'Matrix builds',done:false},
+          {name:'Environments & Secrets',done:false},{name:'Allure + Artifacts',done:false},
           {name:'k6 performance gates',done:false},{name:'Pact contract tests',done:false},
           {name:'Slack notifications',done:false},{name:'Ephemeral environments',done:false},
-          {name:'Multi-org deployment',done:false},{name:'Examen final',done:false},
+          {name:'Multi-org deployment',done:false},{name:'Harness Pipelines Fundamentals',done:false},
+          {name:'Quality Gates in Harness',done:false},{name:'Harness CD Pipeline',done:false},
+          {name:'Final Exam',done:false},
         ]
       },
       {
-        id:'playwright', name:'Playwright', defaultLang:'JavaScript', icon:'🎭', pct:0, color:'purple', tag:'Iniciado', priority:3,
-        chapters:'5/12 caps', hours:'8h', exam:'Jul 2',
+        id:'playwright', name:'Playwright', defaultLang:'JavaScript', icon:'mask-happy', pct:0, color:'purple', tag:'Started', priority:3,
+        chapters:'5/14 ch', hours:'10h', exam:'Jul 2',
         chapList: [
-          {name:'Setup y configuración',done:false},{name:'API tests con request fixture',done:false},
-          {name:'E2E tests básicos',done:false},{name:'Page Object Model',done:false},
+          {name:'Setup & Configuration',done:false},{name:'API Tests with Request Fixture',done:false},
+          {name:'Basic E2E Tests',done:false},{name:'Page Object Model',done:false},
           {name:'Hybrid API + UI tests',done:false},{name:'Visual regression testing',done:false},
           {name:'Network interception',done:false},{name:'Cross-browser testing',done:false},
-          {name:'Debugging y traces',done:false},{name:'GitHub Actions integration',done:false},
-          {name:'demoqa.com proyecto completo',done:false},{name:'Examen final',done:false},
+          {name:'Debugging & Traces',done:false},{name:'GitHub Actions integration',done:false},
+          {name:'Data-Driven Testing with External JSON',done:false},{name:'Multi-Tenant Config Engine',done:false},
+          {name:'demoqa.com Full Project',done:false},{name:'Final Exam',done:false},
         ]
       },
       {
-        id:'sf', name:'Apex/Salesforce', defaultLang:'Apex', icon:'☁', pct:0, color:'orange', tag:'Pendiente', priority:5,
-        chapters:'3/15 caps', hours:'5h', exam:'Jul 20',
+        id:'sf', name:'Apex/Salesforce', defaultLang:'Apex', icon:'cloud', pct:0, color:'orange', tag:'Pending', priority:5,
+        chapters:'3/15 ch', hours:'5h', exam:'Jul 20',
         chapList: [
           {name:'Dev Org setup + SF CLI',done:false},{name:'Apex basics',done:false},
-          {name:'@isTest y @TestSetup',done:false},{name:'HttpCalloutMock',done:false},
-          {name:'System.runAs() y FLS',done:false},{name:'Governor limits testing',done:false},
+          {name:'@isTest & @TestSetup',done:false},{name:'HttpCalloutMock',done:false},
+          {name:'System.runAs() & FLS',done:false},{name:'Governor limits testing',done:false},
           {name:'Debug logs reading',done:false},{name:'LWC Jest tests',done:false},
           {name:'Batch Apex testing',done:false},{name:'Platform Events testing',done:false},
-          {name:'Flow testing en Apex',done:false},{name:'SF CLI CI/CD pipeline',done:false},
+          {name:'Flow Testing in Apex',done:false},{name:'SF CLI CI/CD pipeline',done:false},
           {name:'Multi-org regression',done:false},{name:'Copado basics',done:false},
-          {name:'Examen final',done:false},
+          {name:'Final Exam',done:false},
         ]
       },
       {
-        id:'postman', name:'Postman', defaultLang:'JavaScript', icon:'📮', pct:0, color:'green', tag:'Avanzado', priority:2,
-        chapters:'17/20 caps', hours:'22h', exam:null,
+        id:'postman', name:'Postman', defaultLang:'JavaScript', icon:'mailbox', pct:0, color:'green', tag:'Advanced', priority:2,
+        chapters:'17/20 ch', hours:'22h', exam:null,
         chapList: [
-          {name:'Colecciones y workspaces',done:false},{name:'Variables de entorno',done:false},
+          {name:'Collections & Workspaces',done:false},{name:'Environment Variables',done:false},
           {name:'pm.test assertions',done:false},{name:'Pre-request scripts',done:false},
-          {name:'Schema validation',done:false},{name:'Chaining con env variables',done:false},
-          {name:'Collection Runner',done:false},{name:'Data-driven con CSV',done:false},
+          {name:'Schema validation',done:false},{name:'Chaining with Env Variables',done:false},
+          {name:'Collection Runner',done:false},{name:'Data-Driven with CSV',done:false},
           {name:'Newman CLI',done:false},{name:'HTML reports',done:false},
           {name:'GitHub Actions + Newman',done:false},{name:'Monitors',done:false},
           {name:'Mock servers',done:false},{name:'API documentation',done:false},
-          {name:'Flows (nuevo)',done:false},{name:'Contract testing',done:false},
+          {name:'Flows (new)',done:false},{name:'Contract testing',done:false},
           {name:'Performance testing',done:false},{name:'Negative test folder',done:false},
-          {name:'Advanced scripting',done:false},{name:'Examen final',done:false},
+          {name:'Advanced scripting',done:false},{name:'Final Exam',done:false},
+        ]
+      },
+      {
+        id:'k6', name:'Performance Engineering (K6)', defaultLang:'JavaScript', icon:'chart-bar', pct:0, color:'red', tag:'New', priority:6,
+        chapters:'0/8 caps', hours:'0h', exam:null,
+        chapList: [
+          {name:'K6 Setup & VU Concepts',done:false},{name:'Smoke Testing',done:false},
+          {name:'Load Testing',done:false},{name:'Stress Testing',done:false},
+          {name:'Soak Testing',done:false},{name:'Thresholds & Metrics',done:false},
+          {name:'K6 in CI/CD',done:false},{name:'Final Project: Black Friday',done:false},
+        ]
+      },
+      {
+        id:'sql', name:'SQL & Backend Validation', defaultLang:'SQL', icon:'database', pct:0, color:'yellow', tag:'New', priority:7,
+        chapters:'0/8 ch', hours:'0h', exam:null,
+        chapList: [
+          {name:'SQL Fundamentals & SELECT',done:false},{name:'JOINs & Relationships',done:false},
+          {name:'GROUP BY & HAVING',done:false},{name:'Subqueries & CTEs',done:false},
+          {name:'Data Integrity Validation',done:false},{name:'Duplicate & Orphan Detection',done:false},
+          {name:'Post-Automation Audit',done:false},{name:'Final Project: DB Audit',done:false},
         ]
       },
     ],
@@ -1065,9 +1264,9 @@ function app() {
     // ── Deadlines ──
     getSubjectTag(s) {
       const pct = this.chapPct(s);
-      if (pct === 100) return 'Completado';
-      if (pct > 0) return 'En curso';
-      return 'Pendiente';
+      if (pct === 100) return 'Completed';
+      if (pct > 0) return 'In progress';
+      return 'Pending';
     },
     get nextChapters() {
       return this.subjects
@@ -1100,9 +1299,9 @@ function app() {
           done,
           total,
           reason: pct > 0
-            ? `${done}/${total} caps · ${pct}% completado`
-            : 'Siguiente: cap. 1',
-          action: pct > 0 ? 'Continuar' : 'Empezar',
+            ? `${done}/${total} ch · ${pct}% completed`
+            : 'Next: ch. 1',
+          action: pct > 0 ? 'Continue' : 'Start',
         }));
     },
 
@@ -1136,14 +1335,14 @@ function app() {
     get totalHours(){ return this.weekHours.reduce((a,b)=>a+b,0) },
     get maxH(){ return Math.max(...this.weekHours,1) },
     get todayIdx(){ const d=new Date().getDay(); return d===0?6:d-1 },
-    days: ['L','M','X','J','V','S','D'],
+    days: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
     activity: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 
     // ── Pomodoro ──
     pomoPhase:'work', running:false, donePomos:0, timerInterval:null, timeLeft:25*60,
     circ:2*Math.PI*60, circBig:2*Math.PI*96, pomoLog:[],
     phaseDur:{work:25*60,short:5*60,long:15*60},
-    phaseNames:{work:'ENFOQUE',short:'DESCANSO CORTO',long:'DESCANSO LARGO'},
+    phaseNames:{work:'FOCUS',short:'SHORT BREAK',long:'LONG BREAK'},
     get fmtTime(){
       const m=Math.floor(this.timeLeft/60).toString().padStart(2,'0');
       const s=(this.timeLeft%60).toString().padStart(2,'0');
@@ -1168,9 +1367,9 @@ function app() {
           if(this.timeLeft>0){ this.timeLeft--; }
           else {
             clearInterval(this.timerInterval); this.running=false;
-            const now=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+            const now=new Date().toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'});
             this.pomoLog.unshift({id:Date.now(),
-              label:this.pomoPhase==='work'?`Sesión #${this.donePomos+1}`:'Descanso',
+              label:this.pomoPhase==='work'?`Session #${this.donePomos+1}`:'Break',
               type:this.pomoPhase, time:now,
               focus: this.pomoPhase==='work' ? this.pomoFocusLabel : ''});
             if(this.pomoPhase==='work'){
