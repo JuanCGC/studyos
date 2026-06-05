@@ -964,9 +964,6 @@
                 <button @click="challengeLanguage='javascript'"
                   :style="challengeLanguage==='javascript'?'background:var(--blue3);color:var(--blue2)':'background:transparent;color:var(--t4)'"
                   style="padding:6px 14px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--mono);transition:all .15s">JS</button>
-                <button @click="challengeLanguage='python'"
-                  :style="challengeLanguage==='python'?'background:var(--blue3);color:var(--blue2)':'background:transparent;color:var(--t4)'"
-                  style="padding:6px 14px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--mono);transition:all .15s">PY</button>
               </div>
               <!-- Generate button -->
               <button class="btn-p" @click="generateExercise()" :disabled="challengeGenerating">
@@ -1066,7 +1063,7 @@
                     <div style="width:12px;height:12px;border-radius:50%;background:#fbbf24"></div>
                     <div style="width:12px;height:12px;border-radius:50%;background:var(--green2)"></div>
                   </div>
-                  <span style="font-size:11px;font-family:var(--mono);color:var(--t4)" x-text="challengeLanguage==='python'?'solution.py':'solution.js'"></span>
+                  <span style="font-size:11px;font-family:var(--mono);color:var(--t4)" x-text="'solution.js'"></span>
                 </div>
                 <textarea
                   x-model="challengeCode"
@@ -1324,16 +1321,15 @@
             </div>
           </div>
 
-          <!-- ══ QUIZ SECTION — Trailhead structure + StudyOS dark palette ══ -->
+          <!-- ══ QUIZ — TRAILHEAD STYLE ══ -->
           <div x-show="aiGuide.quiz" :style="aiGuide.quizOnly?'margin-top:24px':'margin-top:48px;border-top:2px solid var(--border);padding-top:40px'">
-            <div style="background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:32px 36px">
+            <div class="quiz-card">
 
-              <!-- Header -->
-              <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.1)">
-                <div style="width:44px;height:44px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧠</div>
+              <div class="quiz-hdr">
+                <div class="quiz-icon">🧠</div>
                 <div>
-                  <div style="font-size:20px;font-weight:700;color:var(--t1)">Verificar conocimiento</div>
-                  <div style="font-size:13px;color:var(--t4);margin-top:2px">Responde 2 de 3 correctamente para completar este capítulo</div>
+                  <div class="quiz-title">Verificar conocimiento</div>
+                  <div class="quiz-sub">Responde 2 de 3 correctamente para completar este capítulo</div>
                 </div>
               </div>
 
@@ -1378,26 +1374,17 @@
               <!-- Questions -->
               <div x-show="aiGuide.quiz&&!aiGuide.quiz.loading&&!aiGuide.quiz.submitted">
                 <template x-for="(q, qi) in (aiGuide.quiz?.questions||[])" :key="qi">
-                  <div :style="qi>0?'border-top:1px solid rgba(255,255,255,.1);margin-top:32px;padding-top:32px':''">
-                    <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:20px">
-                      <div style="min-width:40px;height:40px;border-radius:50%;background:rgba(59,130,246,.1);border:2px solid rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--blue2);flex-shrink:0;font-family:var(--mono)" x-text="qi+1"></div>
-                      <div style="font-size:17px;font-weight:600;color:var(--t1);line-height:1.6;padding-top:7px" x-text="q.q"></div>
+                  <div :class="qi===0?'quiz-q-first':'quiz-q'">
+                    <div class="quiz-q-hdr">
+                      <div class="quiz-q-num" x-text="qi+1"></div>
+                      <div class="quiz-q-text" x-text="q.q"></div>
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:10px;padding-left:56px">
+                    <div class="quiz-opts">
                       <template x-for="(opt, oi) in q.options" :key="oi">
-                        <button
-                          @click="aiGuide.quiz.answers = aiGuide.quiz.answers.map((a,idx)=>idx===qi?oi:a)"
-                          style="display:flex;align-items:center;justify-content:flex-start;gap:16px;text-align:left;width:100%;padding:12px;border-radius:8px;border:1px solid;background:transparent;cursor:pointer;transition:all .15s;font-family:var(--font)"
-                          :style="aiGuide.quiz.answers[qi]===oi?'background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.35)':'background:transparent;border-color:rgba(255,255,255,.06)'"
-                          @mouseover="this.style.backgroundColor='rgba(30,41,59,.3)'"
-                          @mouseout="this.style.backgroundColor=''"
-                        >
-                          <div style="width:40px;height:40px;border-radius:50%;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:var(--mono);transition:all .15s"
-                            :style="aiGuide.quiz.answers[qi]===oi?'border-color:var(--blue2);background:rgba(59,130,246,.2);color:var(--blue2)':'border-color:#334155;color:var(--t2)'"
-                            x-text="['A','B','C','D'][oi]"></div>
-                          <span style="font-size:15px;line-height:1.5;transition:all .15s;text-align:left"
-                            :style="aiGuide.quiz.answers[qi]===oi?'color:var(--t1);font-weight:500':'color:var(--t2)'"
-                            x-text="opt"></span>
+                        <button @click="aiGuide.quiz.answers = aiGuide.quiz.answers.map((a,idx)=>idx===qi?oi:a)"
+                          :class="aiGuide.quiz.answers[qi]===oi?'quiz-opt quiz-opt-sel':'quiz-opt'">
+                          <div class="quiz-opt-dot" x-text="['A','B','C','D'][oi]"></div>
+                          <span class="quiz-opt-label" x-text="opt"></span>
                         </button>
                       </template>
                     </div>
@@ -1405,58 +1392,47 @@
                 </template>
 
                 <!-- Submit bar -->
-                <div style="display:flex;align-items:center;gap:14px;margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1)">
-                  <div style="display:flex;gap:8px;flex:1">
+                <div class="quiz-bar">
+                  <div class="quiz-dots">
                     <template x-for="(q,qi) in (aiGuide.quiz?.questions||[])" :key="qi">
-                      <div style="width:12px;height:12px;border-radius:50%;transition:all .2s"
-                        :style="(aiGuide.quiz?.answers||[])[qi]!==null&&(aiGuide.quiz?.answers||[])[qi]!==undefined?'background:var(--blue2)':'background:#334155'"></div>
+                      <div class="quiz-dot" :class="(aiGuide.quiz?.answers||[])[qi]!==null&&(aiGuide.quiz?.answers||[])[qi]!==undefined?'quiz-dot-done':''"></div>
                     </template>
                   </div>
-                  <button
-                    @click="submitAIQuiz()"
-                    :disabled="(aiGuide.quiz?.answers||[]).some(a=>a===null||a===undefined)"
-                    style="padding:12px 28px;border-radius:8px;background:var(--blue3);border:1px solid var(--blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s"
-                    :style="(aiGuide.quiz?.answers||[]).some(a=>a===null||a===undefined)?'opacity:.4;cursor:not-allowed':''"
-                  >Verificar respuestas →</button>
+                  <button class="quiz-submit" @click="submitAIQuiz()"
+                    :disabled="(aiGuide.quiz?.answers||[]).some(a=>a===null||a===undefined)">
+                    Verificar respuestas →
+                  </button>
                 </div>
               </div>
 
               <!-- Results -->
               <div x-show="aiGuide.quiz&&aiGuide.quiz.submitted" style="animation:fadeUp .3s ease both">
-                <div style="text-align:center;padding:32px 24px;margin-bottom:24px;background:var(--layer);border-radius:14px;border:1px solid rgba(255,255,255,.08)">
-                  <div style="font-size:48px;margin-bottom:14px" x-text="(aiGuide.quiz?.score||0)>=2?'🎉':'📚'"></div>
-                  <div style="font-size:24px;font-weight:700;margin-bottom:8px"
-                    :style="(aiGuide.quiz?.score||0)>=2?'color:var(--green2)':'color:var(--orange2)'"
-                    x-text="(aiGuide.quiz?.score||0)>=2?'¡Capítulo completado!':'Necesitas repasar'"></div>
-                  <div style="display:inline-flex;padding:6px 18px;border-radius:20px;font-size:14px;font-family:var(--mono)"
-                    :style="(aiGuide.quiz?.score||0)>=2?'background:rgba(16,185,129,.12);color:var(--green2)':'background:rgba(249,115,22,.1);color:var(--orange2)'"
-                    x-text="(aiGuide.quiz?.score||0)+'/3 correctas'"></div>
+                <div class="quiz-result-card" :class="(aiGuide.quiz?.score||0)>=2?'quiz-result-pass':'quiz-result-fail'">
+                  <div class="quiz-result-icon" x-text="(aiGuide.quiz?.score||0)>=2?'🎉':'📚'"></div>
+                  <div class="quiz-result-title" x-text="(aiGuide.quiz?.score||0)>=2?'¡Capítulo completado!':'Necesitas repasar'"></div>
+                  <div class="quiz-result-score" x-text="(aiGuide.quiz?.score||0)+'/3 correctas'"></div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+                <div class="quiz-feedback">
                   <template x-for="(q, qi) in (aiGuide.quiz?.questions||[])" :key="qi">
-                    <div style="padding:16px 18px;border-radius:10px;display:flex;gap:14px;align-items:flex-start"
-                      :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2)':'background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2)'">
-                      <div style="font-size:20px;flex-shrink:0;padding-top:1px"
-                        x-text="(aiGuide.quiz?.answers||[])[qi]===q.correct?'✓':'✗'"
-                        :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'color:var(--green2)':'color:#f87171'"></div>
+                    <div class="quiz-fb-item" :class="(aiGuide.quiz?.answers||[])[qi]===q.correct?'quiz-fb-correct':'quiz-fb-wrong'">
+                      <div class="quiz-fb-icon" x-text="(aiGuide.quiz?.answers||[])[qi]===q.correct?'✓':'✗'"
+                        :class="(aiGuide.quiz?.answers||[])[qi]===q.correct?'quiz-fb-icon-pass':'quiz-fb-icon-fail'"></div>
                       <div>
-                        <div style="font-size:14px;color:var(--t2);margin-bottom:4px;line-height:1.5" x-text="q.q"></div>
-                        <div style="font-size:13px;font-family:var(--mono)"
-                          :style="(aiGuide.quiz?.answers||[])[qi]===q.correct?'color:var(--green2)':'color:#f87171'"
+                        <div class="quiz-fb-q" x-text="q.q"></div>
+                        <div class="quiz-fb-answer" :class="(aiGuide.quiz?.answers||[])[qi]===q.correct?'quiz-fb-answer-pass':'quiz-fb-answer-fail'"
                           x-text="q.options[(aiGuide.quiz?.answers||[])[qi]??0]"></div>
-                        <div x-show="(aiGuide.quiz?.answers||[])[qi]!==q.correct" style="font-size:12px;color:var(--t4);margin-top:4px;font-family:var(--mono)"
+                        <div x-show="(aiGuide.quiz?.answers||[])[qi]!==q.correct" class="quiz-fb-correct-answer"
                           x-text="'✓ Correcto: '+q.options[q.correct]"></div>
                       </div>
                     </div>
                   </template>
                 </div>
-                <div style="display:flex;gap:10px">
-                  <button x-show="(aiGuide.quiz?.score||0)>=2" @click="navigate('subject-'+(aiGuide.subject?.id||''))"
-                    style="flex:1;padding:13px;border-radius:8px;background:var(--green);border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font)">
+                <div class="quiz-actions">
+                  <button x-show="(aiGuide.quiz?.score||0)>=2" class="quiz-btn-back" @click="navigate('subject-'+(aiGuide.subject?.id||''))">
                     ← Volver a la materia
                   </button>
-                  <button x-show="(aiGuide.quiz?.score||0)<2" @click="aiGuide.quiz.submitted=false;aiGuide.quiz.answers=Array(aiGuide.quiz.questions?.length||3).fill(null)"
-                    style="flex:1;padding:13px;border-radius:8px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:var(--blue2);font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font)">
+                  <button x-show="(aiGuide.quiz?.score||0)<2" class="quiz-btn-retry"
+                    @click="aiGuide.quiz.submitted=false;aiGuide.quiz.answers=Array(aiGuide.quiz.questions?.length||3).fill(null)">
                     Intentar de nuevo
                   </button>
                 </div>
@@ -4212,16 +4188,16 @@ jobs:
     d.id = 'quiz-block-' + sectionId;
     d.style.cssText = 'margin-top:40px';
     d.innerHTML =
-      '<div style="background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:28px 32px">' +
-        '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">' +
-          '<div style="width:44px;height:44px;border-radius:50%;background:rgba(59,130,246,.12);border:2px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧠</div>' +
+      '<div class="quiz-card" style="padding:28px 32px">' +
+        '<div class="quiz-hdr" style="margin-bottom:10px">' +
+          '<div class="quiz-icon">🧠</div>' +
           '<div>' +
-            '<div style="font-size:20px;font-weight:700;color:var(--t1)">Verificar conocimiento</div>' +
-            '<div style="font-size:13px;color:var(--t4);margin-top:2px">Responde 2 de 3 correctamente para completar este capítulo</div>' +
+            '<div class="quiz-title">Verificar conocimiento</div>' +
+            '<div class="quiz-sub">Responde 2 de 3 correctamente para completar este capítulo</div>' +
           '</div>' +
         '</div>' +
         '<button onclick="loadStaticQuiz(\'' + sectionId + '\',\'' + chapterName.replace(/'/g,"\\'") + '\')"' +
-          ' style="margin-top:16px;background:var(--blue3);color:#fff;border:1px solid var(--blue);padding:11px 26px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;font-family:inherit;display:inline-block">Iniciar prueba →</button>' +
+          ' class="quiz-submit" style="margin-top:16px;display:inline-block">Iniciar prueba →</button>' +
         '<div id="quiz-content-' + sectionId + '" style="color:var(--t1)"></div>' +
       '</div>';
     return d;
@@ -4263,28 +4239,27 @@ function renderStaticQuiz(container, sectionId, questions) {
 
   let html = '';
   questions.forEach(function (q, qi) {
-    html += '<div style="margin-top:' + (qi > 0 ? '28px' : '20px') + ';padding-top:' + (qi > 0 ? '28px' : '0') + ';border-top:' + (qi > 0 ? '1px solid rgba(255,255,255,.1)' : 'none') + '">';
-    html += '<div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:18px">';
-    html += '<div style="min-width:40px;height:40px;border-radius:50%;background:rgba(59,130,246,.1);border:2px solid rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--blue2);flex-shrink:0;font-family:var(--mono)">' + (qi + 1) + '</div>';
-    html += '<div style="font-size:17px;font-weight:600;color:var(--t1);line-height:1.6;padding-top:7px">' + q.q + '</div></div>';
-    html += '<div style="display:flex;flex-direction:column;gap:10px;padding-left:56px">';
+    html += '<div class="' + (qi === 0 ? 'quiz-q-first' : 'quiz-q') + '">';
+    html += '<div class="quiz-q-hdr">';
+    html += '<div class="quiz-q-num">' + (qi + 1) + '</div>';
+    html += '<div class="quiz-q-text">' + q.q + '</div></div>';
+    html += '<div class="quiz-opts">';
     q.options.forEach(function (opt, oi) {
-      html += '<div id="opt-' + sectionId + '-' + qi + '-' + oi + '" onclick="selectSQ(\'' + sectionId + '\',' + qi + ',' + oi + ')"' +
-        ' style="display:flex;align-items:center;justify-content:flex-start;gap:16px;text-align:left;width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .15s;background:transparent" onmouseover="this.style.background=\'rgba(30,41,59,.3)\'" onmouseout="if(this.dataset.selected!==\'1\'){this.style.background=\'transparent\'}">';
-      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" style="width:40px;height:40px;border-radius:50%;border:2px solid #334155;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--t2)">' + ['A','B','C','D'][oi] + '</div>';
-      html += '<span style="font-size:15px;color:var(--t2);line-height:1.5;text-align:left">' + opt + '</span></div>';
+      html += '<div id="opt-' + sectionId + '-' + qi + '-' + oi + '" class="quiz-opt" onclick="selectSQ(\'' + sectionId + '\',' + qi + ',' + oi + ')">';
+      html += '<div id="cir-' + sectionId + '-' + qi + '-' + oi + '" class="quiz-opt-dot">' + ['A','B','C','D'][oi] + '</div>';
+      html += '<span class="quiz-opt-label">' + opt + '</span></div>';
     });
     html += '</div></div>';
   });
 
-  html += '<div style="display:flex;align-items:center;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1)">';
-  html += '<div style="display:flex;gap:7px;flex:1">';
+  html += '<div class="quiz-bar">';
+  html += '<div class="quiz-dots">';
   questions.forEach(function (_, i) {
-    html += '<div id="dot-' + sectionId + '-' + i + '" style="width:12px;height:12px;border-radius:50%;background:#334155"></div>';
+    html += '<div id="dot-' + sectionId + '-' + i + '" class="quiz-dot"></div>';
   });
   html += '</div>';
-  html += '<button id="sqbtn-' + sectionId + '" onclick="submitSQ(\'' + sectionId + '\')"' +
-    ' style="background:var(--blue3);color:#fff;border:1px solid var(--blue);padding:12px 28px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;opacity:.35;pointer-events:none;font-family:inherit">Verificar →</button>';
+  html += '<button id="sqbtn-' + sectionId + '" class="quiz-submit" onclick="submitSQ(\'' + sectionId + '\')"' +
+    ' style="opacity:.35;pointer-events:none">Verificar →</button>';
   html += '</div>';
   html += '<div id="sqres-' + sectionId + '" style="display:none;margin-top:28px"></div>';
 
@@ -4296,19 +4271,14 @@ function selectSQ(sectionId, qi, oi) {
   d.answers[qi] = oi;
   d.questions[qi].options.forEach(function (_, idx) {
     const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + idx);
-    const cir = document.getElementById('cir-' + sectionId + '-' + qi + '-' + idx);
     if (!lbl) return;
     if (idx === oi) {
-      lbl.style.borderColor = 'rgba(59,130,246,.35)'; lbl.style.background = 'rgba(59,130,246,.1)';
-      lbl.dataset.selected = '1';
-      cir.style.borderColor = 'var(--blue2)'; cir.style.background = 'rgba(59,130,246,.2)'; cir.style.color = 'var(--blue2)';
+      lbl.classList.add('quiz-opt-sel'); lbl.dataset.selected = '1';
     } else {
-      lbl.style.borderColor = 'rgba(255,255,255,.06)'; lbl.style.background = 'transparent';
-      lbl.dataset.selected = '0';
-      cir.style.borderColor = '#334155'; cir.style.background = ''; cir.style.color = 'var(--t2)';
+      lbl.classList.remove('quiz-opt-sel'); lbl.dataset.selected = '0';
     }
   });
-  document.getElementById('dot-' + sectionId + '-' + qi).style.background = 'var(--blue2)';
+  document.getElementById('dot-' + sectionId + '-' + qi).classList.add('quiz-dot-done');
   if (d.answers.every(function (a) { return a !== null; })) {
     const btn = document.getElementById('sqbtn-' + sectionId);
     btn.style.opacity = '1'; btn.style.pointerEvents = '';
@@ -4324,12 +4294,13 @@ function submitSQ(sectionId) {
     const correct = d.answers[qi] === q.correct;
     const lbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + d.answers[qi]);
     if (lbl) {
-      lbl.style.borderColor = correct ? 'rgba(16,185,129,.3)' : 'rgba(239,68,68,.3)';
-      lbl.style.background  = correct ? 'rgba(16,185,129,.06)' : 'rgba(239,68,68,.06)';
+      lbl.classList.remove('quiz-opt-sel');
+      lbl.classList.add(correct ? 'quiz-fb-correct' : 'quiz-fb-wrong');
+      lbl.style.pointerEvents = 'none';
     }
     if (!correct) {
       const cLbl = document.getElementById('opt-' + sectionId + '-' + qi + '-' + q.correct);
-      if (cLbl) { cLbl.style.borderColor = 'rgba(16,185,129,.3)'; cLbl.style.background = 'rgba(16,185,129,.06)'; }
+      if (cLbl) { cLbl.classList.add('quiz-fb-correct'); }
     }
   });
 
@@ -4338,11 +4309,11 @@ function submitSQ(sectionId) {
   const res = document.getElementById('sqres-' + sectionId);
   res.style.display = '';
   res.innerHTML =
-    '<div style="text-align:center;padding:32px 24px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:var(--layer)">' +
-      '<div style="font-size:44px;margin-bottom:12px">' + (passed ? '🎉' : '📚') + '</div>' +
-      '<div style="font-size:22px;font-weight:700;color:' + (passed ? 'var(--green2)' : 'var(--orange2)') + ';margin-bottom:8px">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
-      '<div style="font-size:14px;color:var(--t4)">' + score + ' de ' + d.questions.length + ' correctas</div>' +
-      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" style="margin-top:18px;background:rgba(59,130,246,.1);color:var(--blue2);border:1px solid rgba(59,130,246,.25);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit">Intentar de nuevo</button>' : '') +
+    '<div class="quiz-result-card ' + (passed ? 'quiz-result-pass' : 'quiz-result-fail') + '">' +
+      '<div class="quiz-result-icon">' + (passed ? '🎉' : '📚') + '</div>' +
+      '<div class="quiz-result-title">' + (passed ? '¡Prueba superada!' : 'Necesitas repasar') + '</div>' +
+      '<div class="quiz-result-score">' + score + ' de ' + d.questions.length + ' correctas</div>' +
+      (!passed ? '<button onclick="retrySQ(\'' + sectionId + '\')" class="quiz-btn-retry" style="margin-top:18px">Intentar de nuevo</button>' : '') +
     '</div>';
 }
 
