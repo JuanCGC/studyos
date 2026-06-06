@@ -62,7 +62,9 @@ create table if not exists interview_flashcards (
 create index if not exists idx_flash_user on interview_flashcards(user_id);
 create index if not exists idx_flash_subject on interview_flashcards(user_id, subject_id);
 
--- 8. Subscriptions table (Stripe payment webhook target)
+-- 8. Subscriptions table (dLocal payment webhook target)
+-- Migration (si creaste la tabla antes del rename):
+--   alter table subscriptions rename column stripe_subscription_id to payment_id;
 create table if not exists subscriptions (
   user_id                uuid references auth.users(id) on delete cascade primary key,
   plan_type              text not null default 'free',
