@@ -27,6 +27,10 @@ export function usePomodoro() {
   const dash = CIRC * (1 - timeLeft / phaseDur[phase]);
   const dashBig = CIRC_BIG * (1 - timeLeft / phaseDur[phase]);
 
+  const focusLabel = focusSubjectId && focusChapterName
+    ? `${focusSubjectId} — ${focusChapterName}`
+    : focusSubjectId || '';
+
   const changePhase = useCallback((p) => {
     setPhase(p);
     setTimeLeft(phaseDur[p]);
@@ -79,10 +83,6 @@ export function usePomodoro() {
   useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
-
-  const focusLabel = focusSubjectId && focusChapterName
-    ? `${focusSubjectId} — ${focusChapterName}`
-    : focusSubjectId || '';
 
   return {
     phase, setPhase: changePhase, running, timeLeft, fmtTime, phaseLabel,
