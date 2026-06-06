@@ -12,9 +12,16 @@ export function useAuth() {
     }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
+      const hash = window.location.hash;
+      if (hash?.includes('error=')) {
+        const params = new URLSearchParams(hash.replace('#', ''));
+        const desc = params.get('error_description') || params.get('error') || 'Unknown error';
+        window.location.href = '/login.html?error=' + encodeURIComponent(desc);
+        return;
+      }
       setUser(session?.user ?? null);
       setLoading(false);
-      if (window.location.hash?.includes('access_token')) {
+      if (hash?.includes('access_token')) {
         window.location.hash = '';
       }
     });

@@ -124,7 +124,10 @@ let _sb = null;
 async function initSupabase() {
   const cfg = await fetch('/api/config').then(r => r.json());
   _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
-  // if already logged in, redirect
+  // show error from email confirmation (e.g. otp_expired)
+  const urlErr = new URLSearchParams(location.search).get('error');
+  if (urlErr) showError('login-error', decodeURIComponent(urlErr));
+
   const { data: { session } } = await _sb.auth.getSession();
   if (session) {
     await _sb.auth.signOut({ scope: 'global' });
