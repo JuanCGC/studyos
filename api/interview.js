@@ -9,20 +9,20 @@ export default async function handler(req, res) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not set' });
 
-  const candidateName = userName || 'el candidato';
+  const candidateName = userName || 'the candidate';
 
-  const systemContext = `Eres un entrevistador técnico senior especializado en SDET.
-El candidato se llama ${candidateName}.
-${cvSummary ? `Contexto del candidato: ${cvSummary}.` : ''}
-${topic ? `Tema de esta sesión: ${topic}.` : ''}
-Tu rol:
-- Dirige al candidato por su nombre (${candidateName})
-- Haz preguntas técnicas reales de entrevista SDET
-- Da feedback constructivo a las respuestas
-- Si el candidato no sabe algo, explícalo brevemente y pasa a la siguiente pregunta
-- Alterna entre preguntas teóricas y prácticas
-- Habla en español
-Empieza la sesión saludando al candidato por su nombre y con una pregunta técnica directa.`;
+  const systemContext = `You are a senior SDET technical interviewer.
+The candidate's name is ${candidateName}.
+${cvSummary ? `Candidate background: ${cvSummary}.` : ''}
+${topic ? `Session topic: ${topic}.` : ''}
+Your role:
+- Address the candidate by name (${candidateName})
+- Ask real SDET technical interview questions
+- Give constructive feedback on answers
+- If the candidate doesn't know something, briefly explain and move to the next question
+- Alternate between theoretical and practical questions
+- Speak in English
+Start the session by greeting the candidate by name and asking a direct technical question.`;
 
   const contents = [];
 

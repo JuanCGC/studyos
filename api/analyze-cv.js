@@ -15,46 +15,46 @@ export default async function handler(req, res) {
 
   const alreadyHave = currentSubjects.map(s => s.name).join(', ');
 
-  const prompt = `Eres un advisor de carrera especializado en SDET (Software Development Engineer in Test).
-Analiza este CV y realiza lo siguiente:
+  const prompt = `You are a career advisor specialized in SDET (Software Development Engineer in Test).
+Analyze this CV and do the following:
 
-1. Extrae las habilidades técnicas actuales del candidato.
-2. Identifica gaps de conocimiento para el rol SDET.
-3. Recomienda exactamente 4 temas de estudio (que NO sean: ${alreadyHave || 'ninguno'}).
-4. Lista 5 preguntas de entrevista frecuentes basadas en su experiencia actual.
+1. Extract the candidate's current technical skills.
+2. Identify knowledge gaps for the SDET role.
+3. Recommend exactly 4 study topics (that are NOT: ${alreadyHave || 'none'}).
+4. List 5 common interview questions based on their current experience.
 
-Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
+Respond ONLY with valid JSON, no markdown, no extra text:
 {
   "skills": ["skill1", "skill2"],
-  "experience_summary": "resumen en 2 frases",
+  "experience_summary": "summary in 2 sentences",
   "gaps": ["gap1", "gap2"],
   "recommended_subjects": [
     {
-      "name": "Nombre del tema",
+      "name": "Topic name",
       "icon": "emoji",
       "color": "blue|green|orange|purple",
-      "reason": "por qué aprenderlo basado en el CV",
+      "reason": "why to learn it based on the CV",
       "hours": "Xh",
       "chapList": [
-        {"name": "Capítulo 1", "done": false},
-        {"name": "Capítulo 2", "done": false},
-        {"name": "Capítulo 3", "done": false},
-      {"name": "Capítulo 4", "done": false},
-      {"name": "Capítulo 5", "done": false},
-      {"name": "Capítulo 6", "done": false},
-      {"name": "Capítulo 7", "done": false},
-      {"name": "Capítulo 8", "done": false},
-      {"name": "Capítulo 9", "done": false},
-      {"name": "Capítulo 10", "done": false}
+        {"name": "Chapter 1", "done": false},
+        {"name": "Chapter 2", "done": false},
+        {"name": "Chapter 3", "done": false},
+      {"name": "Chapter 4", "done": false},
+      {"name": "Chapter 5", "done": false},
+      {"name": "Chapter 6", "done": false},
+      {"name": "Chapter 7", "done": false},
+      {"name": "Chapter 8", "done": false},
+      {"name": "Chapter 9", "done": false},
+      {"name": "Chapter 10", "done": false}
       ]
     }
   ],
   "interview_questions": [
-    "pregunta 1",
-    "pregunta 2",
-    "pregunta 3",
-    "pregunta 4",
-    "pregunta 5"
+    "question 1",
+    "question 2",
+    "question 3",
+    "question 4",
+    "question 5"
   ]
 }`;
 

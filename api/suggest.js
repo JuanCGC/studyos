@@ -24,42 +24,42 @@ export default async function handler(req, res) {
     notStarted.length  ? `AÚN NO INICIADOS: ${notStarted.map(s => s.name).join(', ')}` : '',
   ].filter(Boolean).join('\n');
 
-  const prompt = `Eres un advisor de carrera para SDET (Software Development Engineer in Test).
+  const prompt = `You are a career advisor for SDET (Software Development Engineer in Test).
 
-PROGRESIÓN ACTUAL DEL ESTUDIANTE:
+CURRENT STUDENT PROGRESSION:
 ${progressDetail}
 
-Analiza su progresión y sugiere exactamente 3 temas que sean la CONTINUACIÓN LÓGICA de lo que está estudiando.
-Razonamiento esperado:
-- Si está avanzado en API Testing → sugerir temas que profundicen o complementen (ej: Contract Testing, API Security, GraphQL Testing)
-- Si está iniciando CI/CD → sugerir temas que se construyen sobre eso (ej: Infrastructure as Code, GitOps, Observability)
-- Si completó algo → sugerir el siguiente nivel o especialización
-- NO sugerir temas genéricos no relacionados con su progresión actual
-- NO repetir: ${alreadyHave}
+Analyze their progression and suggest exactly 3 topics that are the LOGICAL NEXT STEP of what they are studying.
+Expected reasoning:
+- If they are advanced in API Testing → suggest topics that deepen or complement (e.g. Contract Testing, API Security, GraphQL Testing)
+- If they are starting CI/CD → suggest topics that build on that (e.g. Infrastructure as Code, GitOps, Observability)
+- If they completed something → suggest the next level or specialization
+- DO NOT suggest generic topics unrelated to their current progression
+- DO NOT repeat: ${alreadyHave}
 
-Responde ÚNICAMENTE con un JSON array válido. Sin markdown, sin \`\`\`, sin texto extra:
+Respond ONLY with a valid JSON array. No markdown, no \`\`\`, no extra text:
 [
   {
-    "name": "Nombre corto del tema",
-    "icon": "emoji relevante",
+    "name": "Short topic name",
+    "icon": "relevant emoji",
     "color": "blue",
-    "reason": "Una frase concreta explicando por qué sigue lógicamente de su progresión actual",
+    "reason": "One concrete sentence explaining why this follows logically from their current progression",
     "hours": "Xh",
     "chapList": [
-      {"name": "Nombre del capítulo 1", "done": false},
-      {"name": "Nombre del capítulo 2", "done": false},
-      {"name": "Nombre del capítulo 3", "done": false},
-      {"name": "Nombre del capítulo 4", "done": false},
-      {"name": "Nombre del capítulo 5", "done": false},
-      {"name": "Nombre del capítulo 6", "done": false},
-      {"name": "Nombre del capítulo 7", "done": false},
-      {"name": "Nombre del capítulo 8", "done": false},
-      {"name": "Nombre del capítulo 9", "done": false},
-      {"name": "Nombre del capítulo 10", "done": false}
+      {"name": "Chapter 1 name", "done": false},
+      {"name": "Chapter 2 name", "done": false},
+      {"name": "Chapter 3 name", "done": false},
+      {"name": "Chapter 4 name", "done": false},
+      {"name": "Chapter 5 name", "done": false},
+      {"name": "Chapter 6 name", "done": false},
+      {"name": "Chapter 7 name", "done": false},
+      {"name": "Chapter 8 name", "done": false},
+      {"name": "Chapter 9 name", "done": false},
+      {"name": "Chapter 10 name", "done": false}
     ]
   }
 ]
-Colores disponibles: blue, green, orange, purple. Varía entre las 3 sugerencias.`;
+Available colors: blue, green, orange, purple. Vary them across the 3 suggestions.`;
 
   try {
     const geminiRes = await fetch(

@@ -38,6 +38,16 @@ export default function App() {
   // ── Profile ──
   const [profileName, setProfileName] = useState(() => localStorage.getItem('studyos_profileName') || '');
   const [profileSaving, setProfileSaving] = useState(false);
+
+  // ── Cache cleanup for users stuck with corrupted cache ──
+  useEffect(() => {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('guide_') || key.startsWith('quiz_'))) {
+        try { JSON.parse(localStorage.getItem(key)); } catch (e) { localStorage.removeItem(key); }
+      }
+    }
+  }, []);
   const [profileSaved, setProfileSaved] = useState(false);
   const userName = profileName || user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User';
 
@@ -389,18 +399,23 @@ export default function App() {
         if (cached) {
           setAiGuide(prev => ({ ...prev, content: JSON.parse(cached), loading: false }));
         }
-      } catch (e) { /* ignore */ }
+      } catch (e) { localStorage.removeItem(cacheKey); }
     }
     try {
       let cachedQ = localStorage.getItem(quizKey);
       if (cachedQ) {
         setAiGuide(prev => ({ ...prev, quiz: { ...prev.quiz, questions: JSON.parse(cachedQ), loading: false } }));
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) { localStorage.removeItem(quizKey); }
     const tasks = [];
+    const withTimeout = (url, opts, ms = 30000) => {
+      const ctrl = new AbortController();
+      const id = setTimeout(() => ctrl.abort(), ms);
+      return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(id));
+    };
     if (!quizOnly && !localStorage.getItem(cacheKey)) {
       tasks.push(
-        fetch('/api/generate-guide', {
+        withTimeout('/api/generate-guide', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             subjectName: subject.name, chapterName: chapter.name, language: aiGuide.language,
@@ -412,14 +427,14 @@ export default function App() {
             if (guideSessionRef.current !== session) return;
             if (data.error) throw new Error(data.error);
             setAiGuide(prev => ({ ...prev, content: data.guide, loading: false }));
-            try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch (e) { /* ignore */ }
+            try { if (data.guide) localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch (e) { /* ignore */ }
           })
           .catch(e => { if (guideSessionRef.current === session) setAiGuide(prev => ({ ...prev, error: e.message, loading: false })); })
       );
     }
     if (!localStorage.getItem(quizKey)) {
       tasks.push(
-        fetch('/api/quiz', {
+        withTimeout('/api/quiz', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0, language: aiGuide.language }),
         })

@@ -12,27 +12,27 @@ export default async function handler(req, res) {
 
   const { subjectName = '', chapterName = '', chapterIndex = 0, totalChapters = 0 } = req.body || {};
 
-  const position = totalChapters > 0 ? `capítulo ${chapterIndex + 1} de ${totalChapters}` : `capítulo ${chapterIndex + 1}`;
-  const level = chapterIndex <= 2 ? 'introductorio' : chapterIndex <= Math.floor((totalChapters || 10) * 0.5) ? 'intermedio' : 'avanzado';
+  const position = totalChapters > 0 ? `chapter ${chapterIndex + 1} of ${totalChapters}` : `chapter ${chapterIndex + 1}`;
+  const level = chapterIndex <= 2 ? 'introductory' : chapterIndex <= Math.floor((totalChapters || 10) * 0.5) ? 'intermediate' : 'advanced';
 
-  const prompt = `Eres un instructor SDET experto. Crea exactamente 3 preguntas de opción múltiple sobre el capítulo "${chapterName}" (${position}, nivel ${level}) de la materia "${subjectName}".
+  const prompt = `You are an expert SDET instructor. Create exactly 3 multiple-choice questions about the chapter "${chapterName}" (${position}, ${level} level) of the subject "${subjectName}".
 
-Reglas ESTRICTAS:
-- Las preguntas deben cubrir ÚNICAMENTE el contenido de "${chapterName}". NO introduzcas conceptos de otros capítulos.
-- Nivel ${level}: si es introductorio, pregunta sobre definiciones, conceptos básicos y usos fundamentales de "${chapterName}".
-- Las preguntas deben ser respondibles por alguien que acaba de estudiar "${chapterName}" y nada más.
-- 4 opciones por pregunta (A, B, C, D). Solo UNA correcta.
-- Opciones incorrectas plausibles pero claramente incorrectas para quien estudió el tema.
+STRICT rules:
+- Questions must cover ONLY the content of "${chapterName}". DO NOT introduce concepts from other chapters.
+- ${level} level: if introductory, ask about definitions, core concepts and fundamental uses of "${chapterName}".
+- Questions must be answerable by someone who just studied "${chapterName}" and nothing else.
+- 4 options per question (A, B, C, D). Only ONE correct.
+- Wrong options must be plausible but clearly incorrect for someone who studied the topic.
 
-Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto extra:
+Respond ONLY with valid JSON, no markdown, no extra text:
 [
   {
-    "q": "Texto de la pregunta",
-    "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+    "q": "Question text",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
     "correct": 0
   }
 ]
-(correct = índice 0-3 de la opción correcta)`;
+(correct = index 0-3 of the correct option)`;
 
   try {
     const geminiRes = await fetch(
