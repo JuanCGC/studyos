@@ -1,5 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
+import crypto from 'crypto';
+
+const PLANS = {
+  pro:  { amount: 19, currency: 'USD', description: 'StudIt Pro Plan — Monthly', subject_limit: 20, plan_type: 'pro' },
+  enterprise: { amount: 99, currency: 'USD', description: 'StudIt Enterprise Plan — Monthly', subject_limit: 9999, plan_type: 'enterprise' },
+};
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,32 +21,71 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Unauthorized' });
 
-  const { priceId, tier } = req.body || {};
-  if (!priceId || typeof priceId !== 'string') {
-    return res.status(400).json({ error: 'priceId (string) is required' });
+  const { tier } = req.body || {};
+  const plan = PLANS[tier];
+  if (!plan) return res.status(400).json({ error: `Invalid or missing tier. Supported: ${Object.keys(PLANS).join(', ')}` });
+
+  const dlocalLogin = process.env.DLOCAL_LOGIN;
+  const dlocalTransKey = process.env.DLOCAL_TRANS_KEY;
+  const dlocalSecretKey = process.env.DLOCAL_SECRET_KEY;
+  if (!dlocalLogin || !dlocalTransKey || !dlocalSecretKey) {
+    return res.status(500).json({ error: 'dLocal Go not configured' });
   }
 
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) return res.status(500).json({ error: 'Stripe not configured' });
-
   const origin = req.headers.origin || 'https://studit.vercel.app';
+  const orderId = `studit_${user.id}_${Date.now()}`;
 
   try {
-    const stripe = new Stripe(stripeKey);
-
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
+    const body = JSON.stringify({
+      amount: plan.amount,
+      currency: plan.currency,
+      description: plan.description,
+      order_id: orderId,
+      country: 'CO',
+      payer: {
+        name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+        email: user.email,
+        document: '',
+        user_ip: req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || '',
+      },
+      payment_method_id: 'CARD',
+      notification_url: `${origin}/api/subscription-webhook`,
+      callback_url: `${origin}/dashboard?checkout=success`,
       metadata: {
         supabase_user_id: user.id,
-        tier: tier || 'pro',
+        tier,
+        subject_limit: plan.subject_limit,
+        plan_type: plan.plan_type,
+        order_id: orderId,
       },
-      success_url: `${origin}/dashboard?checkout=success`,
-      cancel_url: `${origin}/`,
     });
 
-    res.status(200).json({ url: session.url });
+    const timestamp = Date.now().toString();
+    const authHash = crypto
+      .createHmac('sha256', dlocalSecretKey)
+      .update(timestamp + dlocalLogin + body)
+      .digest('hex');
+
+    const response = await fetch('https://api.dlocal.com/go/v1/payments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Login': dlocalLogin,
+        'X-Trans-Key': dlocalTransKey,
+        'X-Version': '2.1',
+        'X-Date': timestamp,
+        'X-Auth': authHash,
+      },
+      body,
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('dLocal error:', data);
+      return res.status(response.status).json({ error: data.message || 'dLocal payment creation failed' });
+    }
+
+    res.status(200).json({ url: data.redirect_url });
   } catch (err) {
     console.error('Checkout error:', err);
     res.status(500).json({ error: err.message });

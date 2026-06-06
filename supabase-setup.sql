@@ -68,7 +68,7 @@ create table if not exists subscriptions (
   plan_type              text not null default 'free',
   subject_limit          integer not null default 3,
   status                 text not null default 'active',
-  stripe_subscription_id text,
+  payment_id text,
   updated_at             timestamptz default now()
 );
 

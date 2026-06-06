@@ -22,35 +22,21 @@ function readRawBody(req) {
   });
 }
 
-function verifySignature(payload, signature, secret) {
-  const parts = signature.split(',');
-  let sigV1 = null, ts = null;
-  for (const p of parts) {
-    const [k, v] = p.split('=');
-    if (k === 'v1') sigV1 = v;
-    if (k === 't') ts = v;
-  }
-  if (!ts || !sigV1) return null;
-  const expected = crypto
-    .createHmac('sha256', secret)
-    .update(`${ts}.${payload}`)
-    .digest('hex');
-  if (expected === sigV1) return { ts: parseInt(ts, 10) };
-  return null;
+function verifyDlocalSignature(bodyStr, signature, secret) {
+  if (!signature || !secret) return false;
+  const expected = crypto.createHmac('sha256', secret).update(bodyStr).digest('hex');
+  return expected === signature;
 }
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Stripe-Signature');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Signature');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const signature = req.headers['stripe-signature'];
-  if (!signature) return res.status(400).json({ error: 'Missing Stripe-Signature header' });
-
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!secret) return res.status(500).json({ error: 'Webhook secret not configured' });
+  const secret = process.env.DLOCAL_TRANS_KEY;
+  const signature = req.headers['x-signature'];
 
   let rawBody;
   try {
@@ -60,8 +46,12 @@ export default async function handler(req, res) {
   }
 
   const bodyStr = rawBody.toString('utf-8');
-  const verified = verifySignature(bodyStr, signature, secret);
-  if (!verified) return res.status(401).json({ error: 'Invalid signature' });
+
+  if (secret && signature) {
+    if (!verifyDlocalSignature(bodyStr, signature, secret)) {
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
+  }
 
   let payload;
   try {
@@ -70,64 +60,53 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid JSON payload' });
   }
 
-  const eventType = payload.type;
   const supabase = createClient(
     process.env.VITE_SUPABASE_URL,
     process.env.VITE_SUPABASE_SERVICE_ROLE_KEY
   );
 
   try {
-    switch (eventType) {
-      case 'checkout.session.completed':
-      case 'customer.subscription.updated': {
-        const data = payload.data.object;
-        const userId = data.metadata?.supabase_user_id || data.metadata?.user_id;
-        if (!userId) return res.status(400).json({ error: 'Missing user_id in metadata' });
+    const event = payload.event || payload.status;
+    const userId = payload.metadata?.supabase_user_id;
+    const tier = payload.metadata?.tier;
 
-        const tier = (data.metadata?.tier || '').toLowerCase();
-        const config = TIER_CONFIG[tier];
-        if (!config) return res.status(400).json({ error: `Unknown tier: ${tier}` });
+    if (event === 'paid' && userId && tier) {
+      const config = TIER_CONFIG[tier];
+      if (!config) return res.status(400).json({ error: `Unknown tier: ${tier}` });
 
-        const { error } = await supabase.from('subscriptions').upsert({
-          user_id: userId,
-          plan_type: config.plan_type,
-          subject_limit: config.subject_limit,
-          status: 'active',
-          stripe_subscription_id: data.subscription || data.id,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+      const { error } = await supabase.from('subscriptions').upsert({
+        user_id: userId,
+        plan_type: config.plan_type,
+        subject_limit: config.subject_limit,
+        status: 'active',
+        payment_id: payload.id || payload.order_id,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' });
 
-        if (error) throw error;
-        break;
-      }
+      if (error) throw error;
 
-      case 'customer.subscription.deleted': {
-        const data = payload.data.object;
-        const stripeSubId = data.id;
+    } else if (event === 'cancelled' || event === 'canceled') {
+      const orderId = payload.order_id;
+      if (!orderId) return res.status(400).json({ error: 'Missing order_id' });
 
-        const { data: existing, error: lookupError } = await supabase
-          .from('subscriptions')
-          .select('user_id')
-          .eq('stripe_subscription_id', stripeSubId)
-          .single();
+      const { data: existing, error: lookupError } = await supabase
+        .from('subscriptions')
+        .select('user_id')
+        .eq('payment_id', orderId)
+        .single();
 
-        if (lookupError || !existing) {
-          return res.status(404).json({ error: `Subscription not found: ${stripeSubId}` });
-        }
-
+      if (!lookupError && existing) {
         const { error } = await supabase.from('subscriptions').upsert({
           user_id: existing.user_id,
-          stripe_subscription_id: stripeSubId,
+          payment_id: orderId,
           ...FREE_BASELINE,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id' });
-
         if (error) throw error;
-        break;
       }
 
-      default:
-        return res.status(200).json({ received: true });
+    } else if (event === 'paid' && !userId) {
+      return res.status(400).json({ error: 'Missing user_id in metadata' });
     }
 
     res.status(200).json({ received: true });
