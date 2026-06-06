@@ -39,6 +39,12 @@ export default function App() {
   const [profileName, setProfileName] = useState(() => localStorage.getItem('studyos_profileName') || '');
   const [profileSaving, setProfileSaving] = useState(false);
 
+  // ── AI Guide ──
+  const [aiGuide, setAiGuide] = useState({
+    subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null,
+    quiz: null, keyConcept: '', labExpress: null, projectEvolution: null, language: 'JavaScript',
+  });
+
   // ── Cache cleanup for users stuck with corrupted cache ──
   useEffect(() => {
     for (let i = localStorage.length - 1; i >= 0; i--) {
@@ -395,10 +401,6 @@ export default function App() {
   }, [currentExercise, challengeCode, challengeLanguage]);
 
   // ── AI Guide ──
-  const [aiGuide, setAiGuide] = useState({
-    subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null,
-    quiz: null, keyConcept: '', labExpress: null, projectEvolution: null, language: 'JavaScript',
-  });
   const guideSessionRef = useRef(0);
 
   const openAIGuide = useCallback(async (subject, chapter, chapterIndex, quizOnly = false) => {
