@@ -83,10 +83,12 @@ export default function App() {
       try { const g = localStorage.getItem(cacheKey); if (g) cachedContent = JSON.parse(g); } catch {}
       try { const q = localStorage.getItem(quizKey); if (q) cachedQuiz = JSON.parse(q); } catch {}
       if (!cachedContent && !quizOnly) { setView('dashboard'); return; }
+      const embedded = EMBEDDED_GUIDES[subject.id + '_' + chapterIndex];
       setAiGuide({
         subject, chapter, chapterIndex, loading: !cachedContent, quizOnly, error: '', content: cachedContent,
         quiz: cachedQuiz ? { questions: cachedQuiz, answers: [null, null, null], loading: false, submitted: false, score: 0, error: false } : { questions: [], answers: [null, null, null], loading: false, submitted: false, score: 0, error: false },
-        keyConcept: '', labExpress: null, projectEvolution: null, language: language || 'JavaScript',
+        keyConcept: embedded?.kc || '', labExpress: embedded?.le || null, projectEvolution: embedded?.pe || null,
+        language: language || 'JavaScript',
       });
     } catch { setView('dashboard'); }
   }, [view, subjects, aiGuide.subject, setView]);

@@ -91,43 +91,43 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
           </div>
         )}
 
+        {aiGuide.keyConcept && (
+          <div className="mb-8" style={{ background: 'rgba(99,102,241,.08)', border: '1px solid rgba(99,102,241,.2)', borderRadius: 12, padding: '18px 22px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 16 }}><i className="ph ph-crosshair"></i></span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Key Concept</span>
+            </div>
+            {aiGuide.content?.summary && (
+              <p className="text-slate-300 text-base leading-relaxed mb-4">{aiGuide.content?.summary}</p>
+            )}
+            <hr className="border-slate-800 my-3" />
+            <div style={{ fontSize: 14, color: 'var(--t2)', lineHeight: 1.7 }}>{aiGuide.keyConcept}</div>
+          </div>
+        )}
+
+        {aiGuide.labExpress && (
+          <div className="mb-8" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={{ background: 'rgba(251,191,36,.06)', border: '1px solid rgba(251,191,36,.2)', borderRadius: 12, padding: '20px 22px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: 16 }}>🧪</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Lab Express</span>
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--orange2)', marginBottom: 10 }}>{aiGuide.labExpress?.title}</div>
+              <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{aiGuide.labExpress?.body}</div>
+            </div>
+            <div style={{ background: 'rgba(16,185,129,.06)', border: '1px solid rgba(16,185,129,.2)', borderRadius: 12, padding: '20px 22px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: 16 }}>📂</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Project Evolution</span>
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--green2)', marginBottom: 10 }}>{aiGuide.projectEvolution?.title}</div>
+              <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{aiGuide.projectEvolution?.body}</div>
+            </div>
+          </div>
+        )}
+
         {aiGuide.content && !aiGuide.loading && (
           <>
-            {aiGuide.keyConcept && (
-              <div className="mb-8" style={{ background: 'rgba(99,102,241,.08)', border: '1px solid rgba(99,102,241,.2)', borderRadius: 12, padding: '18px 22px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <span style={{ fontSize: 16 }}><i className="ph ph-crosshair"></i></span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Key Concept</span>
-                </div>
-                {aiGuide.content?.summary && (
-                  <p className="text-slate-300 text-base leading-relaxed mb-4">{aiGuide.content?.summary}</p>
-                )}
-                <hr className="border-slate-800 my-3" />
-                <div style={{ fontSize: 14, color: 'var(--t2)', lineHeight: 1.7 }}>{aiGuide.keyConcept}</div>
-              </div>
-            )}
-
-            {aiGuide.labExpress && (
-              <div className="mb-8" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <div style={{ background: 'rgba(251,191,36,.06)', border: '1px solid rgba(251,191,36,.2)', borderRadius: 12, padding: '20px 22px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <span style={{ fontSize: 16 }}>🧪</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Lab Express</span>
-                  </div>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--orange2)', marginBottom: 10 }}>{aiGuide.labExpress?.title}</div>
-                  <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{aiGuide.labExpress?.body}</div>
-                </div>
-                <div style={{ background: 'rgba(16,185,129,.06)', border: '1px solid rgba(16,185,129,.2)', borderRadius: 12, padding: '20px 22px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <span style={{ fontSize: 16 }}>📂</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Project Evolution</span>
-                  </div>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--green2)', marginBottom: 10 }}>{aiGuide.projectEvolution?.title}</div>
-                  <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{aiGuide.projectEvolution?.body}</div>
-                </div>
-              </div>
-            )}
-
             {(aiGuide.content?.sections || []).map((sec, si) => (
               <div key={si} style={{ marginBottom: 24 }}>
                 {sec.type === 'text' && (
