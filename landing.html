@@ -69,6 +69,8 @@
   .price-features{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:28px;flex:1}
   .price-features li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#CBD5E1;line-height:1.5}
   .price-features li .ck{width:18px;height:18px;border-radius:50%;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;color:#3B82F6}
+  .price-features li.no-ai{color:#64748B}
+  .price-features li .ck.cross{background:rgba(71,85,105,0.2);color:#475569}
   .price-btn{display:flex;align-items:center;justify-content:center;border-radius:8px;padding:12px;font-size:14px;font-weight:700;text-decoration:none;transition:all .15s;line-height:1;cursor:pointer}
   .price-btn-outlined{background:transparent;color:#fff;border:1px solid #1E293B}
   .price-btn-outlined:hover{background:#1E293B;border-color:#475569}
@@ -178,11 +180,13 @@
       <div class="price-card">
         <div class="price-name">Free</div>
         <div class="price-amount">$0 <span class="per">/ forever</span></div>
-        <p class="price-desc">For individual researchers and academic students.</p>
+        <p class="price-desc">Essential tools for self-paced independent learners.</p>
         <ul class="price-features">
           <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Up to 3 active subjects</li>
-          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Basic analytics overview</li>
-          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Standard community support</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Standard Pomodoro timer tracking</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Basic weekly hour &amp; semester progress tracking</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Core Task management and Calendar view</li>
+          <li class="no-ai"><span class="ck cross"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="#475569" stroke-width="1.5" stroke-linecap="round"/></svg></span>(No AI tools or CV analysis included)</li>
         </ul>
         <a class="price-btn price-btn-outlined" href="/login.html">Get Started</a>
       </div>
@@ -191,13 +195,14 @@
       <div class="price-card pro">
         <div class="price-badge">Most Popular</div>
         <div class="price-name">Pro</div>
-        <div class="price-amount">$49 <span class="per">/ month</span></div>
-        <p class="price-desc">For professional researchers and fast-moving teams.</p>
+        <div class="price-amount">$19 <span class="per">/ month</span></div>
+        <p class="price-desc">Advanced automation and mock tools for power users.</p>
         <ul class="price-features">
           <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Up to 20 active subjects per user</li>
-          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Advanced automated metrics</li>
-          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Priority support</li>
-          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full data export functions</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full Access: AI CV Analysis &amp; Optimization</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full Access: AI Interview simulation tool</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dynamic, adaptive Learning Path logic</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Unlimited Pomodoro customized tracking history</li>
         </ul>
         <a class="price-btn price-btn-solid" href="/login.html">Upgrade to Pro</a>
       </div>
@@ -206,12 +211,13 @@
       <div class="price-card">
         <div class="price-name">Enterprise</div>
         <div class="price-amount">Custom</div>
-        <p class="price-desc">For large research institutions and enterprise organizations.</p>
+        <p class="price-desc">Customized environments for universities, institutions, and teams.</p>
         <ul class="price-features">
           <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Unlimited active subjects</li>
-          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dedicated workspace instances</li>
-          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Custom compliance &amp; security</li>
-          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dedicated account management</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Bulk CV Analysis &amp; institutional scoring benchmarks</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Fine-tuned AI Interview modules matching custom rubrics</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Institutional dashboard analytics &amp; multi-user management</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full CSV / JSON data export capabilities</li>
         </ul>
         <a class="price-btn price-btn-outlined" href="/login.html">Contact Sales</a>
       </div>
