@@ -126,7 +126,10 @@ async function initSupabase() {
   _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
   // if already logged in, redirect
   const { data: { session } } = await _sb.auth.getSession();
-  if (session) window.location.href = '/';
+  if (session) {
+    await _sb.auth.signOut({ scope: 'global' });
+    Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
+  }
 }
 initSupabase();
 

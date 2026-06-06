@@ -21,7 +21,8 @@ export function useAuth() {
   }, []);
 
   const logout = async () => {
-    if (supabase) await supabase.auth.signOut();
+    if (supabase) await supabase.auth.signOut({ scope: 'global' });
+    Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
     window.location.href = '/login.html';
   };
 
