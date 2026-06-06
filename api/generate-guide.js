@@ -7,8 +7,9 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { subjectName, chapterName, subjectReason = '', language = 'JavaScript', embeddedGuide, showDeepDiveComments } = req.body || {};
+  const { subjectName, chapterName, subjectReason = '', language, embeddedGuide, showDeepDiveComments } = req.body || {};
   if (!subjectName || !chapterName) return res.status(400).json({ error: 'subjectName and chapterName required' });
+  if (!language) return res.status(400).json({ error: 'language is required — select a code language before generating the guide' });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not set' });

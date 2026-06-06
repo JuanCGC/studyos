@@ -1,9 +1,32 @@
+import { useState } from 'react';
+
+const LANGUAGES = ['JavaScript', 'TypeScript', 'Java', 'Python', 'C#', 'Apex', 'YAML', 'Go'];
+
 export default function SubjectDetail({
   subject, onNavigate, chapPct, syncSubjectPct, subjects,
   onDeleteSubject, onResetSubject, notesOpen, toggleNotes, isNotesOpen,
   CHAP_MAP, onGoChapter, onOpenAIGuide
 }) {
   const s = subject;
+
+  const [selectedLang, setSelectedLang] = useState(() => {
+    return localStorage.getItem('stos_ai_language') || s.defaultLang || 'JavaScript';
+  });
+
+  const handleLangChange = (lang) => {
+    setSelectedLang(lang);
+    localStorage.setItem('stos_ai_language', lang);
+  };
+
+  const handleOpenGuide = (ch, i) => {
+    if (!selectedLang) return;
+    onOpenAIGuide(s, ch, i, false, selectedLang);
+  };
+
+  const handleOpenQuiz = (ch, i) => {
+    if (!selectedLang) return;
+    onOpenAIGuide(s, ch, i, true, selectedLang);
+  };
 
   return (
     <div className="view">
@@ -66,6 +89,25 @@ export default function SubjectDetail({
         <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--t4)' }}>{s.chapList.filter(c => c.done).length} of {s.chapList.length} completed</span>
       </div>
 
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, padding: '8px 12px', background: 'var(--layer)', borderRadius: 8, border: '1px solid var(--border)' }}>
+        <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--t4)', flexShrink: 0 }}>Code Language:</span>
+        <select
+          value={selectedLang}
+          onChange={e => handleLangChange(e.target.value)}
+          style={{
+            fontSize: 11, padding: '4px 8px', borderRadius: 6,
+            border: '1px solid ' + (selectedLang ? 'rgba(59,130,246,.3)' : 'rgba(239,68,68,.3)'),
+            background: 'var(--layer2)', color: 'var(--t1)', fontFamily: 'var(--mono)',
+            cursor: 'pointer', outline: 'none', flex: 1, maxWidth: 200,
+          }}
+        >
+          {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
+        </select>
+        {!selectedLang && (
+          <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: '#f87171' }}>Select a language first</span>
+        )}
+      </div>
+
       {s.aiSuggested && (
         <div style={{ marginBottom: 14, padding: '10px 14px', borderRadius: 8, background: 'rgba(168,85,247,.06)', border: '1px solid rgba(168,85,247,.18)', fontSize: 12, color: '#c084fc', fontFamily: 'var(--mono)' }}>
           ✦ AI-generated subject — click ✨ next to each chapter to generate a study guide.
@@ -78,7 +120,7 @@ export default function SubjectDetail({
             <div
               className={'chap-item' + (ch.done ? ' done' : '')}
               style={{ borderRadius: 10, transition: 'background .15s' }}
-              onClick={() => ch.done ? (ch.done = false, syncSubjectPct(s)) : onOpenAIGuide(s, ch, i, false)}
+              onClick={() => ch.done ? (ch.done = false, syncSubjectPct(s)) : handleOpenGuide(ch, i)}
               onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,.03)'}
               onMouseOut={e => { if (!e.currentTarget.classList.contains('done')) e.currentTarget.style.background = ''; }}
             >
@@ -93,8 +135,8 @@ export default function SubjectDetail({
               <span
                 className={'chap-name' + (ch.done ? ' done' : '')}
                 style={{ cursor: 'pointer', flex: 1 }}
-                onClick={e => { e.stopPropagation(); onOpenAIGuide(s, ch, i, false); }}
-                title="Generate guide + quiz with AI"
+                onClick={e => { e.stopPropagation(); handleOpenGuide(ch, i); }}
+                title={selectedLang ? "Generate guide + quiz with AI" : "Select a language first"}
               >{ch.name}</span>
               {CHAP_MAP && CHAP_MAP[ch.name] && (
                 <span
@@ -105,14 +147,14 @@ export default function SubjectDetail({
               )}
               {(!CHAP_MAP || !CHAP_MAP[ch.name]) && (
                 <span
-                  onClick={e => { e.stopPropagation(); onOpenAIGuide(s, ch, i, false); }}
-                  title={s.aiSuggested ? 'Generate guide + quiz with AI' : 'Generate quiz'}
+                  onClick={e => { e.stopPropagation(); handleOpenGuide(ch, i); }}
+                  title={selectedLang ? (s.aiSuggested ? 'Generate guide + quiz with AI' : 'Generate quiz') : 'Select a language first'}
                   style={{
-                    fontSize: 13, color: 'var(--blue2)', marginLeft: 2, flexShrink: 0, cursor: 'pointer',
-                    opacity: 0.7, transition: 'opacity .15s'
+                    fontSize: 13, color: 'var(--blue2)', marginLeft: 2, flexShrink: 0, cursor: selectedLang ? 'pointer' : 'not-allowed',
+                    opacity: selectedLang ? 0.7 : 0.25, transition: 'opacity .15s'
                   }}
-                  onMouseOver={e => e.currentTarget.style.opacity = '1'}
-                  onMouseOut={e => e.currentTarget.style.opacity = '.7'}
+                  onMouseOver={e => { if (selectedLang) e.currentTarget.style.opacity = '1'; }}
+                  onMouseOut={e => { if (selectedLang) e.currentTarget.style.opacity = '.7'; }}
                 ><i className="ph ph-sparkle"></i></span>
               )}
               <span style={{

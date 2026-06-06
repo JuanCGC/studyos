@@ -31,7 +31,7 @@ Respond ONLY with valid JSON, no markdown, no extra text:
   "recommended_subjects": [
     {
       "name": "Topic name",
-      "icon": "emoji",
+      "icon": "relevant phosphor icon name (e.g. robot, database, shield, globe, code, chart-bar, cloud, lock, terminal, bug, gear, graph, layers, stack, wrench, microscope). Choose the most fitting one.",
       "color": "blue|green|orange|purple",
       "reason": "why to learn it based on the CV",
       "hours": "Xh",

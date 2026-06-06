@@ -41,7 +41,7 @@ Respond ONLY with a valid JSON array. No markdown, no \`\`\`, no extra text:
 [
   {
     "name": "Short topic name",
-    "icon": "relevant emoji",
+    "icon": "relevant phosphor icon name (e.g. robot, database, shield, globe, code, chart-bar, cloud, lock, terminal, bug, gear, graph, layers, stack, wrench, microscope). Choose the most fitting one.",
     "color": "blue",
     "reason": "One concrete sentence explaining why this follows logically from their current progression",
     "hours": "Xh",

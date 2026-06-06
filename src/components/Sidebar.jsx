@@ -1,4 +1,5 @@
 import PomodoroMini from './PomodoroMini';
+import DynamicIcon from './DynamicIcon';
 
 const NAV_MAIN = [
   { id: 'dashboard', icon: 'squares-four', label: 'Dashboard' },
@@ -31,7 +32,7 @@ export function Sidebar({ view, onNavigate, subjects, chapPct, todayStr, current
             className={'nav-item' + (view === 'subject-' + s.id ? ' active' : '')}
             onClick={() => onNavigate('subject-' + s.id)}
           >
-            <i className={`ph nav-icon ph-${s.icon}`}></i>
+            <DynamicIcon subjectName={s.name} iconName={s.icon} />
             <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
             <span style={{ flexShrink: 0, fontSize: 10, fontFamily: 'var(--mono)', color: pct > 0 ? `var(--${s.color}2)` : 'var(--t4)' }}>{pct}%</span>
           </div>

@@ -19,7 +19,12 @@ create table if not exists profiles (
 -- 3. Add user preferences column to profiles (deep-dive comments toggle)
 alter table profiles add column if not exists preferences jsonb default '{}';
 
--- 4. Guide cache table (cross-device AI content persistence)
+-- 4. Dynamic subject icons: icon is stored per-subject inside progress.subjects JSONB array.
+-- Each subject object includes an "icon" field with a Phosphor icon name.
+-- No schema change needed — the field is already part of the JSON structure.
+-- See src/components/DynamicIcon.jsx for the keyword-to-icon mapping fallback.
+
+-- 5. Guide cache table (cross-device AI content persistence)
 create table if not exists guide_cache (
   user_id    uuid references auth.users(id) on delete cascade,
   cache_key  text,
@@ -28,7 +33,7 @@ create table if not exists guide_cache (
   primary key (user_id, cache_key)
 );
 
--- 5. Row Level Security
+-- 6. Row Level Security
 alter table progress enable row level security;
 alter table profiles enable row level security;
 alter table guide_cache enable row level security;

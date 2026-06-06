@@ -410,14 +410,15 @@ export default function App() {
   // ── AI Guide ──
   const guideSessionRef = useRef(0);
 
-  const openAIGuide = useCallback(async (subject, chapter, chapterIndex, quizOnly = false) => {
+  const openAIGuide = useCallback(async (subject, chapter, chapterIndex, quizOnly = false, language) => {
     const session = ++guideSessionRef.current;
     const alreadyDone = chapter?.done === true;
+    const lang = language || localStorage.getItem('stos_ai_language') || subject.defaultLang || 'JavaScript';
     setAiGuide({
       subject, chapter, chapterIndex, loading: !quizOnly, quizOnly, error: '', content: null,
       quiz: { questions: [], answers: [null, null, null], loading: !alreadyDone, submitted: alreadyDone, score: alreadyDone ? 3 : 0, error: false },
       keyConcept: '', labExpress: null, projectEvolution: null,
-      language: localStorage.getItem('stos_ai_language') || subject.defaultLang || 'JavaScript',
+      language: lang,
     });
     const embeddedKey = subject.id + '_' + chapterIndex;
     const embedded = EMBEDDED_GUIDES[embeddedKey];
@@ -425,7 +426,7 @@ export default function App() {
       setAiGuide(prev => ({ ...prev, keyConcept: embedded.kc, labExpress: embedded.le, projectEvolution: embedded.pe }));
     }
     navigate('ai-guide');
-    localStorage.setItem('stos_ai_guide', JSON.stringify({ subjectId: subject.id, chapterIndex, quizOnly, language: aiGuide.language }));
+    localStorage.setItem('stos_ai_guide', JSON.stringify({ subjectId: subject.id, chapterIndex, quizOnly, language: lang }));
     const cacheKey = `guide_${subject.id}_${chapterIndex}`;
     const quizKey = `quiz_${subject.id}_${chapterIndex}`;
     if (!quizOnly) {
@@ -453,7 +454,7 @@ export default function App() {
         withTimeout('/api/generate-guide', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            subjectName: subject.name, chapterName: chapter.name, language: aiGuide.language,
+            subjectName: subject.name, chapterName: chapter.name, language: lang,
             embeddedGuide: embedded ? { keyConcept: embedded.kc, labExpress: embedded.le, projectEvolution: embedded.pe } : null,
             showDeepDiveComments,
           }),
@@ -472,7 +473,7 @@ export default function App() {
       tasks.push(
         withTimeout('/api/quiz', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0, language: aiGuide.language }),
+          body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0, language: lang }),
         })
           .then(r => r.json())
           .then(data => {
@@ -486,7 +487,7 @@ export default function App() {
       );
     }
     await Promise.all(tasks);
-  }, [navigate, aiGuide.language, showDeepDiveComments]);
+  }, [navigate, showDeepDiveComments]);
 
   const submitAIQuiz = useCallback(() => {
     setAiGuide(prev => {
