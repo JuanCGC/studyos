@@ -13,7 +13,7 @@ import CalendarView from './views/CalendarView';
 import PomodoroView from './views/PomodoroView';
 import SettingsView from './views/SettingsView';
 import InterviewView from './views/InterviewView';
-import ChallengesView from './views/ChallengesView';
+
 import AIGuideView from './views/AIGuideView';
 
 export default function App() {
@@ -359,88 +359,6 @@ export default function App() {
     setTimeout(() => sendInterviewMessage('__start__'), 100);
   }, [navigate, saveInterviewSession, sendInterviewMessage]);
 
-  // ── Challenges ──
-  const [challengeTopic, setChallengeTopic] = useState('');
-  const [challengeTopicCustom, setChallengeTopicCustom] = useState('');
-  const [challengeDifficulty, setChallengeDifficulty] = useState('medium');
-  const [challengeLanguage, setChallengeLanguage] = useState('javascript');
-  const [currentExercise, setCurrentExercise] = useState(null);
-  const [challengeCode, setChallengeCode] = useState('');
-  const [challengeRunning, setChallengeRunning] = useState(false);
-  const [challengeResult, setChallengeResult] = useState(null);
-  const [challengeGenerating, setChallengeGenerating] = useState(false);
-  const [challengeError, setChallengeError] = useState('');
-  const [challengeShowSolution, setChallengeShowSolution] = useState(false);
-  const [challengeShowHints, setChallengeShowHints] = useState(false);
-  const [challengeHistory, setChallengeHistory] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('stos_challenge_history') || '[]'); }
-    catch { return []; }
-  });
-  const generateExercise = useCallback(async () => {
-    const topic = challengeTopicCustom.trim() || challengeTopic;
-    if (!topic) { setChallengeError('Select or type a topic first'); return; }
-    setChallengeGenerating(true);
-    setChallengeError('');
-    setCurrentExercise(null);
-    setChallengeCode('');
-    setChallengeResult(null);
-    setChallengeShowSolution(false);
-    setChallengeShowHints(false);
-    try {
-      const res = await fetch('/api/exercise', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, difficulty: challengeDifficulty, language: challengeLanguage }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error generating exercise');
-      setCurrentExercise(data.exercise);
-      setChallengeCode(data.exercise.starterCode || '');
-    } catch (e) { setChallengeError(e.message); }
-    finally { setChallengeGenerating(false); }
-  }, [challengeTopicCustom, challengeTopic, challengeDifficulty, challengeLanguage]);
-  const runChallenge = useCallback(() => {
-    if (!currentExercise || !challengeCode.trim()) return;
-    setChallengeRunning(true);
-    setChallengeResult(null);
-    try {
-      const tc = currentExercise.testCases || [];
-      const fnName = currentExercise.functionName || 'solution';
-      let userFn;
-      try {
-        userFn = new Function(`${challengeCode}; return ${fnName};`)();
-      } catch (e) {
-        setChallengeResult({ error: 'Syntax error: ' + e.message, passed: 0, total: tc.length, results: [] });
-        setChallengeRunning(false);
-        return;
-      }
-      let passed = 0;
-      const results = tc.map((t, i) => {
-        try {
-          const got = userFn(t.input);
-          const ok = JSON.stringify(got) === JSON.stringify(t.expected);
-          if (ok) passed++;
-          return { t: i + 1, s: ok ? 'PASS' : 'FAIL', got: JSON.stringify(got), exp: JSON.stringify(t.expected), label: t.label || '' };
-        } catch (e) {
-          return { t: i + 1, s: 'ERROR', err: e.message, label: t.label || '' };
-        }
-      });
-      setChallengeResult({ passed, total: tc.length, results });
-      if (passed === tc.length && tc.length > 0) {
-        const entry = {
-          date: new Date().toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }),
-          topic: currentExercise?.topic || '', title: currentExercise?.title || '',
-          difficulty: currentExercise?.difficulty || '', language: challengeLanguage, passed: true,
-        };
-        setChallengeHistory(prev => {
-          const next = [entry, ...prev].slice(0, 50);
-          try { localStorage.setItem('stos_challenge_history', JSON.stringify(next)); } catch (e) { /* ignore */ }
-          return next;
-        });
-      }
-    } catch (e) { setChallengeResult({ error: e.message }); }
-    setChallengeRunning(false);
-  }, [currentExercise, challengeCode, challengeLanguage]);
-
   // ── AI Guide ──
   const guideSessionRef = useRef(0);
 
@@ -736,33 +654,6 @@ export default function App() {
           cvError={cvError}
           onCvFileChange={handleCVFile}
           onAnalyzeCv={analyzeCV}
-        />;
-      case 'challenges':
-        return <ChallengesView
-          subjects={subjects}
-          challengeTopic={challengeTopic}
-          setChallengeTopic={setChallengeTopic}
-          challengeTopicCustom={challengeTopicCustom}
-          setChallengeTopicCustom={setChallengeTopicCustom}
-          challengeDifficulty={challengeDifficulty}
-          setChallengeDifficulty={setChallengeDifficulty}
-          challengeLanguage={challengeLanguage}
-          setChallengeLanguage={setChallengeLanguage}
-          challengeGenerating={challengeGenerating}
-          onGenerateExercise={generateExercise}
-          challengeError={challengeError}
-          currentExercise={currentExercise}
-          challengeCode={challengeCode}
-          setChallengeCode={setChallengeCode}
-          challengeRunning={challengeRunning}
-          onRunChallenge={runChallenge}
-          challengeResult={challengeResult}
-          challengeShowHints={challengeShowHints}
-          setChallengeShowHints={setChallengeShowHints}
-          challengeShowSolution={challengeShowSolution}
-          setChallengeShowSolution={setChallengeShowSolution}
-          challengeHistory={challengeHistory}
-          onClearChallengeHistory={() => { setChallengeHistory([]); localStorage.removeItem('stos_challenge_history'); }}
         />;
       case 'interview':
         return <InterviewView

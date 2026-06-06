@@ -46,9 +46,6 @@ export function Sidebar({ view, onNavigate, subjects, chapPct, todayStr, current
       })}
 
       <span className="nav-label">Tools</span>
-      <div className={'nav-item' + (view === 'challenges' ? ' active' : '')} onClick={() => onNavigate('challenges')}>
-        <i className="ph nav-icon ph-trophy"></i> Challenges
-      </div>
       <div className={'nav-item' + (view === 'interview' ? ' active' : '')} onClick={() => onNavigate('interview')}>
         <i className="ph nav-icon ph-microphone"></i> AI Interview
       </div>
