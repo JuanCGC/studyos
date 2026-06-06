@@ -29,16 +29,15 @@ export default async function handler(req, res) {
 Generate a PRACTICAL study guide for the chapter "${chapterName}" of the subject "${subjectName}".
 ${subjectReason ? `Topic context: ${subjectReason}` : ''}${labContext}
 
-CRITICAL LANGUAGE RULE: ALL generated content (titles, summaries, explanations, instructions, code comments, exercises, hints, and any other text) MUST be written entirely in ENGLISH. Do not use any other language.
+CRITICAL LANGUAGE RULE: ALL generated content MUST be written entirely in ENGLISH. Do not use any other language.
 
 PHILOSOPHY: Less theory, more code. Each concept should be immediately followed by a real exercise.
 
 KEY INSTRUCTION — CORRELATION WITH LABS:
-- The exercises in "sections" (code) and "exercises" MUST correlate with the associated labs.
-- If there is a Lab Express, the coding exercises must practice exactly what the Lab Express teaches.
-- If there is a Project Evolution, the exercises must build skills that apply directly to that project.
-- Exercise hints and steps must reference the labs when relevant.
-- If the labs use specific tools (Postman, Playwright, Selenium, etc.), the exercises must use the same ones.
+- The code sections MUST correlate with the associated labs.
+- If there is a Lab Express, the coding examples must practice exactly what the Lab Express teaches.
+- If there is a Project Evolution, the examples must build skills that apply directly to that project.
+- If the labs use specific tools (Postman, Playwright, Selenium, etc.), the code must use the same ones.
 
 IMPORTANT — All code examples MUST be written in ${language}. Use ${language} syntax, idioms, and conventions.
 
@@ -71,28 +70,13 @@ Respond ONLY with valid JSON, no markdown, no extra text:
       "title": "Key points to remember",
       "items": ["concrete point 1", "concrete point 2", "concrete point 3"]
     }
-  ],
-  "exercises": [
-    {
-      "title": "Exercise 1",
-      "goal": "What you must achieve",
-      "steps": ["step 1", "step 2", "step 3"],
-      "hint": "Hint or initial snippet in ${language}"
-    },
-    {
-      "title": "Exercise 2 — harder variant",
-      "goal": "What you must achieve",
-      "steps": ["step 1", "step 2", "step 3"],
-      "hint": "Hint or initial snippet in ${language}"
-    }
   ]
 }
 
 Strict rules:
 - Text sections: max 3 sentences each. DO NOT explain what the code already says.
-- Code: minimum 3 code sections, max 2 text sections. Total max 7 sections.
+- Code: minimum 2 code sections, max 1 text section. Total max 3 sections.
 - Each code section MUST have a "what" field explaining what it does in one line.
-- exercises: exactly 2 practical exercises with clear steps and a code hint.
 - ALL code MUST be in ${language}. Use ${language} best practices, naming conventions, and testing frameworks.
 - Everything in English, including text and comments. Code stays in its natural language.
 - Properly ESCAPE the JSON: escape double quotes (\\") and backslashes (\\) inside code values. DO NOT put literal line breaks inside JSON strings.`;
@@ -135,28 +119,7 @@ Do not comment on self-explanatory or basic code lines. Only inject inline comme
     try {
       guide = parseJSON(rawText);
     } catch (_) {
-      if (candidate?.finishReason === 'MAX_TOKENS') {
-        // Retry with Pro model which supports 64K output tokens
-        const proRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { temperature: 0.3, maxOutputTokens: 64000, responseMimeType: 'application/json' },
-            }),
-          }
-        );
-        if (proRes.ok) {
-          const proData = await proRes.json();
-          const proCandidate = proData.candidates?.[0];
-          const proParts = proCandidate?.content?.parts || [];
-          const proText = proParts.filter(p => !p.thought).map(p => p.text).join('') || '';
-          if (proText) try { guide = parseJSON(proText); } catch (_) {}
-        }
-      }
-      if (!guide) return res.status(502).json({ error: 'Gemini response was truncated. Try reducing the chapter size.' });
+      return res.status(502).json({ error: 'Gemini response was truncated. Try reducing the chapter size.' });
     }
 
     res.status(200).json({ guide });
