@@ -23,6 +23,7 @@ STRICT rules:
 - Questions must be answerable by someone who just studied "${chapterName}" and nothing else.
 - 4 options per question (A, B, C, D). Only ONE correct.
 - Wrong options must be plausible but clearly incorrect for someone who studied the topic.
+- CRITICAL — LANGUAGE RULE: ALL content (questions AND options A/B/C/D) MUST be written entirely in ENGLISH, regardless of any language context or user preference.
 
 Respond ONLY with valid JSON, no markdown, no extra text:
 [
