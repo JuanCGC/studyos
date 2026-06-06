@@ -122,16 +122,18 @@
 let _sb = null;
 
   async function initSupabase() {
-    const cfg = await fetch('/api/config').then(r => r.json());
-    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) {
-      showError('login-error','Supabase configuration missing.');
-      return;
+    let cfg = {};
+    try {
+      cfg = await fetch('/api/config').then(r => r.json());
+    } catch (e) {
+      console.warn('Config fetch failed', e);
     }
+    // Fallback to hard‑coded values when env vars are not available (e.g., Vercel static build)
+    if (!cfg.supabaseUrl) cfg.supabaseUrl = 'https://oksfpuzvghuizxubzrat.supabase.co';
+    if (!cfg.supabaseAnonKey) cfg.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rc2ZwdXp2Z2h1aXp4dWJ6cmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5Njg3MTIsImV4cCI6MjA5NTU0NDcxMn0.xlMdxOVaKe5K3_f6YHTHYcV8r2InzdQlnjg93hoW8W4';
     _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
-    // show error from email confirmation (e.g. otp_expired)
     const urlErr = new URLSearchParams(location.search).get('error');
     if (urlErr) showError('login-error', decodeURIComponent(urlErr));
-
     const { data: { session } } = await _sb.auth.getSession();
     if (session) {
       await _sb.auth.signOut({ scope: 'global' });
