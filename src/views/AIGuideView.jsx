@@ -94,6 +94,32 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
           </div>
         )}
 
+        {!aiGuide.content && !aiGuide.loading && !aiGuide.error && !aiGuide.quizOnly && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', textAlign: 'center', gap: 24 }}>
+            <div style={{ fontSize: 14, color: 'var(--t4)', fontFamily: 'var(--mono)', fontWeight: 600, letterSpacing: '.03em' }}>
+              Ready to study <span style={{ color: 'var(--t1)' }}>{aiGuide.chapter?.name}</span>?
+            </div>
+            <button
+              onClick={onRegenerateGuide}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                fontSize: 14, padding: '14px 36px', borderRadius: 10,
+                border: '1px solid rgba(99,102,241,.3)', background: 'rgba(99,102,241,.12)',
+                color: '#818cf8', cursor: 'pointer', fontFamily: 'var(--mono)',
+                fontWeight: 700, transition: 'all .15s', letterSpacing: '.02em'
+              }}
+              onMouseOver={e => e.currentTarget.style.background = 'rgba(99,102,241,.22)'}
+              onMouseOut={e => e.currentTarget.style.background = 'rgba(99,102,241,.12)'}
+            >
+              <i className="ph ph-sparkle" style={{ fontSize: 18 }}></i>
+              Generate Guide
+            </button>
+            <div style={{ fontSize: 12, color: 'var(--t4)', fontFamily: 'var(--mono)', maxWidth: 380 }}>
+              An AI study guide with code examples, lab exercises, and a quiz will be generated for this chapter.
+            </div>
+          </div>
+        )}
+
         {aiGuide.keyConcept && (
           <div className="mb-8" style={{ background: 'rgba(99,102,241,.08)', border: '1px solid rgba(99,102,241,.2)', borderRadius: 12, padding: '18px 22px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>

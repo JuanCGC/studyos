@@ -15,7 +15,11 @@ export default async function handler(req, res) {
   const position = totalChapters > 0 ? `chapter ${chapterIndex + 1} of ${totalChapters}` : `chapter ${chapterIndex + 1}`;
   const level = chapterIndex <= 2 ? 'introductory' : chapterIndex <= Math.floor((totalChapters || 10) * 0.5) ? 'intermediate' : 'advanced';
 
-  const prompt = `You are an expert SDET instructor. Create exactly 3 multiple-choice questions about the chapter "${chapterName}" (${position}, ${level} level) of the subject "${subjectName}".
+  const prompt = `You are an expert SDET instructor teaching entirely in ENGLISH.
+
+CRITICAL — LANGUAGE CONSTRAINT: You MUST generate ALL content strictly in ENGLISH. Never use Spanish, even if the chapter name or subject name seems to suggest a different language. This is non-negotiable.
+
+Create exactly 3 multiple-choice questions about the chapter "${chapterName}" (${position}, ${level} level) of the subject "${subjectName}".
 
 STRICT rules:
 - Questions must cover ONLY the content of "${chapterName}". DO NOT introduce concepts from other chapters.
@@ -23,17 +27,19 @@ STRICT rules:
 - Questions must be answerable by someone who just studied "${chapterName}" and nothing else.
 - 4 options per question (A, B, C, D). Only ONE correct.
 - Wrong options must be plausible but clearly incorrect for someone who studied the topic.
-- CRITICAL — LANGUAGE RULE: ALL content (questions AND options A/B/C/D) MUST be written entirely in ENGLISH, regardless of any language context or user preference.
+- LANGUAGE RULE (again, mandatory): ALL question text, ALL option text (A/B/C/D), and ALL content must be written in ENGLISH ONLY.
 
 Respond ONLY with valid JSON, no markdown, no extra text:
 [
   {
-    "q": "Question text",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correct": 0
+    "q": "What is the correct HTTP status code for a successful POST request?",
+    "options": ["200 OK", "201 Created", "202 Accepted", "204 No Content"],
+    "correct": 1
   }
 ]
-(correct = index 0-3 of the correct option)`;
+(correct = index 0-3 of the correct option)
+
+REMINDER: Questions and options above are just format examples. You must generate NEW questions about "${chapterName}". And they MUST be in ENGLISH.`;
 
   try {
     const geminiRes = await fetch(

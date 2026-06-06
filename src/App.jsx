@@ -445,11 +445,10 @@ export default function App() {
   const guideSessionRef = useRef(0);
 
   const openAIGuide = useCallback(async (subject, chapter, chapterIndex, quizOnly = false, language) => {
-    const session = ++guideSessionRef.current;
     const alreadyDone = chapter?.done === true;
     const lang = language || localStorage.getItem('stos_ai_language') || subject.defaultLang || 'JavaScript';
     setAiGuide({
-      subject, chapter, chapterIndex, loading: !quizOnly, quizOnly, error: '', content: null,
+      subject, chapter, chapterIndex, loading: false, quizOnly, error: '', content: null,
       quiz: { questions: [], answers: [null, null, null], loading: !alreadyDone, submitted: alreadyDone, score: alreadyDone ? 3 : 0, error: false },
       keyConcept: '', labExpress: null, projectEvolution: null,
       language: lang,
@@ -477,55 +476,7 @@ export default function App() {
         setAiGuide(prev => ({ ...prev, quiz: { ...prev.quiz, questions: JSON.parse(cachedQ), loading: false } }));
       }
     } catch (e) { localStorage.removeItem(quizKey); }
-    const tasks = [];
-    const withTimeout = (url, opts, ms = 60000) => {
-      const ctrl = new AbortController();
-      const id = setTimeout(() => ctrl.abort(), ms);
-      return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(id));
-    };
-    if (!quizOnly && !localStorage.getItem(cacheKey)) {
-      tasks.push(
-        withTimeout('/api/generate-guide', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            subjectName: subject.name, chapterName: chapter.name, language: lang,
-            embeddedGuide: embedded ? { keyConcept: embedded.kc, labExpress: embedded.le, projectEvolution: embedded.pe } : null,
-            showDeepDiveComments,
-          }),
-        })
-          .then(r => r.json())
-          .then(data => {
-            if (guideSessionRef.current !== session) return;
-            if (data.error) throw new Error(data.error);
-            setAiGuide(prev => ({ ...prev, content: data.guide, loading: false }));
-            try { if (data.guide) localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch (e) { /* ignore */ }
-          })
-          .catch(e => {
-            if (guideSessionRef.current !== session) return;
-            const msg = e.name === 'AbortError' ? 'Request timed out. The AI guide took too long. Try again.' : e.message;
-            setAiGuide(prev => ({ ...prev, error: msg, loading: false }));
-          })
-      );
-    }
-    if (!localStorage.getItem(quizKey)) {
-      tasks.push(
-        withTimeout('/api/quiz', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0, language: lang }),
-        })
-          .then(r => r.json())
-          .then(data => {
-            if (guideSessionRef.current !== session) return;
-            if (data.questions) {
-              setAiGuide(prev => ({ ...prev, quiz: { ...prev.quiz, questions: data.questions, loading: false } }));
-              try { localStorage.setItem(quizKey, JSON.stringify(data.questions)); } catch (e) { /* ignore */ }
-            }
-          })
-          .catch(() => { if (guideSessionRef.current === session) setAiGuide(prev => ({ ...prev, quiz: { ...prev.quiz, error: true, loading: false } })); })
-      );
-    }
-    await Promise.all(tasks);
-  }, [navigate, showDeepDiveComments]);
+  }, [navigate]);
 
   const submitAIQuiz = useCallback(() => {
     setAiGuide(prev => {
@@ -553,22 +504,40 @@ export default function App() {
     if (!subject) return;
     const cacheKey = `guide_${subject.id}_${chapterIndex}`;
     localStorage.removeItem(cacheKey);
-    setAiGuide(prev => ({ ...prev, content: null, loading: true, error: '' }));
+    const quizKey = `quiz_${subject.id}_${chapterIndex}`;
+    localStorage.removeItem(quizKey);
+    setAiGuide(prev => ({ ...prev, content: null, loading: true, error: '',
+      quiz: { questions: [], answers: [null, null, null], loading: true, submitted: false, score: 0, error: false },
+    }));
     const session = ++guideSessionRef.current;
-    fetch('/api/generate-guide', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        subjectName: subject.name, chapterName: chapter.name, language: aiGuide.language,
-        embeddedGuide: labExpress ? { keyConcept, labExpress, projectEvolution } : null,
-        showDeepDiveComments,
+    const lang = aiGuide.language;
+    const promises = [
+      fetch('/api/generate-guide', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjectName: subject.name, chapterName: chapter.name, language: lang,
+          embeddedGuide: labExpress ? { keyConcept, labExpress, projectEvolution } : null,
+          showDeepDiveComments,
+        }),
       }),
-    })
-      .then(r => r.json())
-      .then(data => {
+      fetch('/api/quiz', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapters.length,
+        }),
+      }),
+    ];
+    Promise.all(promises)
+      .then(async ([guideRes, quizRes]) => {
         if (guideSessionRef.current !== session) return;
-        if (data.error) throw new Error(data.error);
-        setAiGuide(prev => ({ ...prev, content: data.guide, loading: false }));
-        try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch (e) { /* ignore */ }
+        if (!guideRes.ok || !quizRes.ok) throw new Error('Regeneration failed');
+        const [guideData, quizData] = await Promise.all([guideRes.json(), quizRes.json()]);
+        if (guideSessionRef.current !== session) return;
+        setAiGuide(prev => ({ ...prev, content: guideData.guide, loading: false,
+          quiz: { questions: quizData.questions, answers: [null, null, null], loading: false, submitted: false, score: 0, error: false },
+        }));
+        try { localStorage.setItem(cacheKey, JSON.stringify(guideData.guide)); } catch (e) { /* ignore */ }
+        try { localStorage.setItem(quizKey, JSON.stringify(quizData.questions)); } catch (e) { /* ignore */ }
       })
       .catch(e => { if (guideSessionRef.current === session) setAiGuide(prev => ({ ...prev, error: e.message, loading: false })); });
   }, [aiGuide, showDeepDiveComments]);
