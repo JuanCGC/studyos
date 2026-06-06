@@ -75,7 +75,7 @@ Respond ONLY with valid JSON, no markdown, no extra text:
 
 Strict rules:
 - Text sections: max 3 sentences each. DO NOT explain what the code already says.
-- Code: minimum 2 code sections, max 1 text section. Total max 3 sections.
+- Code: minimum 2 code sections, max 2 text sections. Total max 5 sections.
 - Each code section MUST have a "what" field explaining what it does in one line.
 - ALL code MUST be in ${language}. Use ${language} best practices, naming conventions, and testing frameworks.
 - Everything in English, including text and comments. Code stays in its natural language.
