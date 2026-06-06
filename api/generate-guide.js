@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { subjectName, chapterName, subjectReason = '', embeddedGuide } = req.body || {};
+  const { subjectName, chapterName, subjectReason = '', language = 'JavaScript', embeddedGuide } = req.body || {};
   if (!subjectName || !chapterName) return res.status(400).json({ error: 'subjectName and chapterName required' });
 
   const apiKey = process.env.GEMINI_API_KEY;
@@ -37,6 +37,8 @@ KEY INSTRUCTION — CORRELATION WITH LABS:
 - Exercise hints and steps must reference the labs when relevant.
 - If the labs use specific tools (Postman, Playwright, Selenium, etc.), the exercises must use the same ones.
 
+IMPORTANT — All code examples MUST be written in ${language}. Use ${language} syntax, idioms, and conventions.
+
 Respond ONLY with valid JSON, no markdown, no extra text:
 {
   "title": "${chapterName}",
@@ -51,15 +53,15 @@ Respond ONLY with valid JSON, no markdown, no extra text:
       "type": "code",
       "title": "Exercise title",
       "what": "One line explaining exactly what this code does and why",
-      "language": "java",
-      "content": "// real, complete, executable code"
+      "language": "${language.toLowerCase()}",
+      "content": "// real, complete, executable code in ${language}"
     },
     {
       "type": "code",
       "title": "Next exercise",
       "what": "One line explaining exactly what this code does and why",
-      "language": "java",
-      "content": "// code that builds on the previous one"
+      "language": "${language.toLowerCase()}",
+      "content": "// code that builds on the previous one, in ${language}"
     },
     {
       "type": "list",
@@ -72,13 +74,13 @@ Respond ONLY with valid JSON, no markdown, no extra text:
       "title": "Exercise 1",
       "goal": "What you must achieve",
       "steps": ["step 1", "step 2", "step 3"],
-      "hint": "Hint or initial snippet"
+      "hint": "Hint or initial snippet in ${language}"
     },
     {
       "title": "Exercise 2 — harder variant",
       "goal": "What you must achieve",
       "steps": ["step 1", "step 2", "step 3"],
-      "hint": "Hint or initial snippet"
+      "hint": "Hint or initial snippet in ${language}"
     }
   ]
 }
@@ -88,7 +90,7 @@ Strict rules:
 - Code: minimum 3 code sections, max 2 text sections. Total max 7 sections.
 - Each code section MUST have a "what" field explaining what it does in one line.
 - exercises: exactly 2 practical exercises with clear steps and a code hint.
-- Functional, real SDET stack code (java, javascript, bash, yaml, python, groovy).
+- ALL code MUST be in ${language}. Use ${language} best practices, naming conventions, and testing frameworks.
 - Everything in English, including text and comments. Code stays in its natural language.
 - Properly ESCAPE the JSON: escape double quotes (\\") and backslashes (\\) inside code values. DO NOT put literal line breaks inside JSON strings.`;
 
