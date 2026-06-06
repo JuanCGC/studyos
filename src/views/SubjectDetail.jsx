@@ -148,7 +148,7 @@ export default function SubjectDetail({
               {(!CHAP_MAP || !CHAP_MAP[ch.name]) && (
                 <span
                   onClick={e => { e.stopPropagation(); handleOpenGuide(ch, i); }}
-                  title={selectedLang ? (s.aiSuggested ? 'Generate guide + quiz with AI' : 'Generate quiz') : 'Select a language first'}
+                  title={selectedLang ? 'Generate guide + quiz' : 'Select a language first'}
                   style={{
                     fontSize: 13, color: 'var(--blue2)', marginLeft: 2, flexShrink: 0, cursor: selectedLang ? 'pointer' : 'not-allowed',
                     opacity: selectedLang ? 0.7 : 0.25, transition: 'opacity .15s'

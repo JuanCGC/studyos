@@ -228,7 +228,7 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
                 </div>
               </div>
 
-              {aiGuide.quiz && aiGuide.quiz.loading && (
+              {aiGuide.quiz.loading && (
                 <div style={{ padding: 28, background: 'var(--layer)', borderRadius: 12, border: '1px solid rgba(255,255,255,.08)' }}>
                   <div className="flex-col g20">
                     {[0, 1, 2].map(qi => (
@@ -245,13 +245,13 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
                 </div>
               )}
 
-              {aiGuide.quiz && !aiGuide.quiz.loading && aiGuide.quiz.error && !aiGuide.quiz.questions?.length && (
+              {!aiGuide.quiz.loading && aiGuide.quiz.error && !aiGuide.quiz.questions?.length && (
                 <div style={{ padding: 28, textAlign: 'center', background: 'rgba(239,68,68,.06)', borderRadius: 12, border: '1px solid rgba(239,68,68,.2)' }}>
                   <div style={{ color: '#f87171', fontSize: 14 }}>Could not generate the quiz. Check your connection and try again.</div>
                 </div>
               )}
 
-              {aiGuide.quiz && !aiGuide.quiz.loading && !aiGuide.quiz.submitted && (
+              {!aiGuide.quiz.loading && !aiGuide.quiz.submitted && (
                 <>
                   {(aiGuide.quiz?.questions || []).map((q, qi) => (
                     <div key={qi} className={qi === 0 ? 'quiz-q-first' : 'quiz-q'}>

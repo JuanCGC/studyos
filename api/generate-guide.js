@@ -119,7 +119,7 @@ Do not comment on self-explanatory or basic code lines. Only inject inline comme
     try {
       guide = parseJSON(rawText);
     } catch (_) {
-      return res.status(502).json({ error: 'Gemini response was truncated. Try reducing the chapter size.' });
+      return res.status(502).json({ error: 'Failed to parse Gemini response. Try again.' });
     }
 
     res.status(200).json({ guide });

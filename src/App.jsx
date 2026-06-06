@@ -445,7 +445,6 @@ export default function App() {
   const guideSessionRef = useRef(0);
 
   const openAIGuide = useCallback(async (subject, chapter, chapterIndex, quizOnly = false, language) => {
-    const alreadyDone = chapter?.done === true;
     const lang = language || localStorage.getItem('stos_ai_language') || subject.defaultLang || 'JavaScript';
     setAiGuide({
       subject, chapter, chapterIndex, loading: false, quizOnly, error: '', content: null,
@@ -501,7 +500,7 @@ export default function App() {
   const regenerateGuide = useCallback(() => {
     localStorage.setItem('stos_ai_language', aiGuide.language);
     const { subject, chapter, chapterIndex, labExpress, keyConcept, projectEvolution } = aiGuide;
-    if (!subject) return;
+    if (!subject) { setAiGuide(prev => ({ ...prev, error: 'No chapter selected.' })); return; }
     const cacheKey = `guide_${subject.id}_${chapterIndex}`;
     localStorage.removeItem(cacheKey);
     const quizKey = `quiz_${subject.id}_${chapterIndex}`;
@@ -523,7 +522,7 @@ export default function App() {
       fetch('/api/quiz', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapters.length,
+          subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0,
         }),
       }),
     ];
