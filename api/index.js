@@ -71,7 +71,7 @@ async function geminiFetch(prompt, config = {}) {
 }
 
 // ── GET /api/config ──────────────────────────────────────────
-app.get('/api/config', (req, res) => {
+app.get('/config', (req, res) => {
   res.json({
     supabaseUrl: process.env.VITE_SUPABASE_URL || '',
     supabaseAnonKey: process.env.VITE_SUPABASE_ANON_KEY || '',
@@ -713,9 +713,6 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
   }
 });
 
-// ── Catch‑all: 404 for unknown /api/* routes ─────────────────
-app.use('/api', (req, res) => {
-  res.status(404).json({ error: `Not found: ${req.method} ${req.originalUrl}` });
-});
+// Catch‑all removed – let Express default 404 handling
 
 export default app;
