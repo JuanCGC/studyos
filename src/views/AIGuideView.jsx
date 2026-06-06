@@ -217,7 +217,7 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
           </>
         )}
 
-        {aiGuide.quiz && (
+        {(aiGuide.content || aiGuide.quiz.loading) && aiGuide.quiz && (
           <div style={aiGuide.quizOnly ? { marginTop: 24 } : { marginTop: 48, borderTop: '2px solid var(--border)', paddingTop: 40 }}>
             <div className="quiz-card">
               <div className="quiz-hdr">

@@ -449,7 +449,7 @@ export default function App() {
     const lang = language || localStorage.getItem('stos_ai_language') || subject.defaultLang || 'JavaScript';
     setAiGuide({
       subject, chapter, chapterIndex, loading: false, quizOnly, error: '', content: null,
-      quiz: { questions: [], answers: [null, null, null], loading: !alreadyDone, submitted: alreadyDone, score: alreadyDone ? 3 : 0, error: false },
+      quiz: { questions: [], answers: [null, null, null], loading: false, submitted: false, score: 0, error: false },
       keyConcept: '', labExpress: null, projectEvolution: null,
       language: lang,
     });
