@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         user_ip: req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || '',
       },
       payment_method_id: 'CARD',
-      notification_url: `${origin}/api/subscription-webhook`,
+      notification_url: `${origin}/api/webhooks/dlocal`,
       callback_url: `${origin}/dashboard?checkout=success`,
       metadata: {
         supabase_user_id: user.id,
