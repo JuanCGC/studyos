@@ -162,7 +162,7 @@ async function handleLogin() {
     showError('login-error', error.message);
     btn.disabled = false; btn.textContent = 'Sign In';
   } else {
-    window.location.href = '/';
+    window.location.href = '/dashboard';
   }
 }
 
