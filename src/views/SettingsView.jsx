@@ -4,7 +4,7 @@ export default function SettingsView({
   currentWeek, setCurrentWeek, settings, setSettings,
   onSaveProfile, profileSaving, profileSaved,
   cvFile, cvFilename, cvAnalyzing, cvAnalysis, cvError,
-  onCvFileChange, onAnalyzeCv
+  onCvFileChange, onAnalyzeCv, onClearCv
 }) {
   const applyPomoSettings = () => {
     if (typeof setPomoSettings === 'function') {
@@ -115,7 +115,7 @@ export default function SettingsView({
                 <span style={{ fontSize: 13, color: 'var(--t4)' }}>📎</span>
                 <span style={{ fontSize: 13, color: 'var(--t3)', fontFamily: 'var(--mono)' }}>{cvFilename}</span>
               </div>
-              <button className="btn-s" onClick={() => { cvAnalysis = null; cvFile = null; cvFilename = ''; }} style={{ padding: '5px 12px', borderRadius: 8, fontSize: 12 }}>↺ Change CV</button>
+              <button className="btn-s" onClick={onClearCv} style={{ padding: '5px 12px', borderRadius: 8, fontSize: 12 }}>↺ Change CV</button>
             </div>
             <div style={{ marginBottom: 28 }}>
               <div className="ttu fs11 fw7 c-t4 ls-1 mono mb10">Summary</div>

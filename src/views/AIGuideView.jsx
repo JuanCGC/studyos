@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Toggle from '../components/Toggle';
 import HttpCheatSheetSidebar from '../components/HttpCheatSheetSidebar';
 
-export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, onNavigate, onChangeLanguage, showDeepDiveComments, onToggleDeepDive }) {
+export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, onAnswerQuiz, onNavigate, onChangeLanguage, showDeepDiveComments, onToggleDeepDive }) {
   const [isCheatSheetOpen, setCheatSheetOpen] = useState(false);
   return (
     <div style={{ padding: '24px 28px 80px' }}>
@@ -217,7 +217,7 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
           </>
         )}
 
-        {(aiGuide.content || aiGuide.quiz.loading) && aiGuide.quiz && (
+        {(aiGuide.content || aiGuide.quiz.loading || aiGuide.quizOnly) && aiGuide.quiz && (
           <div style={aiGuide.quizOnly ? { marginTop: 24 } : { marginTop: 48, borderTop: '2px solid var(--border)', paddingTop: 40 }}>
             <div className="quiz-card">
               <div className="quiz-hdr">
@@ -264,10 +264,7 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
                           <button
                             key={oi}
                             onClick={() => {
-                              const answers = [...(aiGuide.quiz.answers || [])];
-                              answers[qi] = oi;
-                              aiGuide.quiz.answers = answers;
-                              if (onSubmitQuiz) onSubmitQuiz(aiGuide);
+                              if (onAnswerQuiz) onAnswerQuiz(qi, oi);
                             }}
                             className={'quiz-opt' + ((aiGuide.quiz.answers || [])[qi] === oi ? ' quiz-opt-sel' : '')}
                           >

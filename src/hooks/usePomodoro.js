@@ -13,6 +13,7 @@ export function usePomodoro() {
   const [focusSubjectId, setFocusSubjectId] = useState('');
   const [focusChapterName, setFocusChapterName] = useState('');
   const timerRef = useRef(null);
+  const donePomosRef = useRef(0);
   const phaseDur = useMemo(() => ({ work: 25 * 60, short: 5 * 60, long: 15 * 60 }), []);
 
   const fmtTime = useMemo(() => {
@@ -50,38 +51,40 @@ export function usePomodoro() {
           clearInterval(timerRef.current);
           setRunning(false);
           const now = new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
-          setPomoLog(l => {
-            const isWork = phase === 'work';
-            return [{
-              id: Date.now(),
-              label: isWork ? `Session #${donePomos + 1}` : 'Break',
-              type: phase, time: now,
-              focus: isWork ? focusLabel : '',
-              subjectId: isWork ? focusSubjectId : '',
-              chapterName: isWork ? focusChapterName : '',
-              durationMinutes: 25,
-            }, ...l];
-          });
-          if (phase === 'work') {
-            setDonePomos(dp => { const n = Math.min(4, dp + 1); return n; });
+          const isWork = phase === 'work';
+          donePomosRef.current = isWork ? donePomosRef.current + 1 : donePomosRef.current;
+          if (isWork) {
+            setDonePomos(donePomosRef.current);
             setPomosToday(pt => pt + 1);
-            setPhase(dp => dp % 4 === 0 ? 'long' : 'short');
-            setTimeLeft(phaseDur[phase % 4 === 0 ? 'long' : 'short']);
+            const nextPhase = donePomosRef.current % 4 === 0 ? 'long' : 'short';
+            setPhase(nextPhase);
+            setTimeLeft(phaseDur[nextPhase]);
+            setPomoLog(l => [{
+              id: Date.now(), label: `Session #${donePomosRef.current}`, type: 'work', time: now,
+              focus: focusLabel, subjectId: focusSubjectId, chapterName: focusChapterName,
+              durationMinutes: 25,
+            }, ...l]);
           } else {
             setPhase('work');
             setTimeLeft(phaseDur.work);
+            setPomoLog(l => [{
+              id: Date.now(), label: 'Break', type: phase, time: now,
+              focus: '', subjectId: '', chapterName: '', durationMinutes: 5,
+            }, ...l]);
           }
           return prev;
         });
       }, 1000);
     }
-  }, [running, phase, phaseDur, donePomos, focusLabel]);
+  }, [running, phase, phaseDur, focusLabel]);
 
   const resetTimer = useCallback(() => {
     clearInterval(timerRef.current);
     setRunning(false);
     setTimeLeft(phaseDur[phase]);
   }, [phase, phaseDur]);
+
+  useEffect(() => { donePomosRef.current = donePomos; }, [donePomos]);
 
   useEffect(() => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };

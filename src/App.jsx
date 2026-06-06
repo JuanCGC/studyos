@@ -299,6 +299,13 @@ export default function App() {
     finally { setCvAnalyzing(false); }
   }, [cvFile, subjects, debounceSave]);
 
+  const clearCv = useCallback(() => {
+    setCvFile(null);
+    setCvFilename('');
+    setCvAnalysis(null);
+    setCvError('');
+  }, []);
+
   // ── Interview ──
   const [interviewTopic, setInterviewTopic] = useState('');
   const [interviewMessages, setInterviewMessages] = useState([]);
@@ -414,6 +421,14 @@ export default function App() {
       return { ...prev, quiz: { ...prev.quiz, submitted: true, score } };
     });
   }, [syncSubjectPct, debounceSave]);
+
+  const answerQuiz = useCallback((qi, oi) => {
+    setAiGuide(prev => {
+      const answers = [...(prev.quiz?.answers || [])];
+      answers[qi] = oi;
+      return { ...prev, quiz: { ...prev.quiz, answers } };
+    });
+  }, []);
 
   const regenerateGuide = useCallback(() => {
     localStorage.setItem('stos_ai_language', aiGuide.language);
@@ -654,6 +669,7 @@ export default function App() {
           cvError={cvError}
           onCvFileChange={handleCVFile}
           onAnalyzeCv={analyzeCV}
+          onClearCv={clearCv}
         />;
       case 'interview':
         return <InterviewView
@@ -676,6 +692,7 @@ export default function App() {
           aiGuide={aiGuide}
           onRegenerateGuide={regenerateGuide}
           onSubmitQuiz={submitAIQuiz}
+          onAnswerQuiz={answerQuiz}
           onNavigate={navigate}
           onChangeLanguage={(lang) => {
             localStorage.setItem('stos_ai_language', lang);
