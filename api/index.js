@@ -1,7 +1,7 @@
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
-// import 'dotenv/config'; // removed - not needed; env vars are provided by the runtime
+import 'dotenv/config';
 
 const app = express();
 
@@ -71,7 +71,7 @@ async function geminiFetch(prompt, config = {}) {
 }
 
 // ── GET /api/config ──────────────────────────────────────────
-app.get('/config', (req, res) => {
+app.get('/api/config', (req, res) => {
   res.json({
     supabaseUrl: process.env.VITE_SUPABASE_URL || '',
     supabaseAnonKey: process.env.VITE_SUPABASE_ANON_KEY || '',
