@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import Toggle from '../components/Toggle';
+import HttpCheatSheetSidebar from '../components/HttpCheatSheetSidebar';
 
 export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, onNavigate, onChangeLanguage, showDeepDiveComments, onToggleDeepDive }) {
+  const [isCheatSheetOpen, setCheatSheetOpen] = useState(false);
   return (
     <div style={{ padding: '24px 28px 80px' }}>
       <div className="view">
@@ -93,9 +96,18 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
 
         {aiGuide.keyConcept && (
           <div className="mb-8" style={{ background: 'rgba(99,102,241,.08)', border: '1px solid rgba(99,102,241,.2)', borderRadius: 12, padding: '18px 22px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <span style={{ fontSize: 16 }}><i className="ph ph-crosshair"></i></span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Key Concept</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 16 }}><i className="ph ph-crosshair"></i></span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Key Concept</span>
+              </div>
+              <button
+                onClick={() => setCheatSheetOpen(true)}
+                className="text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 rounded-md transition-colors font-mono font-medium flex items-center gap-1.5 shrink-0"
+              >
+                <i className="ph ph-book-open text-sm"></i>
+                Open Cheat Sheet
+              </button>
             </div>
             {aiGuide.content?.summary && (
               <p className="text-slate-300 text-base leading-relaxed mb-4">{aiGuide.content?.summary}</p>
@@ -309,6 +321,7 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
           </div>
         )}
       </div>
+      <HttpCheatSheetSidebar isOpen={isCheatSheetOpen} onClose={() => setCheatSheetOpen(false)} />
     </div>
   );
 }
