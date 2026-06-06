@@ -85,8 +85,9 @@ export function usePomodoro() {
   }, []);
 
   return {
-    phase, setPhase: changePhase, running, timeLeft, fmtTime, phaseLabel,
+    phase, setPhase: changePhase, changePhase, running, timeLeft, fmtTime, phaseLabel,
     donePomos, pomosToday, pomoLog, dash, dashBig, CIRC, CIRC_BIG,
+    phaseDur,
     focusSubjectId, setFocusSubjectId, focusChapterName, setFocusChapterName, focusLabel,
     toggleTimer, resetTimer,
   };

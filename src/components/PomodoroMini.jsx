@@ -10,7 +10,8 @@ export default function PomodoroMini() {
   const isFocus = phase === 'work';
   const accent = isFocus ? 'var(--blue3)' : 'var(--green)';
   const bgAccent = isFocus ? 'rgba(59,130,246,.08)' : 'rgba(16,185,129,.08)';
-  const pct = 1 - timeLeft / phaseDur[phase];
+  const phaseDurations = phaseDur || { work: 25 * 60, short: 5 * 60, long: 15 * 60 };
+  const pct = 1 - timeLeft / phaseDurations[phase];
 
   return (
     <div style={{
