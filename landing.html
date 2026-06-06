@@ -10,10 +10,11 @@
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{font-family:'Inter',system-ui,sans-serif;background:#0B111E;color:#fff;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-  body{min-height:100vh;display:flex;flex-direction:column}
+  body{min-height:100vh}
 
   .container{max-width:1200px;margin:0 auto;padding:0 24px;width:100%}
 
+  /* ── Nav ── */
   nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid #1E293B}
   .nav-l{display:flex;align-items:center;gap:12px}
   .logo-box{width:40px;height:40px;background:#131C2E;border:1px solid #1E293B;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#3B82F6;flex-shrink:0;line-height:1}
@@ -24,7 +25,8 @@
   .nav-btn{display:inline-flex;align-items:center;gap:6px;background:#131C2E;color:#3B82F6;border:1px solid #1E293B;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;text-decoration:none;transition:all .15s;line-height:1}
   .nav-btn:hover{background:#1E293B;border-color:#3B82F6}
 
-  .hero{flex:1;display:flex;align-items:center;padding:60px 0 80px}
+  /* ── Hero ── */
+  .hero{padding:80px 0 100px}
   .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
   .hero h1{font-size:54px;font-weight:800;line-height:1.15;letter-spacing:-0.02em;color:#fff;margin-bottom:20px}
   .hero h1 .pb{display:block}
@@ -41,18 +43,60 @@
   .gfx-bar:nth-child(4){width:70%}
   .gfx-dot{width:32px;height:32px;border-radius:8px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(59,130,246,0.5)}
 
+  /* ── Section Headers ── */
+  .sec-header{text-align:center;margin-bottom:56px}
+  .sec-tag{font-size:13px;font-weight:600;color:#3B82F6;letter-spacing:0.1em;margin-bottom:12px}
+  .sec-title{font-size:36px;font-weight:700;color:#fff;letter-spacing:-0.02em;line-height:1.2}
+
+  /* ── Features ── */
+  .features{padding:0 0 120px}
+  .feat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+  .feat-card{background:#131C2E;border:1px solid #1E293B;border-radius:8px;padding:32px;display:flex;flex-direction:column;gap:14px}
+  .feat-icon{width:44px;height:44px;border-radius:10px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#3B82F6}
+  .feat-card h3{font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.01em}
+  .feat-card p{font-size:14px;line-height:1.65;color:#94A3B8}
+
+  /* ── Pricing ── */
+  .pricing{padding:0 0 120px}
+  .price-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-items:start}
+  .price-card{background:#131C2E;border:1px solid #1E293B;border-radius:8px;padding:32px;display:flex;flex-direction:column;position:relative}
+  .price-card.pro{background:linear-gradient(135deg,#131C2E,#151e34);border-color:rgba(59,130,246,0.35);box-shadow:0 0 0 1px rgba(59,130,246,0.15)}
+  .price-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#3B82F6;color:#fff;font-size:11px;font-weight:700;letter-spacing:0.08em;padding:4px 14px;border-radius:20px;text-transform:uppercase}
+  .price-name{font-size:13px;font-weight:600;color:#3B82F6;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px}
+  .price-amount{font-size:44px;font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1.1;margin-bottom:6px}
+  .price-amount .per{font-size:14px;font-weight:500;color:#94A3B8;letter-spacing:0}
+  .price-desc{font-size:14px;line-height:1.6;color:#94A3B8;margin-bottom:24px}
+  .price-features{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:28px;flex:1}
+  .price-features li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#CBD5E1;line-height:1.5}
+  .price-features li .ck{width:18px;height:18px;border-radius:50%;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;color:#3B82F6}
+  .price-btn{display:flex;align-items:center;justify-content:center;border-radius:8px;padding:12px;font-size:14px;font-weight:700;text-decoration:none;transition:all .15s;line-height:1;cursor:pointer}
+  .price-btn-outlined{background:transparent;color:#fff;border:1px solid #1E293B}
+  .price-btn-outlined:hover{background:#1E293B;border-color:#475569}
+  .price-btn-solid{background:#fff;color:#0B111E;border:none}
+  .price-btn-solid:hover{background:#e2e8f0}
+
+  /* ── Footer ── */
   footer{padding:24px 0;border-top:1px solid #1E293B}
   .copy{font-size:13px;color:#475569}
 
+  /* ── Mobile ── */
   @media(max-width:768px){
     .container{padding:0 20px}
     nav{padding:16px 0}
     .nav-r .nav-link{display:none}
-    .hero{padding:40px 0 60px;text-align:center}
+    .hero{padding:60px 0 80px;text-align:center}
     .hero-grid{grid-template-columns:1fr;gap:40px}
     .hero h1{font-size:36px}
     .hero p{margin-left:auto;margin-right:auto}
     .hero-gfx{aspect-ratio:4/3}
+    .sec-title{font-size:28px}
+    .sec-header{margin-bottom:40px}
+    .feat-grid{grid-template-columns:1fr;gap:20px}
+    .features{padding:0 0 80px}
+    .price-grid{grid-template-columns:1fr;gap:28px}
+    .pricing{padding:0 0 80px}
+    .price-card{text-align:center}
+    .price-features li{justify-content:center}
     footer{text-align:center}
   }
 
@@ -65,6 +109,7 @@
 </head>
 <body>
 
+  <!-- ── Nav ── -->
   <div class="container">
     <nav>
       <div class="nav-l">
@@ -78,6 +123,7 @@
     </nav>
   </div>
 
+  <!-- ── Hero ── -->
   <div class="container hero">
     <div class="hero-grid">
       <div>
@@ -97,6 +143,82 @@
     </div>
   </div>
 
+  <!-- ── What We Offer ── -->
+  <div class="container features">
+    <div class="sec-header">
+      <div class="sec-tag">FEATURES</div>
+      <h2 class="sec-title">Everything you need to scale your research</h2>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <h3>Intuitive Study Builder</h3>
+        <p>Design complex research logic, variables, and tracking milestones without writing a single line of code.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg></div>
+        <h3>Automated Deployment</h3>
+        <p>Instantly distribute your studies across environments or pipelines with unified validation built-in.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <h3>Advanced Analytics</h3>
+        <p>Monitor progress, track active study hours, and analyze data metrics through an elegant, real-time dashboard.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Pricing Plans ── -->
+  <div class="container pricing">
+    <div class="sec-header">
+      <h2 class="sec-title">Simple, transparent pricing</h2>
+    </div>
+    <div class="price-grid">
+      <!-- Free -->
+      <div class="price-card">
+        <div class="price-name">Free</div>
+        <div class="price-amount">$0 <span class="per">/ forever</span></div>
+        <p class="price-desc">For individual researchers and academic students.</p>
+        <ul class="price-features">
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Up to 3 active subjects</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Basic analytics overview</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Standard community support</li>
+        </ul>
+        <a class="price-btn price-btn-outlined" href="/login.html">Get Started</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="price-card pro">
+        <div class="price-badge">Most Popular</div>
+        <div class="price-name">Pro</div>
+        <div class="price-amount">$49 <span class="per">/ month</span></div>
+        <p class="price-desc">For professional researchers and fast-moving teams.</p>
+        <ul class="price-features">
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Up to 20 active subjects per user</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Advanced automated metrics</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Priority support</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full data export functions</li>
+        </ul>
+        <a class="price-btn price-btn-solid" href="/login.html">Upgrade to Pro</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="price-card">
+        <div class="price-name">Enterprise</div>
+        <div class="price-amount">Custom</div>
+        <p class="price-desc">For large research institutions and enterprise organizations.</p>
+        <ul class="price-features">
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Unlimited active subjects</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dedicated workspace instances</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Custom compliance &amp; security</li>
+          <li><span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dedicated account management</li>
+        </ul>
+        <a class="price-btn price-btn-outlined" href="/login.html">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
   <div class="container">
     <footer>
       <span class="copy">&copy; 2026 StudIt</span>
