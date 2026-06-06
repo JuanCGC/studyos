@@ -46,15 +46,9 @@ export default function TasksView({ tasks, onToggleTask, onAddTask, onDeleteTask
                 {t.pri === 'high' ? 'High' : (t.pri === 'medium' ? 'Medium' : 'Low')}
               </span>
               <button
+                className="task-del-btn"
                 onClick={e => { e.stopPropagation(); onDeleteTask(t.id); }}
                 title="Delete task"
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px',
-                  borderRadius: 5, fontSize: 13, color: 'var(--t4)', opacity: 0,
-                  transition: 'all .15s', flexShrink: 0
-                }}
-                onMouseOver={e => { e.currentTarget.style.color = '#f87171'; e.currentTarget.style.opacity = '1'; }}
-                onMouseOut={e => { e.currentTarget.style.color = 'var(--t4)'; e.currentTarget.style.opacity = '0'; }}
               >✕</button>
             </div>
           ))}

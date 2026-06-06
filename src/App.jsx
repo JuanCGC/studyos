@@ -39,6 +39,16 @@ export default function App() {
   const [profileName, setProfileName] = useState(() => localStorage.getItem('studyos_profileName') || '');
   const [profileSaving, setProfileSaving] = useState(false);
 
+  // ── Deep-Dive Comments ──
+  const [showDeepDiveComments, setShowDeepDiveComments] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('studyos_deepDiveComments') || 'false');
+    } catch { return false; }
+  });
+  useEffect(() => {
+    localStorage.setItem('studyos_deepDiveComments', JSON.stringify(showDeepDiveComments));
+  }, [showDeepDiveComments]);
+
   // ── AI Guide ──
   const [aiGuide, setAiGuide] = useState({
     subject: null, chapter: null, chapterIndex: 0, loading: false, quizOnly: false, error: '', content: null,
@@ -448,6 +458,7 @@ export default function App() {
           body: JSON.stringify({
             subjectName: subject.name, chapterName: chapter.name, language: aiGuide.language,
             embeddedGuide: embedded ? { keyConcept: embedded.kc, labExpress: embedded.le, projectEvolution: embedded.pe } : null,
+            showDeepDiveComments,
           }),
         })
           .then(r => r.json())
@@ -478,7 +489,7 @@ export default function App() {
       );
     }
     await Promise.all(tasks);
-  }, [navigate, aiGuide.language]);
+  }, [navigate, aiGuide.language, showDeepDiveComments]);
 
   const submitAIQuiz = useCallback(() => {
     setAiGuide(prev => {
@@ -513,6 +524,7 @@ export default function App() {
       body: JSON.stringify({
         subjectName: subject.name, chapterName: chapter.name, language: aiGuide.language,
         embeddedGuide: labExpress ? { keyConcept, labExpress, projectEvolution } : null,
+        showDeepDiveComments,
       }),
     })
       .then(r => r.json())
@@ -523,7 +535,7 @@ export default function App() {
         try { localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch (e) { /* ignore */ }
       })
       .catch(e => { if (guideSessionRef.current === session) setAiGuide(prev => ({ ...prev, error: e.message, loading: false })); });
-  }, [aiGuide]);
+  }, [aiGuide, showDeepDiveComments]);
 
   // ── Subject helpers ──
   const [resetTarget, setResetTarget] = useState(null);
@@ -594,6 +606,41 @@ export default function App() {
 
   // ── Watchers ──
   useEffect(() => { debounceSave(); }, [subjects, tasks]);
+
+  // ── Sync deep-dive preference to Supabase ──
+  const syncDeepDivePref = useCallback(async () => {
+    if (!supabase || !user) return;
+    try {
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        preferences: { showDeepDiveComments },
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'id' });
+    } catch (e) { /* ignore */ }
+  }, [user, showDeepDiveComments]);
+
+  const loadProfilePreferences = useCallback(async () => {
+    if (!supabase || !user) return;
+    try {
+      const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
+      if (data?.preferences?.showDeepDiveComments === true) {
+        setShowDeepDiveComments(true);
+      }
+    } catch (e) { /* ignore */ }
+  }, [user]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      loadProfilePreferences();
+    }
+  }, [authLoading, user, loadProfilePreferences]);
+
+  const deepDiveSyncTimer = useRef(null);
+  useEffect(() => {
+    clearTimeout(deepDiveSyncTimer.current);
+    deepDiveSyncTimer.current = setTimeout(() => syncDeepDivePref(), 1500);
+    return () => clearTimeout(deepDiveSyncTimer.current);
+  }, [showDeepDiveComments, syncDeepDivePref]);
 
   // ── Pomodoro focus ──
   const [focusSubjectId, setFocusSubjectId] = useState('');
@@ -750,6 +797,8 @@ export default function App() {
             localStorage.setItem('stos_ai_language', lang);
             setAiGuide(prev => ({ ...prev, language: lang }));
           }}
+          showDeepDiveComments={showDeepDiveComments}
+          onToggleDeepDive={() => setShowDeepDiveComments(v => !v)}
         />;
       default:
         if (view.startsWith('subject-')) {

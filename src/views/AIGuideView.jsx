@@ -1,4 +1,6 @@
-export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, onNavigate, onChangeLanguage }) {
+import Toggle from '../components/Toggle';
+
+export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, onNavigate, onChangeLanguage, showDeepDiveComments, onToggleDeepDive }) {
   return (
     <div style={{ padding: '24px 28px 80px' }}>
       <div className="view">
@@ -13,40 +15,53 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
             )}
             <div className="detail-title" style={{ fontSize: 18 }}>{aiGuide.chapter?.name}</div>
           </div>
-          <div className="flex aic g8">
-            {aiGuide.content && !aiGuide.quizOnly && (
-              <button
-                onClick={onRegenerateGuide}
+            <div className="flex aic g8" style={{ flexWrap: 'wrap' }}>
+              {aiGuide.content && !aiGuide.quizOnly && (
+                <button
+                  onClick={onRegenerateGuide}
+                  style={{
+                    fontSize: 11, padding: '5px 12px', borderRadius: 7,
+                    border: '1px solid rgba(251,191,36,.25)', background: 'rgba(251,191,36,.08)',
+                    color: '#fbbf24', cursor: 'pointer', fontFamily: 'var(--mono)',
+                    fontWeight: 600, transition: 'all .15s', whiteSpace: 'nowrap'
+                  }}
+                  onMouseOver={e => e.currentTarget.style.background = 'rgba(251,191,36,.15)'}
+                  onMouseOut={e => e.currentTarget.style.background = 'rgba(251,191,36,.08)'}
+                >↻ Regenerate</button>
+              )}
+              <label style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                fontSize: 11, fontFamily: 'var(--mono)', color: showDeepDiveComments ? 'var(--blue2)' : 'var(--t4)',
+                cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={!!showDeepDiveComments}
+                  onChange={onToggleDeepDive}
+                  style={{ accentColor: 'var(--blue)', cursor: 'pointer' }}
+                />
+                💡 Deep-Dive
+              </label>
+              <select
+                value={aiGuide.language}
+                onChange={e => onChangeLanguage && onChangeLanguage(e.target.value)}
                 style={{
-                  fontSize: 11, padding: '5px 12px', borderRadius: 7,
-                  border: '1px solid rgba(251,191,36,.25)', background: 'rgba(251,191,36,.08)',
-                  color: '#fbbf24', cursor: 'pointer', fontFamily: 'var(--mono)',
-                  fontWeight: 600, transition: 'all .15s', whiteSpace: 'nowrap'
+                  fontSize: 11, padding: '4px 8px', borderRadius: 7,
+                  border: '1px solid rgba(255,255,255,.12)', background: 'var(--layer)',
+                  color: 'var(--t2)', fontFamily: 'var(--mono)', cursor: 'pointer', outline: 'none'
                 }}
-                onMouseOver={e => e.currentTarget.style.background = 'rgba(251,191,36,.15)'}
-                onMouseOut={e => e.currentTarget.style.background = 'rgba(251,191,36,.08)'}
-              >↻ Regenerate</button>
-            )}
-            <select
-              value={aiGuide.language}
-              onChange={e => onChangeLanguage && onChangeLanguage(e.target.value)}
-              style={{
-                fontSize: 11, padding: '4px 8px', borderRadius: 7,
-                border: '1px solid rgba(255,255,255,.12)', background: 'var(--layer)',
-                color: 'var(--t2)', fontFamily: 'var(--mono)', cursor: 'pointer', outline: 'none'
-              }}
-            >
-              <option value="JavaScript">JavaScript</option>
-              <option value="TypeScript">TypeScript</option>
-              <option value="Java">Java</option>
-              <option value="Python">Python</option>
-              <option value="C#">C#</option>
-              <option value="Apex">Apex</option>
-              <option value="YAML">YAML</option>
-              <option value="Go">Go</option>
-            </select>
-            <span style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--t4)' }}>{aiGuide.subject?.name}</span>
-          </div>
+              >
+                <option value="JavaScript">JavaScript</option>
+                <option value="TypeScript">TypeScript</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+                <option value="C#">C#</option>
+                <option value="Apex">Apex</option>
+                <option value="YAML">YAML</option>
+                <option value="Go">Go</option>
+              </select>
+              <span style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--t4)' }}>{aiGuide.subject?.name}</span>
+            </div>
         </div>
 
         {aiGuide.loading && (

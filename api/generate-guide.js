@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { subjectName, chapterName, subjectReason = '', language = 'JavaScript', embeddedGuide } = req.body || {};
+  const { subjectName, chapterName, subjectReason = '', language = 'JavaScript', embeddedGuide, showDeepDiveComments } = req.body || {};
   if (!subjectName || !chapterName) return res.status(400).json({ error: 'subjectName and chapterName required' });
 
   const apiKey = process.env.GEMINI_API_KEY;
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     }
   }
 
-  const prompt = `You are a senior technical instructor specialized in SDET (Software Development Engineer in Test).
+  let prompt = `You are a senior technical instructor specialized in SDET (Software Development Engineer in Test).
 Generate a PRACTICAL study guide for the chapter "${chapterName}" of the subject "${subjectName}".
 ${subjectReason ? `Topic context: ${subjectReason}` : ''}${labContext}
 
@@ -93,6 +93,16 @@ Strict rules:
 - ALL code MUST be in ${language}. Use ${language} best practices, naming conventions, and testing frameworks.
 - Everything in English, including text and comments. Code stays in its natural language.
 - Properly ESCAPE the JSON: escape double quotes (\\") and backslashes (\\) inside code values. DO NOT put literal line breaks inside JSON strings.`;
+
+  if (showDeepDiveComments) {
+    prompt += `
+
+CRITICAL CODE COMMENTING RULE (SELECTIVE):
+Do not comment on self-explanatory or basic code lines. Only inject inline comments for critical, high-impact lines that involve environment handling, performance/scaling trade-offs, or hidden pitfalls.
+- Limit comments to a maximum of 2 to 4 critical lines per code block.
+- Use the prefix '// \u{1F4A1} CRITICAL:' (or the appropriate language equivalent comment syntax, like '#' for Python/YAML) followed by a concise engineering justification.
+- Ensure the code remains syntactically valid.`;
+  }
 
   try {
     const geminiRes = await fetch(

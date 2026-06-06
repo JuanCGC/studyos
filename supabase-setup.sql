@@ -16,7 +16,10 @@ create table if not exists profiles (
   updated_at   timestamptz default now()
 );
 
--- 3. Guide cache table (cross-device AI content persistence)
+-- 3. Add user preferences column to profiles (deep-dive comments toggle)
+alter table profiles add column if not exists preferences jsonb default '{}';
+
+-- 4. Guide cache table (cross-device AI content persistence)
 create table if not exists guide_cache (
   user_id    uuid references auth.users(id) on delete cascade,
   cache_key  text,
@@ -25,7 +28,7 @@ create table if not exists guide_cache (
   primary key (user_id, cache_key)
 );
 
--- 4. Row Level Security
+-- 5. Row Level Security
 alter table progress enable row level security;
 alter table profiles enable row level security;
 alter table guide_cache enable row level security;
