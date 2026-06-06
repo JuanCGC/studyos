@@ -48,6 +48,32 @@ export default function App() {
       }
     }
   }, []);
+
+  // ── Restore ai-guide state on refresh ──
+  useEffect(() => {
+    if (view !== 'ai-guide') return;
+    if (aiGuide.subject) return;
+    const saved = localStorage.getItem('stos_ai_guide');
+    if (!saved) { setView('dashboard'); return; }
+    try {
+      const { subjectId, chapterIndex, quizOnly, language } = JSON.parse(saved);
+      const subject = subjects.find(s => s.id === subjectId);
+      if (!subject) { setView('dashboard'); return; }
+      const chapter = subject.chapList?.[chapterIndex];
+      if (!chapter) { setView('dashboard'); return; }
+      const cacheKey = `guide_${subject.id}_${chapterIndex}`;
+      const quizKey = `quiz_${subject.id}_${chapterIndex}`;
+      let cachedContent = null, cachedQuiz = null;
+      try { const g = localStorage.getItem(cacheKey); if (g) cachedContent = JSON.parse(g); } catch {}
+      try { const q = localStorage.getItem(quizKey); if (q) cachedQuiz = JSON.parse(q); } catch {}
+      if (!cachedContent && !quizOnly) { setView('dashboard'); return; }
+      setAiGuide({
+        subject, chapter, chapterIndex, loading: !cachedContent, quizOnly, error: '', content: cachedContent,
+        quiz: cachedQuiz ? { questions: cachedQuiz, answers: [null, null, null], loading: false, submitted: false, score: 0, error: false } : { questions: [], answers: [null, null, null], loading: false, submitted: false, score: 0, error: false },
+        keyConcept: '', labExpress: null, projectEvolution: null, language: language || 'JavaScript',
+      });
+    } catch { setView('dashboard'); }
+  }, [view, subjects, aiGuide.subject, setView]);
   const [profileSaved, setProfileSaved] = useState(false);
   const userName = profileName || user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'User';
 
