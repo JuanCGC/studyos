@@ -13,7 +13,8 @@
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/supabase-js": "^2.107.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "stripe": "^22.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.2.0",

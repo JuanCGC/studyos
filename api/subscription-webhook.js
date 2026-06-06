@@ -81,7 +81,7 @@ export default async function handler(req, res) {
       case 'checkout.session.completed':
       case 'customer.subscription.updated': {
         const data = payload.data.object;
-        const userId = data.metadata?.user_id;
+        const userId = data.metadata?.supabase_user_id || data.metadata?.user_id;
         if (!userId) return res.status(400).json({ error: 'Missing user_id in metadata' });
 
         const tier = (data.metadata?.tier || '').toLowerCase();
