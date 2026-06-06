@@ -1039,7 +1039,7 @@ function app() {
 
     _saveChallengeToHistory(passed) {
       const entry = {
-        date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }),
+        date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
         topic: this.currentExercise?.topic || '',
         title: this.currentExercise?.title || '',
         difficulty: this.currentExercise?.difficulty || '',
@@ -1056,8 +1056,8 @@ function app() {
       const duration = this.interviewStartTime ? Math.round((Date.now() - this.interviewStartTime) / 60000) : 0;
       const score = Math.min(100, Math.round(40 + userMsgs * 8 + (duration > 5 ? 10 : 0)));
       const entry = {
-        date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }),
-        topic: this.interviewTopic || 'Tema libre',
+        date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
+        topic: this.interviewTopic || 'Free topic',
         duration,
         score,
       };
@@ -1688,7 +1688,7 @@ function app() {
           body: JSON.stringify({ subjects: payload }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Error desconocido');
+        if (!res.ok) throw new Error(data.error || 'Unknown error');
         data.suggestions.forEach(s => this.subjects.push(s));
         await this.saveProgress();
       } catch (e) {
@@ -1701,7 +1701,7 @@ function app() {
     // ── Calendar ──
     calYear:new Date().getFullYear(), calMonth:new Date().getMonth(),
     get calLabel(){
-      return new Date(this.calYear,this.calMonth,1).toLocaleDateString('es',{month:'long',year:'numeric'});
+      return new Date(this.calYear,this.calMonth,1).toLocaleDateString('en',{month:'long',year:'numeric'});
     },
     get calCells(){
       const today=new Date();
@@ -1728,7 +1728,7 @@ function app() {
 
     // ── Misc ──
     get todayStr(){
-      return new Date().toLocaleDateString('es',{weekday:'long',day:'numeric',month:'short'});
+      return new Date().toLocaleDateString('en',{weekday:'long',day:'numeric',month:'short'});
     },
 
     pomoSettings: {work:25,short:5,long:15},
@@ -1817,73 +1817,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Task lists definitions for the tracker
   const p1_items = [
-    "Configurar JDK 21 y Maven", "Crear proyecto api-test-suite", "Configurar dependencias en pom.xml",
-    "Establecer ApiConfig.java baseURI", "T01: GET /posts returns 200 & 100 posts", "T02: GET /posts/1 returns schema & id=1",
+    "Set up JDK 21 and Maven", "Create api-test-suite project", "Configure dependencies in pom.xml",
+    "Set up ApiConfig.java baseURI", "T01: GET /posts returns 200 & 100 posts", "T02: GET /posts/1 returns schema & id=1",
     "T03: GET /posts?userId=1 returns filtered results", "T04: POST /posts returns 201 & generated id", "T05: PUT /posts/1 returns updated data",
     "T06: PATCH /posts/1 returns patched title", "T07: DELETE /posts/1 returns empty body", "T08: GET /posts/99999 returns 404",
-    "Configurar schemas/post.json", "Validar adicionalProperties: false en schema", "Crear UsersTest.java",
+    "Configure schemas/post.json", "Validate additionalProperties: false in schema", "Create UsersTest.java",
     "T01 (Users): GET /users returns 10", "T02 (Users): Check nested address and company fields", "T03 (Users): GET /users/1/posts returns 10 posts",
     "T04 (Users): Filter by query param username", "T05 (Users): Verify todo items completion status", "T06 (Users): Invalid user IDs return 404",
-    "Crear CommentsTest.java", "T01 (Comments): GET /comments returns 500", "T02 (Comments): Filter by query param postId",
-    "T03 (Comments): Verify nested route results", "Integrar Allure report en pom.xml", "Generar primer reporte Allure local",
-    "Crear workflow GitHub Actions básico", "Habilitar caché Maven en GHA workflow"
+    "Create CommentsTest.java", "T01 (Comments): GET /comments returns 500", "T02 (Comments): Filter by query param postId",
+    "T03 (Comments): Verify nested route results", "Integrate Allure report in pom.xml", "Generate first Allure report locally",
+    "Create basic GitHub Actions workflow", "Enable Maven cache in GHA workflow"
   ]; // 29 items
 
   const p2_items = [
-    "Instalar Docker Desktop local", "Crear Dockerfile para tests", "Definir docker-compose.yml",
-    "Levantar servicios locales en Docker", "Instalar Grafana k6", "Escribir script smoke.js en k6",
-    "Configurar thresholds de performance en k6", "Ejecutar k6 smoke localmente", "Validar fallos de performance en k6",
-    "Crear stub en WireMock", "Validar respuestas mock con JUnit", "Escribir tests Pact básicos",
-    "Generar contrato Pact local", "Subir contrato a Pact Broker", "Configurar GitHub Actions matrix builds",
-    "Habilitar cache de Docker layers en GHA", "Configurar secrets de GitHub Actions", "Ejecutar tests unitarios en pipeline",
-    "Ejecutar tests funcionales en pipeline", "Ejecutar k6 performance gate en GHA", "Subir reportes Allure como artefactos GHA",
-    "Configurar alertas en Slack desde pipeline"
+    "Install Docker Desktop locally", "Create Dockerfile for tests", "Define docker-compose.yml",
+    "Run local services in Docker", "Install Grafana k6", "Write smoke.js script in k6",
+    "Configure performance thresholds in k6", "Run k6 smoke locally", "Validate performance failures in k6",
+    "Create stub in WireMock", "Validate mock responses with JUnit", "Write basic Pact tests",
+    "Generate Pact contract locally", "Upload contract to Pact Broker", "Configure GitHub Actions matrix builds",
+    "Enable Docker layer cache in GHA", "Configure GitHub Actions secrets", "Run unit tests in pipeline",
+    "Run functional tests in pipeline", "Run k6 performance gate in GHA", "Upload Allure reports as GHA artifacts",
+    "Set up Slack alerts from pipeline"
   ]; // 22 items
 
   const concepts_items = [
-    "Métodos HTTP y su idempotencia", "Status Codes de éxito (2xx) y redirección (3xx)", "Status Codes de error cliente (4xx) y servidor (5xx)",
-    "Diferencia entre 401 Unauthorized y 403 Forbidden", "Estructura y campos clave de un JWT (JSON Web Token)", "Diferencia entre autenticación y autorización",
-    "Vulnerabilidad de seguridad IDOR (Direct Object Reference)", "Vulnerabilidad de seguridad SQL injection en APIs", "Vulnerabilidad de seguridad XSS en payloads",
-    "Concepto de Rate Limiting y código 429", "Qué es la validación estricta de esquemas JSON", "Diferencia entre pruebas de carga, estrés y picos",
-    "Qué es Consumer-Driven Contract Testing (Pact)", "Para qué sirve hacer stubs o mocks con WireMock", "Qué es un Quality Gate en un pipeline de CI/CD"
+    "HTTP methods and idempotency", "Success codes (2xx) and redirects (3xx)", "Client error (4xx) and server error (5xx)",
+    "Difference between 401 Unauthorized and 403 Forbidden", "JWT structure and key fields", "Difference between authentication and authorization",
+    "IDOR (Insecure Direct Object Reference)", "SQL injection in APIs", "XSS in payloads",
+    "Rate limiting and 429 status", "Strict JSON Schema validation", "Load vs stress vs spike testing",
+    "Consumer-Driven Contract Testing (Pact)", "Stubbing and mocking with WireMock", "Quality gates in CI/CD pipelines"
   ]; // 15 items
 
   const study_items = [
-    "Semana 1: Fundamentos HTTP y REST", "Semana 1: Herramientas curl y Postman", "Semana 2: Patrones de API Testing",
-    "Semana 2: Primeros assertions en RestAssured", "Semana 3: Auth y Seguridad en APIs", "Semana 3: IDOR, SQLi y XSS",
-    "Semana 4: CI/CD Pipelines básico", "Semana 4: GitHub Actions setup", "Semana 5: Docker y Mocking",
-    "Semana 5: WireMock y Docker Compose", "Semana 6: Contract Testing", "Semana 6: Pact JVM integration",
-    "Semana 7: Performance Testing con k6", "Semana 7: Performance gates en CI/CD", "Semana 8: Salesforce SDET basics",
-    "Semana 8: Simulación de entrevistas y portafolio"
+    "Week 1: HTTP and REST fundamentals", "Week 1: curl and Postman tools", "Week 2: API Testing patterns",
+    "Week 2: First RestAssured assertions", "Week 3: Auth and API Security", "Week 3: IDOR, SQLi and XSS",
+    "Week 4: CI/CD Pipelines basics", "Week 4: GitHub Actions setup", "Week 5: Docker and Mocking",
+    "Week 5: WireMock and Docker Compose", "Week 6: Contract Testing", "Week 6: Pact JVM integration",
+    "Week 7: Performance Testing with k6", "Week 7: Performance gates in CI/CD", "Week 8: Salesforce SDET basics",
+    "Week 8: Interview simulation and portfolio"
   ]; // 16 items
 
   const p3sf_items = [
-    "Crear Dev Org Salesforce gratuita", "Instalar Salesforce CLI local", "Autenticar org con SF CLI",
-    "Escribir primera clase Apex de prueba", "Usar anotación @isTest", "Configurar datos en @TestSetup",
-    "Implementar HttpCalloutMock", "Mockear llamadas de API externas en Apex", "Validar permisos y FLS en tests",
-    "Escribir tests usando System.runAs()", "Probar governor limits en Apex", "Ejecutar tests desde SF CLI",
-    "Generar reporte de cobertura de código Apex", "Escribir Jest tests para LWC", "Instalar Node dependencias de LWC",
-    "Mockear servicios wire en LWC", "Configurar pipeline CI/CD en GHA para Salesforce", "Configurar variables de entorno y auth CLI en GHA",
-    "Ejecutar regression testing en multi-org", "Entender conceptos básicos de Copado"
+    "Create free Salesforce Dev Org", "Install Salesforce CLI locally", "Authenticate org with SF CLI",
+    "Write first Apex test class", "Use @isTest annotation", "Set up data in @TestSetup",
+    "Implement HttpCalloutMock", "Mock external API calls in Apex", "Validate permissions and FLS in tests",
+    "Write tests using System.runAs()", "Test governor limits in Apex", "Run tests from SF CLI",
+    "Generate Apex code coverage report", "Write Jest tests for LWC", "Install LWC Node dependencies",
+    "Mock wire services in LWC", "Set up CI/CD pipeline in GHA for Salesforce", "Configure env vars and CLI auth in GHA",
+    "Run regression testing in multi-org", "Understand Copado basics"
   ]; // 20 items
 
   const p4postman_items = [
-    "Crear cuenta y workspace en Postman", "Definir variables globales y de entorno", "Escribir assertions con pm.test",
-    "Implementar scripts de Pre-request", "Guardar valores de respuesta en variables", "Crear colecciones de happy path",
-    "Diseñar carpeta de negative tests", "Validar esquemas JSON en Postman", "Encadenar requests (chaining)",
-    "Configurar Collection Runner", "Ejecutar pruebas con Newman CLI", "Generar reportes HTML con htmlextra",
-    "Automatizar Newman en GitHub Actions", "Programar Postman Monitors en la nube", "Configurar Mock Servers en Postman",
-    "Generar documentación de API interactiva", "Validar flujos con Postman Flows", "Configurar pruebas de contract testing",
-    "Implementar pruebas de performance básicas"
+    "Create Postman account and workspace", "Define global and environment variables", "Write assertions with pm.test",
+    "Implement Pre-request scripts", "Save response values in variables", "Create happy path collections",
+    "Design negative tests folder", "Validate JSON schemas in Postman", "Chain requests (chaining)",
+    "Configure Collection Runner", "Run tests with Newman CLI", "Generate HTML reports with htmlextra",
+    "Automate Newman in GitHub Actions", "Schedule Postman Monitors in the cloud", "Configure Mock Servers in Postman",
+    "Generate interactive API documentation", "Validate flows with Postman Flows", "Configure contract testing",
+    "Implement basic performance tests"
   ]; // 19 items
 
   const p5playwright_items = [
-    "Inicializar proyecto Playwright con TypeScript", "Configurar playwright.config.ts", "Escribir pure API tests con request fixture",
-    "Diseñar Page Object Models (POM)", "Implementar LoginPage.ts", "Implementar FormsPage.ts",
-    "Escribir e2e tests para formularios (demoqa)", "Escribir e2e tests para tablas (webtables)", "Implementar hybrid API + UI tests",
-    "Realizar limpieza en afterAll vía API", "Escribir visual regression tests con toHaveScreenshot", "Interceptar tráfico de red (route.fulfill)",
-    "Configurar cross-browser testing (chromium/firefox/webkit)", "Ejecutar pruebas con repeat-each para flake detection", "Depurar tests usando Playwright Trace Viewer",
-    "Integrar tests Playwright en pipeline CI/CD de GHA"
+    "Initialize Playwright project with TypeScript", "Configure playwright.config.ts", "Write pure API tests with request fixture",
+    "Design Page Object Models (POM)", "Implement LoginPage.ts", "Implement FormsPage.ts",
+    "Write e2e tests for forms (demoqa)", "Write e2e tests for tables (webtables)", "Implement hybrid API + UI tests",
+    "Clean up in afterAll via API", "Write visual regression tests with toHaveScreenshot", "Intercept network traffic (route.fulfill)",
+    "Configure cross-browser testing (chromium/firefox/webkit)", "Run tests with repeat-each for flake detection", "Debug tests using Playwright Trace Viewer",
+    "Integrate Playwright tests in GHA CI/CD pipeline"
   ]; // 16 items
 
   // Build the groups in the DOM
