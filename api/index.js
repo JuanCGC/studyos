@@ -1,7 +1,7 @@
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
-import parseJSON from './_parse.js';
+// import 'dotenv/config'; // removed - not needed; env vars are provided by the runtime
 
 const app = express();
 
@@ -73,8 +73,8 @@ async function geminiFetch(prompt, config = {}) {
 // ── GET /api/config ──────────────────────────────────────────
 app.get('/api/config', (req, res) => {
   res.json({
-    supabaseUrl: process.env.SUPABASE_URL || '',
-    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
+    supabaseUrl: process.env.VITE_SUPABASE_URL || '',
+    supabaseAnonKey: process.env.VITE_SUPABASE_ANON_KEY || '',
   });
 });
 
@@ -714,7 +714,7 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
 });
 
 // ── Catch‑all: 404 for unknown /api/* routes ─────────────────
-app.use('/api/*', (req, res) => {
+app.use('/api', (req, res) => {
   res.status(404).json({ error: `Not found: ${req.method} ${req.originalUrl}` });
 });
 
