@@ -795,7 +795,7 @@ function switchPanel(panel) {
   document.getElementById('panel-dash').classList.toggle('visible', panel==='dash');
   document.getElementById('panel-guide').classList.toggle('visible', panel==='guide');
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.panel===panel));
-  try { localStorage.setItem('stos_panel', panel); } catch(e) {}
+  try { localStorage.setItem('studit_panel', panel); } catch(e) {}
   if (panel==='dash') window._dashApp && window._dashApp.$nextTick(()=>null);
 }
 
@@ -846,11 +846,11 @@ window._user = null;
 function app() {
   return {
     // ── Routing ──
-    view: (() => { const v = localStorage.getItem('stos_view'); return (v && (v === 'dashboard' || v === 'subjects' || v === 'pomodoro' || v === 'interview' || v === 'settings' || v === 'challenges' || v.startsWith('subject-') || v === 'ai-guide')) ? v : 'dashboard'; })(),
+    view: (() => { const v = localStorage.getItem('studit_view'); return (v && (v === 'dashboard' || v === 'subjects' || v === 'pomodoro' || v === 'interview' || v === 'settings' || v === 'challenges' || v.startsWith('subject-') || v === 'ai-guide')) ? v : 'dashboard'; })(),
     navigate(v) {
       this.view = v;
-      localStorage.setItem('stos_view', v);
-      if (v !== 'ai-guide') localStorage.removeItem('stos_ai_guide');
+      localStorage.setItem('studit_view', v);
+      if (v !== 'ai-guide') localStorage.removeItem('studit_ai_guide');
       this.$nextTick(() => document.getElementById('panel-dash').scrollTo(0, 0));
     },
     goGuide(sectionId) {
@@ -883,7 +883,7 @@ function app() {
     async saveProfile() {
       this.profileSaving = true;
       try {
-        localStorage.setItem('studyos_profileName', this.profileName);
+        localStorage.setItem('studit_profileName', this.profileName);
         if (window._sb && window._user) {
           await window._sb.auth.updateUser({ data: { full_name: this.profileName } });
         }
@@ -959,7 +959,7 @@ function app() {
     interviewUserInput: '',
     interviewLoading: false,
     interviewStartTime: null,
-    interviewHistory: JSON.parse(localStorage.getItem('stos_interview_history') || '[]'),
+    interviewHistory: JSON.parse(localStorage.getItem('studit_interview_history') || '[]'),
 
     // ── Challenges ──
     challengeTopic: '',
@@ -974,7 +974,7 @@ function app() {
     challengeError: '',
     challengeShowSolution: false,
     challengeShowHints: false,
-    challengeHistory: JSON.parse(localStorage.getItem('stos_challenge_history') || '[]'),
+    challengeHistory: JSON.parse(localStorage.getItem('studit_challenge_history') || '[]'),
 
     async generateExercise() {
       const topic = this.challengeTopicCustom.trim() || this.challengeTopic;
@@ -1047,7 +1047,7 @@ function app() {
         passed,
       };
       this.challengeHistory = [entry, ...this.challengeHistory].slice(0, 50);
-      try { localStorage.setItem('stos_challenge_history', JSON.stringify(this.challengeHistory)); } catch(e) {}
+      try { localStorage.setItem('studit_challenge_history', JSON.stringify(this.challengeHistory)); } catch(e) {}
     },
 
     _saveInterviewSession() {
@@ -1062,7 +1062,7 @@ function app() {
         score,
       };
       this.interviewHistory = [entry, ...this.interviewHistory].slice(0, 20);
-      try { localStorage.setItem('stos_interview_history', JSON.stringify(this.interviewHistory)); } catch(e) {}
+      try { localStorage.setItem('studit_interview_history', JSON.stringify(this.interviewHistory)); } catch(e) {}
     },
 
     async startInterview() {
@@ -1471,15 +1471,15 @@ function app() {
       }
 
       // Set language from global preference or subject default
-      this.aiGuide.language = localStorage.getItem('stos_ai_language') || subject.defaultLang || 'JavaScript';
+      this.aiGuide.language = localStorage.getItem('studit_ai_language') || subject.defaultLang || 'JavaScript';
 
       this.navigate('ai-guide');
-      localStorage.setItem('stos_ai_guide', JSON.stringify({
+      localStorage.setItem('studit_ai_guide', JSON.stringify({
         subjectId: subject.id, chapterIndex,
         quizOnly,
         language: this.aiGuide.language
       }));
-      try { localStorage.setItem('stos_panel', 'dash'); } catch(e) {}
+      try { localStorage.setItem('studit_panel', 'dash'); } catch(e) {}
 
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
       const quizKey  = `quiz_${subject.id}_${chapterIndex}`;
@@ -1579,7 +1579,7 @@ function app() {
 
 
     async regenerateGuide() {
-      localStorage.setItem('stos_ai_language', this.aiGuide.language);
+      localStorage.setItem('studit_ai_language', this.aiGuide.language);
       const { subject, chapter, chapterIndex, labExpress, keyConcept, projectEvolution } = this.aiGuide;
       if (!subject) return;
       const cacheKey = `guide_${subject.id}_${chapterIndex}`;
@@ -1619,7 +1619,7 @@ function app() {
     },
     async _restoreAIGuide() {
       if (this.view !== 'ai-guide') return;
-      const saved = localStorage.getItem('stos_ai_guide');
+      const saved = localStorage.getItem('studit_ai_guide');
       if (!saved) { this._leaveAIGuide(); return; }
       try {
         const g = JSON.parse(saved);
@@ -1653,7 +1653,7 @@ function app() {
           this.aiGuide.projectEvolution = embedded.pe;
         }
         // Restore language from global preference or saved state
-        this.aiGuide.language = localStorage.getItem('stos_ai_language') || g.language || subject.defaultLang || 'JavaScript';
+        this.aiGuide.language = localStorage.getItem('studit_ai_language') || g.language || subject.defaultLang || 'JavaScript';
         let cachedQ = localStorage.getItem(quizKey);
         if (!cachedQ) cachedQ = await this._loadCacheFromSupabase(quizKey);
         if (cachedQ) {
@@ -1666,8 +1666,8 @@ function app() {
     },
     _leaveAIGuide() {
       this.view = 'dashboard';
-      localStorage.setItem('stos_view', 'dashboard');
-      localStorage.removeItem('stos_ai_guide');
+      localStorage.setItem('studit_view', 'dashboard');
+      localStorage.removeItem('studit_ai_guide');
     },
 
     // ── AI Suggestions ──
@@ -1737,20 +1737,20 @@ function app() {
     // ── Settings persistence (localStorage) ──
     loadSettings() {
       try {
-        const s = JSON.parse(localStorage.getItem('studyos_settings') || '{}');
+        const s = JSON.parse(localStorage.getItem('studit_settings') || '{}');
         if (s.settings) Object.assign(this.settings, s.settings);
         if (s.pomoSettings) { Object.assign(this.pomoSettings, s.pomoSettings); this.applyPomoSettings(); }
         if (s.weekGoal != null) this.weekGoal = s.weekGoal;
         if (s.pomosGoal != null) this.pomosGoal = s.pomosGoal;
         if (s.currentWeek != null) this.currentWeek = s.currentWeek;
-        const savedName = localStorage.getItem('studyos_profileName');
+        const savedName = localStorage.getItem('studit_profileName');
         if (savedName) this.profileName = savedName;
         else if (window._user?.user_metadata?.full_name) this.profileName = window._user.user_metadata.full_name;
       } catch(e) {}
     },
     _saveSettings() {
       try {
-        localStorage.setItem('studyos_settings', JSON.stringify({
+        localStorage.setItem('studit_settings', JSON.stringify({
           settings: this.settings,
           pomoSettings: this.pomoSettings,
           weekGoal: this.weekGoal,
@@ -1762,9 +1762,9 @@ function app() {
 
     async init() {
       // Bust old quiz caches so improved prompt regenerates questions
-      if (!localStorage.getItem('stos_quiz_cache_v2')) {
+      if (!localStorage.getItem('studit_quiz_cache_v2')) {
         Object.keys(localStorage).filter(k => k.startsWith('quiz_')).forEach(k => localStorage.removeItem(k));
-        localStorage.setItem('stos_quiz_cache_v2', '1');
+        localStorage.setItem('studit_quiz_cache_v2', '1');
       }
       this.loadSettings();
       // Restore ai-guide state after subjects are finalised
@@ -1896,7 +1896,7 @@ document.addEventListener('DOMContentLoaded', () => {
   buildGroup(p5playwright_items, 'p5playwright', 'tr-p5playwright', 'p5playwright-counter', 'p5playwright-bar', 'amber');
 
   // Restore panel preference (default dash)
-  const panelPref = localStorage.getItem('stos_panel') || 'dash';
+  const panelPref = localStorage.getItem('studit_panel') || 'dash';
   switchPanel(panelPref);
   updateTrackerAll();
 });

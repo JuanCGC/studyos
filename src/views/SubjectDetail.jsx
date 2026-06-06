@@ -10,12 +10,12 @@ export default function SubjectDetail({
   const s = subject;
 
   const [selectedLang, setSelectedLang] = useState(() => {
-    return localStorage.getItem('stos_ai_language') || s.defaultLang || 'JavaScript';
+    return localStorage.getItem('studit_ai_language') || s.defaultLang || 'JavaScript';
   });
 
   const handleLangChange = (lang) => {
     setSelectedLang(lang);
-    localStorage.setItem('stos_ai_language', lang);
+    localStorage.setItem('studit_ai_language', lang);
   };
 
   const handleOpenGuide = (ch, i) => {

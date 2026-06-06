@@ -26,27 +26,27 @@ export default function App() {
 
   // ── Routing ──
   const [view, setView] = useState(() => {
-    const v = localStorage.getItem('stos_view');
+    const v = localStorage.getItem('studit_view');
     return v ? v : 'dashboard';
   });
   const navigate = useCallback((v) => {
     setView(v);
-    localStorage.setItem('stos_view', v);
-    if (v !== 'ai-guide') localStorage.removeItem('stos_ai_guide');
+    localStorage.setItem('studit_view', v);
+    if (v !== 'ai-guide') localStorage.removeItem('studit_ai_guide');
   }, []);
 
   // ── Profile ──
-  const [profileName, setProfileName] = useState(() => localStorage.getItem('studyos_profileName') || '');
+  const [profileName, setProfileName] = useState(() => localStorage.getItem('studit_profileName') || '');
   const [profileSaving, setProfileSaving] = useState(false);
 
   // ── Deep-Dive Comments ──
   const [showDeepDiveComments, setShowDeepDiveComments] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('studyos_deepDiveComments') || 'false');
+      return JSON.parse(localStorage.getItem('studit_deepDiveComments') || 'false');
     } catch { return false; }
   });
   useEffect(() => {
-    localStorage.setItem('studyos_deepDiveComments', JSON.stringify(showDeepDiveComments));
+    localStorage.setItem('studit_deepDiveComments', JSON.stringify(showDeepDiveComments));
   }, [showDeepDiveComments]);
 
   // ── AI Guide ──
@@ -69,7 +69,7 @@ export default function App() {
   useEffect(() => {
     if (view !== 'ai-guide') return;
     if (aiGuide.subject) return;
-    const saved = localStorage.getItem('stos_ai_guide');
+    const saved = localStorage.getItem('studit_ai_guide');
     if (!saved) { setView('dashboard'); return; }
     try {
       const { subjectId, chapterIndex, quizOnly, language } = JSON.parse(saved);
@@ -98,7 +98,7 @@ export default function App() {
   const saveProfile = useCallback(async () => {
     setProfileSaving(true);
     try {
-      localStorage.setItem('studyos_profileName', profileName);
+      localStorage.setItem('studit_profileName', profileName);
       if (user?.id) {
         if (supabase) {
           await supabase.auth.updateUser({ data: { full_name: profileName } });
@@ -113,33 +113,33 @@ export default function App() {
   // ── Settings ──
   const [settings, setSettings] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('studyos_settings') || '{}').settings || { alarmOn: true, focusMode: false };
+      return JSON.parse(localStorage.getItem('studit_settings') || '{}').settings || { alarmOn: true, focusMode: false };
     } catch { return { alarmOn: true, focusMode: false }; }
   });
   const [pomoSettings, setPomoSettingsRaw] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('studyos_settings') || '{}').pomoSettings || { work: 25, short: 5, long: 15 };
+      return JSON.parse(localStorage.getItem('studit_settings') || '{}').pomoSettings || { work: 25, short: 5, long: 15 };
     } catch { return { work: 25, short: 5, long: 15 }; }
   });
   const [weekGoal, setWeekGoalRaw] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('studyos_settings') || '{}').weekGoal || 35;
+      return JSON.parse(localStorage.getItem('studit_settings') || '{}').weekGoal || 35;
     } catch { return 35; }
   });
   const [pomosGoal, setPomosGoalRaw] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('studyos_settings') || '{}').pomosGoal || 8;
+      return JSON.parse(localStorage.getItem('studit_settings') || '{}').pomosGoal || 8;
     } catch { return 8; }
   });
   const [currentWeek, setCurrentWeekRaw] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('studyos_settings') || '{}').currentWeek || 1;
+      return JSON.parse(localStorage.getItem('studit_settings') || '{}').currentWeek || 1;
     } catch { return 1; }
   });
 
   const saveSettings = useCallback(() => {
     try {
-      localStorage.setItem('studyos_settings', JSON.stringify({ settings, pomoSettings, weekGoal, pomosGoal, currentWeek }));
+      localStorage.setItem('studit_settings', JSON.stringify({ settings, pomoSettings, weekGoal, pomosGoal, currentWeek }));
     } catch (e) { /* ignore */ }
   }, [settings, pomoSettings, weekGoal, pomosGoal, currentWeek]);
 
@@ -191,7 +191,7 @@ export default function App() {
   // ── Hours / Streak ──
   const [weekHours, setWeekHours] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('studyos_weekHours') || 'null') || [0, 0, 0, 0, 0, 0, 0];
+      return JSON.parse(localStorage.getItem('studit_weekHours') || 'null') || [0, 0, 0, 0, 0, 0, 0];
     } catch { return [0, 0, 0, 0, 0, 0, 0]; }
   });
   const totalHours = weekHours.reduce((a, b) => a + b, 0);
@@ -313,7 +313,7 @@ export default function App() {
   const [interviewLoading, setInterviewLoading] = useState(false);
   const interviewStartTimeRef = useRef(null);
   const [interviewHistory, setInterviewHistory] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('stos_interview_history') || '[]'); }
+    try { return JSON.parse(localStorage.getItem('studit_interview_history') || '[]'); }
     catch { return []; }
   });
   const saveInterviewSession = useCallback(() => {
@@ -324,7 +324,7 @@ export default function App() {
     const entry = { date: new Date().toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }), topic: interviewTopic || 'Free topic', duration, score };
     setInterviewHistory(prev => {
       const next = [entry, ...prev].slice(0, 20);
-      try { localStorage.setItem('stos_interview_history', JSON.stringify(next)); } catch (e) { /* ignore */ }
+      try { localStorage.setItem('studit_interview_history', JSON.stringify(next)); } catch (e) { /* ignore */ }
       return next;
     });
   }, [interviewMessages, interviewTopic]);
@@ -370,7 +370,7 @@ export default function App() {
   const guideSessionRef = useRef(0);
 
   const openAIGuide = useCallback(async (subject, chapter, chapterIndex, quizOnly = false, language) => {
-    const lang = language || localStorage.getItem('stos_ai_language') || subject.defaultLang || 'JavaScript';
+    const lang = language || localStorage.getItem('studit_ai_language') || subject.defaultLang || 'JavaScript';
     setAiGuide({
       subject, chapter, chapterIndex, loading: false, quizOnly, error: '', content: null,
       quiz: { questions: [], answers: [null, null, null], loading: false, submitted: false, score: 0, error: false },
@@ -383,7 +383,7 @@ export default function App() {
       setAiGuide(prev => ({ ...prev, keyConcept: embedded.kc, labExpress: embedded.le, projectEvolution: embedded.pe }));
     }
     navigate('ai-guide');
-    localStorage.setItem('stos_ai_guide', JSON.stringify({ subjectId: subject.id, chapterIndex, quizOnly, language: lang }));
+    localStorage.setItem('studit_ai_guide', JSON.stringify({ subjectId: subject.id, chapterIndex, quizOnly, language: lang }));
     const cacheKey = `guide_${subject.id}_${chapterIndex}`;
     const quizKey = `quiz_${subject.id}_${chapterIndex}`;
     if (!quizOnly) {
@@ -431,7 +431,7 @@ export default function App() {
   }, []);
 
   const regenerateGuide = useCallback(() => {
-    localStorage.setItem('stos_ai_language', aiGuide.language);
+    localStorage.setItem('studit_ai_language', aiGuide.language);
     const { subject, chapter, chapterIndex, labExpress, keyConcept, projectEvolution } = aiGuide;
     if (!subject) { setAiGuide(prev => ({ ...prev, error: 'No chapter selected.' })); return; }
     const cacheKey = `guide_${subject.id}_${chapterIndex}`;
@@ -683,7 +683,7 @@ export default function App() {
           onStartInterview={startInterview}
           onSendMessage={sendInterviewMessage}
           interviewHistory={interviewHistory}
-          onClearHistory={() => { setInterviewHistory([]); localStorage.removeItem('stos_interview_history'); }}
+          onClearHistory={() => { setInterviewHistory([]); localStorage.removeItem('studit_interview_history'); }}
           cvAnalysis={cvAnalysis}
           profileName={profileName}
         />;
@@ -695,7 +695,7 @@ export default function App() {
           onAnswerQuiz={answerQuiz}
           onNavigate={navigate}
           onChangeLanguage={(lang) => {
-            localStorage.setItem('stos_ai_language', lang);
+            localStorage.setItem('studit_ai_language', lang);
             setAiGuide(prev => ({ ...prev, language: lang }));
           }}
           showDeepDiveComments={showDeepDiveComments}

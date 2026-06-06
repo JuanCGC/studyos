@@ -16,7 +16,7 @@ const DEFAULT_TASKS = [
 export function useProgress(user) {
   const [subjects, setSubjects] = useState(() => {
     try {
-      const saved = localStorage.getItem('studyos_subjects');
+      const saved = localStorage.getItem('studit_subjects');
       return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(SUBJECTS));
     } catch {
       return JSON.parse(JSON.stringify(SUBJECTS));
@@ -25,7 +25,7 @@ export function useProgress(user) {
 
   const [tasks, setTasks] = useState(() => {
     try {
-      const saved = localStorage.getItem('studyos_tasks');
+      const saved = localStorage.getItem('studit_tasks');
       return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_TASKS));
     } catch {
       return JSON.parse(JSON.stringify(DEFAULT_TASKS));
@@ -47,8 +47,8 @@ export function useProgress(user) {
 
   const saveProgress = useCallback(async () => {
     try {
-      localStorage.setItem('studyos_subjects', JSON.stringify(subjects));
-      localStorage.setItem('studyos_tasks', JSON.stringify(tasks));
+      localStorage.setItem('studit_subjects', JSON.stringify(subjects));
+      localStorage.setItem('studit_tasks', JSON.stringify(tasks));
     } catch (e) { /* ignore */ }
     if (!supabase || !user) return;
     try {
@@ -73,12 +73,12 @@ export function useProgress(user) {
       if (data?.subjects) {
         const parsed = JSON.parse(data.subjects);
         setSubjects(parsed);
-        localStorage.setItem('studyos_subjects', JSON.stringify(parsed));
+        localStorage.setItem('studit_subjects', JSON.stringify(parsed));
       }
       if (data?.tasks) {
         const parsed = JSON.parse(data.tasks);
         setTasks(parsed);
-        localStorage.setItem('studyos_tasks', JSON.stringify(parsed));
+        localStorage.setItem('studit_tasks', JSON.stringify(parsed));
       }
     } catch (e) { /* ignore */ }
   }, [user]);
