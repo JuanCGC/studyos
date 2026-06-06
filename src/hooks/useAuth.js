@@ -10,10 +10,15 @@ export function useAuth() {
       setLoading(false);
       return;
     }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
+      if (window.location.hash?.includes('access_token')) {
+        window.location.hash = '';
+      }
     });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
