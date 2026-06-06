@@ -8,7 +8,7 @@ const NAV_MAIN = [
   { id: 'calendar', icon: 'calendar', label: 'Calendar' },
 ];
 
-export function Sidebar({ view, onNavigate, subjects, chapPct, todayStr, currentWeek, onLogout }) {
+export function Sidebar({ view, onNavigate, subjects, chapPct, todayStr, currentWeek, onLogout, hoursPerSubject }) {
   return (
     <aside className="sidebar">
       <span className="nav-label">General</span>
@@ -26,6 +26,7 @@ export function Sidebar({ view, onNavigate, subjects, chapPct, todayStr, current
       <span className="nav-label">Subjects</span>
       {subjects.map(s => {
         const pct = chapPct(s);
+        const hours = hoursPerSubject?.find(h => h.subject_id === s.id)?.total_hours;
         return (
           <div
             key={s.id}
@@ -34,7 +35,12 @@ export function Sidebar({ view, onNavigate, subjects, chapPct, todayStr, current
           >
             <DynamicIcon subjectName={s.name} iconName={s.icon} />
             <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
-            <span style={{ flexShrink: 0, fontSize: 10, fontFamily: 'var(--mono)', color: pct > 0 ? `var(--${s.color}2)` : 'var(--t4)' }}>{pct}%</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+              {hours > 0 && (
+                <span style={{ fontSize: 9, fontFamily: 'var(--mono)', color: 'var(--t4)', opacity: 0.7 }}>{hours}h</span>
+              )}
+              <span style={{ fontSize: 10, fontFamily: 'var(--mono)', color: pct > 0 ? `var(--${s.color}2)` : 'var(--t4)' }}>{pct}%</span>
+            </span>
           </div>
         );
       })}

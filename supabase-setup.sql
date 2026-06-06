@@ -33,10 +33,40 @@ create table if not exists guide_cache (
   primary key (user_id, cache_key)
 );
 
--- 6. Row Level Security
+-- 6. Pomodoro sessions table (auto-logged focus blocks)
+create table if not exists pomodoro_sessions (
+  id              uuid primary key default gen_random_uuid(),
+  user_id         uuid references auth.users(id) on delete cascade not null,
+  subject_id      text,
+  chapter_name    text,
+  duration_minutes integer not null default 25,
+  completed_at    timestamptz default now()
+);
+
+create index if not exists idx_pomo_user on pomodoro_sessions(user_id);
+create index if not exists idx_pomo_subject on pomodoro_sessions(user_id, subject_id);
+
+-- 7. Interview flashcards table (active recall system)
+create table if not exists interview_flashcards (
+  id              uuid primary key default gen_random_uuid(),
+  user_id         uuid references auth.users(id) on delete cascade not null,
+  subject_id      text not null,
+  question        text not null,
+  answer          text not null,
+  difficulty      text not null default 'medium',
+  mastered        boolean not null default false,
+  review_count    integer not null default 0,
+  last_reviewed   timestamptz
+);
+
+create index if not exists idx_flash_user on interview_flashcards(user_id);
+create index if not exists idx_flash_subject on interview_flashcards(user_id, subject_id);
+
+-- 8. Row Level Security
 alter table progress enable row level security;
 alter table profiles enable row level security;
 alter table guide_cache enable row level security;
+alter table pomodoro_sessions enable row level security;
 
 create policy "own_progress" on progress
   for all using (auth.uid() = user_id);
@@ -45,4 +75,12 @@ create policy "own_profile" on profiles
   for all using (auth.uid() = id);
 
 create policy "own_guide_cache" on guide_cache
+  for all using (auth.uid() = user_id);
+
+create policy "own_pomo_sessions" on pomodoro_sessions
+  for all using (auth.uid() = user_id);
+
+alter table interview_flashcards enable row level security;
+
+create policy "own_flashcards" on interview_flashcards
   for all using (auth.uid() = user_id);

@@ -1,7 +1,7 @@
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 
-export function Layout({ view, onNavigate, subjects, chapPct, todayStr, currentWeek, onLogout, userName, streak, children }) {
+export function Layout({ view, onNavigate, subjects, chapPct, todayStr, currentWeek, onLogout, userName, streak, hoursPerSubject, children }) {
   const navMain = [
     { id: 'dashboard', icon: 'squares-four', label: 'Dashboard' },
     { id: 'pomodoro', icon: 'timer', label: 'Pomodoro' },
@@ -19,6 +19,7 @@ export function Layout({ view, onNavigate, subjects, chapPct, todayStr, currentW
         todayStr={todayStr}
         currentWeek={currentWeek}
         onLogout={onLogout}
+        hoursPerSubject={hoursPerSubject}
       />
       <main className="main">
         <Topbar

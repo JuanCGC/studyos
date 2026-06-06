@@ -57,6 +57,9 @@ export function usePomodoro() {
               label: isWork ? `Session #${donePomos + 1}` : 'Break',
               type: phase, time: now,
               focus: isWork ? focusLabel : '',
+              subjectId: isWork ? focusSubjectId : '',
+              chapterName: isWork ? focusChapterName : '',
+              durationMinutes: 25,
             }, ...l];
           });
           if (phase === 'work') {

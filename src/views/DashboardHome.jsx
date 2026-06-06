@@ -67,7 +67,8 @@ function computeCalCells(year, month) {
 export default function DashboardHome({
   subjects, tasks,
   onNavigate, onToggleTask, chapPct, overallPct,
-  weekHours, totalHours, maxH, weekGoal,
+  weekHours, totalHours, maxH, weekGoal, hoursPerSubject,
+  flashcardSummary,
 }) {
   const pomodoro = useTimer();
   const { pomosToday } = pomodoro;
@@ -147,17 +148,27 @@ export default function DashboardHome({
           <div className="sdelta">↑ +3h vs anterior</div>
         </div>
         <div className="scard green">
-          <div className="si"><i className="ph ph-check-circle"></i></div>
-          <div className="sv green">{doneTasks}/{tasks.length}</div>
-          <div className="slb">Tasks completed</div>
-          <div className="sdelta">↑ +2 hoy</div>
+          <div className="si"><i className="ph ph-brain"></i></div>
+          <div className="sv green">
+            {flashcardSummary
+              ? `${flashcardSummary.mastered}/${flashcardSummary.total}`
+              : <span style={{ fontSize: 14, opacity: 0.4 }}>—</span>
+            }
+          </div>
+          <div className="slb">Cards mastered</div>
+          <div className="sdelta">
+            {flashcardSummary
+              ? `${flashcardSummary.reviewed} reviewed · ${flashcardSummary.total} total`
+              : 'Loading...'
+            }
+          </div>
         </div>
         <div className="scard orange">
           <div className="si"><i className="ph ph-crosshair"></i></div>
           <div className="sv orange">{subjects.filter(s => chapPct(s) > 0).length}</div>
           <div className="slb">Active subjects</div>
-          <div className="sdelta" style={{ color: 'var(--orange2)' }}>
-            De un total de <span>{subjects.length}</span>
+          <div className="sdelta" style={{ color: 'var(--orange2)', fontSize: 10 }}>
+            {hoursPerSubject?.filter(h => h.total_hours > 0).length || 0} with study hours
           </div>
         </div>
         <div className="scard purple">
@@ -196,7 +207,7 @@ export default function DashboardHome({
                 </div>
                 <div className="track"><div className={'fill ' + s.color} style={{ width: chapPct(s) + '%' }}></div></div>
                 <div className="subj-foot">
-                  <span className="subj-meta">{s.chapList.filter(c => c.done).length}/{s.chapList.length} caps · {s.hours}</span>
+                  <span className="subj-meta">{s.chapList.filter(c => c.done).length}/{s.chapList.length} caps · {hoursPerSubject?.find(h => h.subject_id === s.id)?.total_hours || 0}h studied</span>
                 </div>
               </div>
             ))}

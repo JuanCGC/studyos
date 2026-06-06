@@ -198,6 +198,38 @@ export default function App() {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const streak = 0;
 
+  const [hoursPerSubject, setHoursPerSubject] = useState([]);
+  const fetchHoursPerSubject = useCallback(async () => {
+    if (!supabase) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+    try {
+      const r = await fetch('/api/analytics-hours', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (r.ok) setHoursPerSubject(await r.json());
+    } catch { /* silent */ }
+  }, []);
+  useEffect(() => { fetchHoursPerSubject(); }, [fetchHoursPerSubject]);
+  useEffect(() => {
+    const id = setInterval(fetchHoursPerSubject, 30000);
+    return () => clearInterval(id);
+  }, [fetchHoursPerSubject]);
+
+  const [flashcardSummary, setFlashcardSummary] = useState(null);
+  const fetchFlashcardSummary = useCallback(async () => {
+    if (!supabase) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+    try {
+      const r = await fetch('/api/analytics/flashcards-summary', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (r.ok) setFlashcardSummary(await r.json());
+    } catch { /* silent */ }
+  }, []);
+  useEffect(() => { fetchFlashcardSummary(); }, [fetchFlashcardSummary]);
+
   // ── Calendar ──
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
@@ -444,7 +476,7 @@ export default function App() {
       }
     } catch (e) { localStorage.removeItem(quizKey); }
     const tasks = [];
-    const withTimeout = (url, opts, ms = 30000) => {
+    const withTimeout = (url, opts, ms = 60000) => {
       const ctrl = new AbortController();
       const id = setTimeout(() => ctrl.abort(), ms);
       return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(id));
@@ -466,7 +498,11 @@ export default function App() {
             setAiGuide(prev => ({ ...prev, content: data.guide, loading: false }));
             try { if (data.guide) localStorage.setItem(cacheKey, JSON.stringify(data.guide)); } catch (e) { /* ignore */ }
           })
-          .catch(e => { if (guideSessionRef.current === session) setAiGuide(prev => ({ ...prev, error: e.message, loading: false })); })
+          .catch(e => {
+            if (guideSessionRef.current !== session) return;
+            const msg = e.name === 'AbortError' ? 'Request timed out. The AI guide took too long. Try again.' : e.message;
+            setAiGuide(prev => ({ ...prev, error: msg, loading: false }));
+          })
       );
     }
     if (!localStorage.getItem(quizKey)) {
@@ -658,6 +694,8 @@ export default function App() {
           totalHours={totalHours}
           maxH={maxH}
           weekGoal={weekGoal}
+          hoursPerSubject={hoursPerSubject}
+          flashcardSummary={flashcardSummary}
           days={days}
           todayIdx={todayIdx}
           calYear={calYear}
@@ -852,6 +890,7 @@ export default function App() {
         onLogout={logout}
         userName={userName}
         streak={streak}
+        hoursPerSubject={hoursPerSubject}
       >
         {renderView()}
       </Layout>
