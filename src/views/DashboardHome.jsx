@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTimer } from '../hooks/TimerContext';
 
 const CIRC = 2 * Math.PI * 60;
 const SPANISH_DAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
@@ -64,10 +65,12 @@ function computeCalCells(year, month) {
 }
 
 export default function DashboardHome({
-  subjects, tasks, pomodoro, pomosToday,
+  subjects, tasks,
   onNavigate, onToggleTask, chapPct, overallPct,
   weekHours, totalHours, maxH, weekGoal,
 }) {
+  const pomodoro = useTimer();
+  const { pomosToday } = pomodoro;
   const [calYear, setCalYear] = useState(() => new Date().getFullYear());
   const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
 

@@ -1,9 +1,13 @@
+import { useTimer } from '../hooks/TimerContext';
+
 export default function PomodoroView({
-  pomodoro, pomosToday, pomoLog, subjects,
-  focusSubjectId, setFocusSubjectId,
-  focusChapterName, setFocusChapterName,
+  subjects,
 }) {
-  const { phase, timeLeft, fmtTime, phaseLabel, running, donePomos, dashBig, CIRC_BIG, toggleTimer, resetTimer, setPhase, focusLabel } = pomodoro;
+  const {
+    phase, timeLeft, fmtTime, phaseLabel, running, donePomos, dashBig, CIRC_BIG,
+    toggleTimer, resetTimer, setPhase, focusLabel, pomosToday, pomoLog,
+    focusSubjectId, setFocusSubjectId, focusChapterName, setFocusChapterName,
+  } = useTimer();
   const focusSubject = subjects.find(s => s.id === focusSubjectId);
 
   return (

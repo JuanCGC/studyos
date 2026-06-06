@@ -1,3 +1,5 @@
+import PomodoroMini from './PomodoroMini';
+
 const NAV_MAIN = [
   { id: 'dashboard', icon: 'squares-four', label: 'Dashboard' },
   { id: 'pomodoro', icon: 'timer', label: 'Pomodoro' },
@@ -52,6 +54,7 @@ export function Sidebar({ view, onNavigate, subjects, chapPct, todayStr, current
         <i className="ph nav-icon ph-sign-out"></i> Sign out
       </div>
 
+      <PomodoroMini />
       <div className="sb-bottom">
         <div className="today-pill">
           <div className="d">{todayStr}</div>

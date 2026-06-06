@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { supabase } from './lib/supabaseClient';
 import { useProgress } from './hooks/useProgress';
-import { usePomodoro } from './hooks/usePomodoro';
+import { TimerProvider } from './hooks/TimerContext';
 import { CHAP_MAP, EMBEDDED_GUIDES } from './data/subjects';
 import { Layout } from './components/Layout';
 import DashboardHome from './views/DashboardHome';
@@ -157,9 +157,6 @@ export default function App() {
     setCurrentWeekRaw(v);
     setTimeout(() => saveSettings(), 0);
   }, [saveSettings]);
-
-  // ── Pomodoro ──
-  const pomodoro = usePomodoro();
 
   // ── Tasks ──
   const [taskFilter, setTaskFilter] = useState('all');
@@ -642,10 +639,6 @@ export default function App() {
     return () => clearTimeout(deepDiveSyncTimer.current);
   }, [showDeepDiveComments, syncDeepDivePref]);
 
-  // ── Pomodoro focus ──
-  const [focusSubjectId, setFocusSubjectId] = useState('');
-  const [focusChapterName, setFocusChapterName] = useState('');
-
   // ── Interview helper ──
   const [clearInterviewHistory, setClearInterviewHistory] = useState(false);
 
@@ -656,8 +649,6 @@ export default function App() {
         return <DashboardHome
           subjects={subjects}
           tasks={tasks}
-          pomodoro={pomodoro}
-          pomosToday={pomodoro.pomosToday}
           onNavigate={navigate}
           onToggleTask={toggleTask}
           chapPct={chapPct}
@@ -682,14 +673,7 @@ export default function App() {
         />;
       case 'pomodoro':
         return <PomodoroView
-          pomodoro={pomodoro}
-          pomosToday={pomodoro.pomosToday}
-          pomoLog={pomodoro.pomoLog}
           subjects={subjects}
-          focusSubjectId={focusSubjectId}
-          setFocusSubjectId={setFocusSubjectId}
-          focusChapterName={focusChapterName}
-          setFocusChapterName={setFocusChapterName}
         />;
       case 'tasks':
         return <TasksView
@@ -829,8 +813,6 @@ export default function App() {
         return <DashboardHome
           subjects={subjects}
           tasks={tasks}
-          pomodoro={pomodoro}
-          pomosToday={pomodoro.pomosToday}
           onNavigate={navigate}
           onToggleTask={toggleTask}
           chapPct={chapPct}
@@ -858,18 +840,20 @@ export default function App() {
   }
 
   return (
-    <Layout
-      view={view}
-      onNavigate={navigate}
-      subjects={subjects}
-      chapPct={chapPct}
-      todayStr={todayStr}
-      currentWeek={currentWeek}
-      onLogout={logout}
-      userName={userName}
-      streak={streak}
-    >
-      {renderView()}
-    </Layout>
+    <TimerProvider>
+      <Layout
+        view={view}
+        onNavigate={navigate}
+        subjects={subjects}
+        chapPct={chapPct}
+        todayStr={todayStr}
+        currentWeek={currentWeek}
+        onLogout={logout}
+        userName={userName}
+        streak={streak}
+      >
+        {renderView()}
+      </Layout>
+    </TimerProvider>
   );
 }
