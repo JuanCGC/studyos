@@ -28,11 +28,11 @@ Start the session by greeting the candidate by name and asking a direct technica
 
   if (messages.length === 0) {
     contents.push({ role: 'user', parts: [{ text: systemContext }] });
-    contents.push({ role: 'model', parts: [{ text: `¡Empecemos, ${candidateName}! ` }] });
+    contents.push({ role: 'model', parts: [{ text: `Let's begin, ${candidateName}! ` }] });
   } else {
     // inject system context in first exchange
     contents.push({ role: 'user', parts: [{ text: systemContext }] });
-    contents.push({ role: 'model', parts: [{ text: 'Entendido, comenzamos.' }] });
+    contents.push({ role: 'model', parts: [{ text: 'Understood, starting the session.' }] });
     // add conversation history
     for (const m of messages) {
       contents.push({

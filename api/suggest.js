@@ -19,9 +19,9 @@ export default async function handler(req, res) {
   const notStarted = subjects.filter(s => s.pct === 0);
 
   const progressDetail = [
-    inProgress.length  ? `EN PROGRESO: ${inProgress.map(s => `${s.name} (${s.pct}%)`).join(', ')}` : '',
-    completed.length   ? `COMPLETADOS: ${completed.map(s => s.name).join(', ')}` : '',
-    notStarted.length  ? `AÚN NO INICIADOS: ${notStarted.map(s => s.name).join(', ')}` : '',
+    inProgress.length  ? `IN PROGRESS: ${inProgress.map(s => `${s.name} (${s.pct}%)`).join(', ')}` : '',
+    completed.length   ? `COMPLETED: ${completed.map(s => s.name).join(', ')}` : '',
+    notStarted.length  ? `NOT STARTED: ${notStarted.map(s => s.name).join(', ')}` : '',
   ].filter(Boolean).join('\n');
 
   const prompt = `You are a career advisor for SDET (Software Development Engineer in Test).
@@ -99,8 +99,8 @@ Available colors: blue, green, orange, purple. Vary them across the 3 suggestion
       ...s,
       id: slug(s.name),
       pct: 0,
-      tag: 'Sugerido',
-      chapters: `0/${s.chapList.length} caps`,
+      tag: 'Suggested',
+      chapters: `0/${s.chapList.length} ch`,
       exam: null,
       aiSuggested: true,
       priority: 10 + idx,

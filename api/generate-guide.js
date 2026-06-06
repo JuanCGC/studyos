@@ -29,6 +29,8 @@ export default async function handler(req, res) {
 Generate a PRACTICAL study guide for the chapter "${chapterName}" of the subject "${subjectName}".
 ${subjectReason ? `Topic context: ${subjectReason}` : ''}${labContext}
 
+CRITICAL LANGUAGE RULE: ALL generated content (titles, summaries, explanations, instructions, code comments, exercises, hints, and any other text) MUST be written entirely in ENGLISH. Do not use any other language.
+
 PHILOSOPHY: Less theory, more code. Each concept should be immediately followed by a real exercise.
 
 KEY INSTRUCTION — CORRELATION WITH LABS:

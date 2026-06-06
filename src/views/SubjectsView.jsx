@@ -23,7 +23,7 @@ export default function SubjectsView({ subjects, onNavigate, chapPct, overallPct
                 <div className={'fill ' + s.color} style={{ width: chapPct(s) + '%' }}></div>
               </div>
               <div className="flex aic jbs txt-xs c-t4 mono">
-                <span>{s.chapList.filter(c => c.done).length}/{s.chapList.length} caps</span>
+                <span>{s.chapList.filter(c => c.done).length}/{s.chapList.length} ch</span>
                 <span>{s.hours}</span>
               </div>
             </div>

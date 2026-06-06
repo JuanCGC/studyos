@@ -290,7 +290,7 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
                             {q.options[(aiGuide.quiz?.answers || [])[qi] ?? 0]}
                           </div>
                           {(aiGuide.quiz?.answers || [])[qi] !== q.correct && (
-                            <div className="quiz-fb-correct-answer">{'✓ Correcto: ' + q.options[q.correct]}</div>
+                            <div className="quiz-fb-correct-answer">{'✓ Correct: ' + q.options[q.correct]}</div>
                           )}
                         </div>
                       </div>

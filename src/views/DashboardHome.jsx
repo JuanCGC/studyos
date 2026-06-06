@@ -2,13 +2,12 @@ import { useState, useMemo } from 'react';
 import { useTimer } from '../hooks/TimerContext';
 
 const CIRC = 2 * Math.PI * 60;
-const SPANISH_DAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-const CHART_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function getSubjectTag(pct) {
   if (pct === 100) return 'Completed';
   if (pct > 0) return 'In progress';
-  return 'Pending';
+  return 'To Do';
 }
 
 function computeNextChapters(subjects, chapPct) {
@@ -76,7 +75,7 @@ export default function DashboardHome({
   const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
 
   const calLabel = useMemo(
-    () => new Date(calYear, calMonth, 1).toLocaleDateString('es', { month: 'long', year: 'numeric' }),
+    () => new Date(calYear, calMonth, 1).toLocaleDateString('en', { month: 'long', year: 'numeric' }),
     [calYear, calMonth]
   );
 
@@ -145,7 +144,7 @@ export default function DashboardHome({
           <div className="si"><i className="ph ph-book-open"></i></div>
           <div className="sv blue">{totalHours}h</div>
           <div className="slb">Hours this week</div>
-          <div className="sdelta">↑ +3h vs anterior</div>
+          <div className="sdelta">↑ +3h vs previous week</div>
         </div>
         <div className="scard green">
           <div className="si"><i className="ph ph-brain"></i></div>
@@ -207,7 +206,7 @@ export default function DashboardHome({
                 </div>
                 <div className="track"><div className={'fill ' + s.color} style={{ width: chapPct(s) + '%' }}></div></div>
                 <div className="subj-foot">
-                  <span className="subj-meta">{s.chapList.filter(c => c.done).length}/{s.chapList.length} caps · {hoursPerSubject?.find(h => h.subject_id === s.id)?.total_hours || 0}h studied</span>
+                  <span className="subj-meta">{s.chapList.filter(c => c.done).length}/{s.chapList.length} ch · {hoursPerSubject?.find(h => h.subject_id === s.id)?.total_hours || 0}h studied</span>
                 </div>
               </div>
             ))}
@@ -224,8 +223,8 @@ export default function DashboardHome({
               <button className="calnav" onClick={nextMonth}>›</button>
             </div>
             <div className="calgrid">
-              {SPANISH_DAYS.map(d => (
-                <div key={d} className="caldl">{d}</div>
+              {DAYS.map(d => (
+                <div key={d} className="caldl">{d.slice(0, 1)}</div>
               ))}
               {calCells.map(c => (
                 <div
@@ -324,7 +323,7 @@ export default function DashboardHome({
                   className={'hbar' + (i === todayIdx ? ' today' : (h === 0 ? ' zero' : ' past'))}
                   style={{ height: Math.max(3, (h / maxH) * 68) + 'px' }}
                 ></div>
-                <div className="hday">{CHART_DAYS[i]}</div>
+                <div className="hday">{DAYS[i]}</div>
               </div>
             ))}
           </div>
@@ -340,8 +339,8 @@ export default function DashboardHome({
           <div className="div"></div>
           <span className="st" style={{ display: 'block', marginBottom: 8 }}>4-Week Activity</span>
           <div className="hlabels">
-            {SPANISH_DAYS.map(d => (
-              <div key={d} className="hl">{d}</div>
+            {DAYS.map(d => (
+              <div key={d} className="hl">{d.slice(0, 1)}</div>
             ))}
           </div>
           <div className="hgrid">
@@ -363,7 +362,7 @@ export default function DashboardHome({
                 <div className={'tcheck' + (t.done ? ' on' : '')}><span>{t.done ? '✓' : ''}</span></div>
                 <span className={'ttxt' + (t.done ? ' done' : '')}>{t.text}</span>
                 <span className={'tpri ' + (t.pri === 'high' ? 'phi' : (t.pri === 'medium' ? 'pmd' : 'plo'))}>
-                  {t.pri === 'high' ? 'Alta' : (t.pri === 'medium' ? 'Media' : 'Baja')}
+                  {t.pri === 'high' ? 'High' : (t.pri === 'medium' ? 'Medium' : 'Low')}
                 </span>
               </div>
             ))}
