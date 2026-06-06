@@ -62,7 +62,22 @@ create table if not exists interview_flashcards (
 create index if not exists idx_flash_user on interview_flashcards(user_id);
 create index if not exists idx_flash_subject on interview_flashcards(user_id, subject_id);
 
--- 8. Row Level Security
+-- 8. Subscriptions table (Stripe payment webhook target)
+create table if not exists subscriptions (
+  user_id                uuid references auth.users(id) on delete cascade primary key,
+  plan_type              text not null default 'free',
+  subject_limit          integer not null default 3,
+  status                 text not null default 'active',
+  stripe_subscription_id text,
+  updated_at             timestamptz default now()
+);
+
+alter table subscriptions enable row level security;
+
+create policy "own_subscription" on subscriptions
+  for all using (auth.uid() = user_id);
+
+-- 9. Row Level Security
 alter table progress enable row level security;
 alter table profiles enable row level security;
 alter table guide_cache enable row level security;
