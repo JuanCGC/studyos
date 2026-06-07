@@ -101,3 +101,33 @@ alter table interview_flashcards enable row level security;
 
 create policy "own_flashcards" on interview_flashcards
   for all using (auth.uid() = user_id);
+
+-- ─────────────────────────────────────────────
+-- 10. Add plan_type to profiles (default free)
+-- ─────────────────────────────────────────────
+alter table profiles add column if not exists plan_type text not null default 'free';
+
+-- 11. Auto-create profile + subscription rows on signup
+create or replace function handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = ''
+as $$
+begin
+  insert into public.profiles (id, plan_type)
+  values (new.id, 'free')
+  on conflict (id) do nothing;
+
+  insert into public.subscriptions (user_id, plan_type, subject_limit)
+  values (new.id, 'free', 3)
+  on conflict (user_id) do nothing;
+
+  return new;
+end;
+$$;
+
+-- 12. Apply the trigger (drops old one if exists)
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function handle_new_user();

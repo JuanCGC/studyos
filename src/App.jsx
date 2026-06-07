@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './hooks/useAuth';
+import { usePlan } from './hooks/usePlan';
 import { supabase } from './lib/supabaseClient';
 import { useProgress } from './hooks/useProgress';
 import { TimerProvider } from './hooks/TimerContext';
@@ -15,8 +16,13 @@ import SettingsView from './views/SettingsView';
 import InterviewView from './views/InterviewView';
 
 import AIGuideView from './views/AIGuideView';
+import OnboardingWizard from './views/OnboardingWizard';
 
 export default function App() {
+  const [onboardingDone, setOnboardingDone] = useState(() => {
+    return localStorage.getItem('studit_onboarding_done') === 'true';
+  });
+  const { plan, loading: planLoading } = usePlan(user);
   const { user, loading: authLoading, logout } = useAuth();
   const {
     subjects, setSubjects, tasks, setTasks,
@@ -754,6 +760,13 @@ export default function App() {
 
   if (authLoading) {
     return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F172A', color: '#64748B', fontFamily: 'var(--mono)', fontSize: 14 }}>Loading...</div>;
+  }
+
+  if (user && !onboardingDone) {
+    if (planLoading) {
+      return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F172A', color: '#64748B', fontFamily: 'var(--mono)', fontSize: 14 }}>Loading...</div>;
+    }
+    return <OnboardingWizard plan={plan} onComplete={() => setOnboardingDone(true)} />;
   }
 
   return (
