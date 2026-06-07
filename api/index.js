@@ -604,12 +604,14 @@ app.delete('/api/tasks', async (req, res) => {
       .eq('user_id', user.id)
       .single();
 
-    const tasks = progress?.tasks || [];
-    const updated = tasks.filter(t => String(t.id) !== String(id));
+    let raw = progress?.tasks;
+    if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch { raw = []; } }
+    if (!Array.isArray(raw)) raw = [];
+    const updated = raw.filter(t => String(t?.id) !== String(id));
 
     const { error } = await supabase
       .from('progress')
-      .upsert({ user_id: user.id, tasks: JSON.stringify(updated), updated_at: new Date().toISOString() });
+      .upsert({ user_id: user.id, tasks: updated, updated_at: new Date().toISOString() });
 
     if (error) return res.status(500).json({ error: error.message });
     res.status(200).json({ success: true });
