@@ -2,6 +2,7 @@ import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import 'dotenv/config';
+import parseJSON from './_parse.js';
 
 const app = express();
 
