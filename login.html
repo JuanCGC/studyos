@@ -211,6 +211,7 @@ async function handleRegister() {
   };
 
   console.log('[signup] payload:', JSON.stringify(payload, null, 2));
+  console.log('[Dispatched Payload Path]:', email);
 
   try {
     const { data, error } = await _sb.auth.signUp(payload);
