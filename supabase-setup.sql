@@ -158,6 +158,8 @@ begin
 end;
 $$;
 
+grant execute on function merge_progress(uuid, jsonb, jsonb) to authenticated;
+
 -- 14. Atomic task deletion inside PostgreSQL (avoids read-modify-write race)
 create or replace function delete_progress_task(
   p_user_id uuid,
@@ -177,6 +179,8 @@ begin
   where user_id = p_user_id;
 end;
 $$;
+
+grant execute on function delete_progress_task(uuid, text) to authenticated;
 
 -- Migration: ensure payment_id is unique to prevent duplicate webhook processing
 -- Run: alter table subscriptions add constraint subscriptions_payment_id_key unique (payment_id);

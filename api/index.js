@@ -54,20 +54,53 @@ function devError(...args) {
   if (process.env.NODE_ENV === 'development') console.error(...args);
 }
 
-function getSupabase() {
-  return createClient(
-    process.env.VITE_SUPABASE_URL,
-    process.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-  );
+const DEFAULT_SUPABASE_URL = 'https://jyasohtnqlracghsxdla.supabase.co';
+const DEFAULT_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5YXNvaHRucWxyYWNnaHN4ZGxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODkxNjMsImV4cCI6MjA5NjM2NTE2M30.lE99l7i3Pxrl6F9EjJSBXvc0oxivRKTzulmvRmkejKY';
+
+function getSupabaseConfig() {
+  return {
+    url: process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL,
+    anonKey: process.env.VITE_SUPABASE_ANON_KEY || DEFAULT_ANON_KEY,
+    serviceKey: process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+  };
+}
+
+/** Service-role client — webhooks and other admin-only paths */
+function getSupabaseAdmin() {
+  const { url, anonKey, serviceKey } = getSupabaseConfig();
+  if (!serviceKey) devError('[api] VITE_SUPABASE_SERVICE_ROLE_KEY not set — webhook/admin ops may fail');
+  return createClient(url, serviceKey || anonKey);
+}
+
+/** User-scoped client — respects RLS via the caller's JWT */
+function getSupabaseForUser(accessToken) {
+  const { url, anonKey } = getSupabaseConfig();
+  return createClient(url, anonKey, {
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+  });
+}
+
+function extractToken(req) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  return authHeader.slice(7);
 }
 
 async function getUser(req) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return null;
-  const supabase = getSupabase();
-  const token = authHeader.replace('Bearer ', '');
+  const token = extractToken(req);
+  if (!token) return null;
+  const supabase = getSupabaseForUser(token);
   const { data: { user }, error } = await supabase.auth.getUser(token);
   return !error && user ? user : null;
+}
+
+async function getUserClient(req) {
+  const token = extractToken(req);
+  if (!token) return { user: null, supabase: null };
+  const supabase = getSupabaseForUser(token);
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+  if (error || !user) return { user: null, supabase: null };
+  return { user, supabase };
 }
 
 function requireUser(req, res, next) {
@@ -119,9 +152,10 @@ async function geminiFetch(prompt, config = {}, timeoutMs = 30000) {
 
 // ── GET /api/config ──────────────────────────────────────────
 app.get('/api/config', (req, res) => {
+  const cfg = getSupabaseConfig();
   res.json({
-    supabaseUrl: process.env.VITE_SUPABASE_URL || '',
-    supabaseAnonKey: process.env.VITE_SUPABASE_ANON_KEY || '',
+    supabaseUrl: cfg.url,
+    supabaseAnonKey: cfg.anonKey,
   });
 });
 
@@ -619,13 +653,12 @@ Start the session by greeting the candidate by name and asking a direct technica
 
 // ── GET /api/analytics-hours ─────────────────────────────────
 app.get('/api/analytics-hours', async (req, res) => {
-  const user = await getUser(req);
-  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const { user, supabase } = await getUserClient(req);
+  if (!user || !supabase) return res.status(401).json({ error: 'Unauthorized' });
 
   const timezone = req.query.timezone || 'UTC';
 
   try {
-    const supabase = getSupabase();
     const { data, error } = await supabase
       .from('pomodoro_sessions')
       .select('subject_id, duration_minutes, completed_at')
@@ -650,15 +683,14 @@ app.get('/api/analytics-hours', async (req, res) => {
 
 // ── POST /api/pomodoro-log ───────────────────────────────────
 app.post('/api/pomodoro-log', async (req, res) => {
-  const user = await getUser(req);
-  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const { user, supabase } = await getUserClient(req);
+  if (!user || !supabase) return res.status(401).json({ error: 'Unauthorized' });
 
   const { subjectId, chapterName, durationMinutes, timezone } = req.body || {};
   if (!durationMinutes || typeof durationMinutes !== 'number')
     return res.status(400).json({ error: 'durationMinutes (number) is required' });
 
   try {
-    const supabase = getSupabase();
     const { error } = await supabase.from('pomodoro_sessions').insert({
       user_id: user.id,
       subject_id: subjectId || null,
@@ -675,14 +707,13 @@ app.post('/api/pomodoro-log', async (req, res) => {
 
 // ── DELETE /api/tasks ────────────────────────────────────────
 app.delete('/api/tasks', async (req, res) => {
-  const user = await getUser(req);
-  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const { user, supabase } = await getUserClient(req);
+  if (!user || !supabase) return res.status(401).json({ error: 'Unauthorized' });
 
   const { id } = req.query;
   if (!id) return res.status(400).json({ error: 'Missing task id' });
 
   try {
-    const supabase = getSupabase();
     const { error: rpcErr } = await supabase.rpc('delete_progress_task', {
       p_user_id: user.id,
       p_task_id: String(id),
@@ -719,14 +750,13 @@ app.delete('/api/tasks', async (req, res) => {
 
 // ── DELETE /api/subjects ──────────────────────────────────────
 app.delete('/api/subjects', async (req, res) => {
-  const user = await getUser(req);
-  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const { user, supabase } = await getUserClient(req);
+  if (!user || !supabase) return res.status(401).json({ error: 'Unauthorized' });
 
   const { id } = req.query;
   if (!id) return res.status(400).json({ error: 'Missing subject id' });
 
   try {
-    const supabase = getSupabase();
 
     await supabase.from('pomodoro_sessions').delete()
       .eq('user_id', user.id)
@@ -744,11 +774,10 @@ app.delete('/api/subjects', async (req, res) => {
 
 // ── GET /api/analytics/flashcards-summary ────────────────────
 app.get('/api/analytics/flashcards-summary', async (req, res) => {
-  const user = await getUser(req);
-  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const { user, supabase } = await getUserClient(req);
+  if (!user || !supabase) return res.status(401).json({ error: 'Unauthorized' });
 
   try {
-    const supabase = getSupabase();
     const { data, error } = await supabase
       .from('interview_flashcards')
       .select('id, mastered, review_count')
@@ -802,7 +831,7 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
         const config = TIER_CONFIG[tier];
         if (!config) return;
 
-        const supabase = getSupabase();
+        const supabase = getSupabaseAdmin();
 
         const { error } = await supabase.from('subscriptions').upsert({
           user_id: userId,
@@ -817,7 +846,7 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
         if (error) devError('Supabase upsert error:', error);
 
       } else if ((event === 'cancelled' || event === 'canceled') && paymentId) {
-        const supabase = getSupabase();
+        const supabase = getSupabaseAdmin();
         const { data: existing, error: lookupError } = await supabase
           .from('subscriptions')
           .select('user_id')

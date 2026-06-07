@@ -61,10 +61,10 @@ export function useProgress(user) {
     try {
       const { error } = await supabase.rpc('merge_progress', {
         p_user_id: user.id,
-        p_subjects: JSON.stringify(s),
-        p_tasks: JSON.stringify(t),
+        p_subjects: s,
+        p_tasks: t,
       });
-      if (error && (error.message || '').includes('function') && (error.message || '').includes('exist')) {
+      if (error) {
         await supabase.from('progress').upsert({
           user_id: user.id,
           subjects: s,

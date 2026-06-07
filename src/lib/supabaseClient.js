@@ -7,8 +7,8 @@ const DEFAULT_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || DEFAULT_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_ANON_KEY;
 
-if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.warn('[Supabase] Using built-in fallback credentials. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for production.');
+if (import.meta.env.DEV && (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY)) {
+  console.warn('[Supabase] Using built-in fallback credentials. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
