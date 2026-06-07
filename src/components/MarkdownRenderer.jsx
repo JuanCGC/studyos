@@ -1,12 +1,14 @@
-const CODE_BLOCK = /```(\w*)\n([\s\S]*?)```/g;
-const INLINE_CODE = /`([^`]+)`/g;
-const BOLD = /\*\*(.+?)\*\*/g;
-const LIST = /^- (.+)/gm;
+import DOMPurify from 'dompurify';
+
 const PARAGRAPH = /\n\s*\n/g;
 
 function escapeHtml(text) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return text.replace(/[&<>"']/g, c => map[c]);
+}
+
+function sanitize(html) {
+  return DOMPurify.sanitize(html, { ALLOWED_TAGS: ['strong', 'code', 'span', 'br', 'ul', 'li', 'pre', 'p'], ALLOWED_ATTR: ['style'] });
 }
 
 function inlineFormat(line) {
@@ -83,7 +85,7 @@ export default function MarkdownRenderer({ children, className = '' }) {
                 {items.map((item, ii) => (
                   <li key={ii} style={{ marginBottom: 4, position: 'relative', paddingLeft: 8 }}>
                     <span style={{ position: 'absolute', left: -16, color: 'var(--blue2)' }}>•</span>
-                    <span dangerouslySetInnerHTML={{ __html: inlineFormat(item) }} />
+                    <span dangerouslySetInnerHTML={{ __html: sanitize(inlineFormat(item)) }} />
                   </li>
                 ))}
               </ul>
@@ -95,7 +97,7 @@ export default function MarkdownRenderer({ children, className = '' }) {
               {para.split('\n').map((line, li) => (
                 <span key={li}>
                   {li > 0 && <br />}
-                  <span dangerouslySetInnerHTML={{ __html: inlineFormat(line) }} />
+                  <span dangerouslySetInnerHTML={{ __html: sanitize(inlineFormat(line)) }} />
                 </span>
               ))}
             </p>

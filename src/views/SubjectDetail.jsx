@@ -5,7 +5,8 @@ const LANGUAGES = ['JavaScript', 'TypeScript', 'Java', 'Python', 'C#', 'Apex', '
 export default function SubjectDetail({
   subject, onNavigate, chapPct, syncSubjectPct, subjects,
   onDeleteSubject, onResetSubject, notesOpen, toggleNotes, isNotesOpen,
-  CHAP_MAP, onGoChapter, onOpenAIGuide
+  CHAP_MAP, onGoChapter, onOpenAIGuide,
+  onToggleChapter, onUpdateNotes,
 }) {
   const s = subject;
 
@@ -120,7 +121,7 @@ export default function SubjectDetail({
             <div
               className={'chap-item' + (ch.done ? ' done' : '')}
               style={{ borderRadius: 10, transition: 'background .15s' }}
-              onClick={() => ch.done ? (ch.done = false, syncSubjectPct(s)) : handleOpenGuide(ch, i)}
+              onClick={() => ch.done ? onToggleChapter(s.id, i) : handleOpenGuide(ch, i)}
               onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,.03)'}
               onMouseOut={e => { if (!e.currentTarget.classList.contains('done')) e.currentTarget.style.background = ''; }}
             >
@@ -185,7 +186,7 @@ export default function SubjectDetail({
               <div style={{ margin: '6px 0 8px 52px' }}>
                 <textarea
                   value={ch.notes || ''}
-                  onChange={e => { ch.notes = e.target.value; syncSubjectPct(s); }}
+                  onChange={e => onUpdateNotes(s.id, i, e.target.value)}
                   onClick={e => e.stopPropagation()}
                   placeholder="Notes, doubts, key concepts from this chapter..."
                   style={{

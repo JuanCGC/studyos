@@ -1,13 +1,19 @@
-import { useTimer } from '../hooks/TimerContext';
+import { useTimer, useTimerTick } from '../hooks/TimerContext';
+
+const CIRC_BIG = 2 * Math.PI * 96;
 
 export default function PomodoroView({
   subjects,
 }) {
+  const stable = useTimer();
+  const tick = useTimerTick();
   const {
-    phase, timeLeft, fmtTime, phaseLabel, running, donePomos, dashBig, CIRC_BIG,
-    toggleTimer, resetTimer, setPhase, focusLabel, pomosToday, pomoLog,
+    phase, running, donePomos, pomosToday, pomoLog, focusLabel,
+    toggleTimer, resetTimer, setPhase,
     focusSubjectId, setFocusSubjectId, focusChapterName, setFocusChapterName,
-  } = useTimer();
+  } = stable;
+  const { timeLeft, fmtTime, phaseLabel } = tick;
+  const dashBig = CIRC_BIG * (1 - timeLeft / ({ work: 25 * 60, short: 5 * 60, long: 15 * 60 })[phase]);
   const focusSubject = subjects.find(s => s.id === focusSubjectId);
 
   return (

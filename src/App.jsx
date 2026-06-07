@@ -20,7 +20,7 @@ import OnboardingWizard from './views/OnboardingWizard';
 import PlanGate from './components/PlanGate';
 
 export default function App() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading, reconnecting, logout } = useAuth();
   const [onboardingDone, setOnboardingDone] = useState(false);
   const [onboardingChecking, setOnboardingChecking] = useState(true);
   const { plan, loading: planLoading } = usePlan(user);
@@ -52,7 +52,8 @@ export default function App() {
     chapPct, syncSubjectPct, overallPct,
     saveProgress, debounceSave, loadProgress,
   } = useProgress(user);
-  const displaySubjects = plan === 'free' ? (subjects || []).slice(0, 3) : subjects;
+  const lockedCount = plan === 'free' ? Math.max(0, (subjects?.length || 0) - 3) : 0;
+  const displaySubjects = (subjects || []).map((s, i) => ({ ...s, locked: plan === 'free' && i >= 3 }));
 
   // ── Routing ──
   const [view, setView] = useState(() => {
@@ -79,11 +80,15 @@ export default function App() {
   }, []);
 
   const fetchControllerRef = useRef(null);
+  const viewOnFetchRef = useRef('');
   const getFetchSignal = useCallback(() => {
     if (fetchControllerRef.current) fetchControllerRef.current.abort();
     fetchControllerRef.current = new AbortController();
+    viewOnFetchRef.current = view;
     return fetchControllerRef.current.signal;
-  }, []);
+  }, [view]);
+
+  const isViewStale = useCallback(() => viewOnFetchRef.current !== view, [view]);
 
   useEffect(() => {
     return () => { if (fetchControllerRef.current) fetchControllerRef.current.abort(); };
@@ -242,6 +247,28 @@ export default function App() {
     debounceSave();
   }, [newTask, debounceSave]);
 
+  const onToggleChapter = useCallback((subjectId, chapterIndex) => {
+    setSubjects(prev => prev.map(sub => {
+      if (sub.id !== subjectId) return sub;
+      const chapList = sub.chapList?.map((c, i) =>
+        i === chapterIndex ? { ...c, done: false } : c
+      );
+      return { ...sub, chapList };
+    }));
+    debounceSave();
+  }, [debounceSave]);
+
+  const onUpdateNotes = useCallback((subjectId, chapterIndex, value) => {
+    setSubjects(prev => prev.map(sub => {
+      if (sub.id !== subjectId) return sub;
+      const chapList = sub.chapList?.map((c, i) =>
+        i === chapterIndex ? { ...c, notes: value } : c
+      );
+      return { ...sub, chapList };
+    }));
+    debounceSave();
+  }, [debounceSave]);
+
   // ── Hours / Streak ──
   const [weekHours, setWeekHours] = useState(() => {
     try {
@@ -260,7 +287,8 @@ export default function App() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) return;
     try {
-      const r = await fetch('/api/analytics-hours', {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const r = await fetch('/api/analytics-hours?timezone=' + encodeURIComponent(tz), {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (r.ok) setHoursPerSubject(await r.json());
@@ -350,20 +378,26 @@ export default function App() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error');
+      if (isViewStale()) return;
       setCvAnalysis(data.analysis);
       if (plan === 'free' && subjects.length >= 3) {
         setShowPlanGate('cv');
       } else {
         const slots = plan === 'free' ? Math.max(0, 3 - subjects.length) : Infinity;
-        (data.analysis.recommended_subjects || []).slice(0, slots).forEach(s => setSubjects(prev => [...prev, s]));
+        const newSubjects = (data.analysis.recommended_subjects || []).slice(0, slots);
+        if (newSubjects.length) setSubjects(prev => {
+          const existing = new Set(prev.map(p => p.id));
+          return [...prev, ...newSubjects.filter(s => !existing.has(s.id))];
+        });
         debounceSave();
       }
     } catch (e) {
       if (e.name === 'AbortError') return;
+      if (isViewStale()) return;
       setCvError(e.message);
     }
     finally { setCvAnalyzing(false); }
-  }, [cvFile, subjects, debounceSave, plan]);
+  }, [cvFile, subjects, debounceSave, plan, isViewStale]);
 
   const clearCv = useCallback(() => {
     setCvFile(null);
@@ -474,24 +508,33 @@ export default function App() {
   }, [navigate]);
 
   const submitAIQuiz = useCallback(() => {
+    let subjectId = null;
+    let chapterIdx = -1;
+    let quizDone = false;
     setAiGuide(prev => {
       const qs = prev.quiz?.questions || [];
       const ans = prev.quiz?.answers || [];
       let score = 0;
       qs.forEach((q, i) => { if (ans[i] === q.correct) score++; });
       const passed = score >= 2;
-      if (passed) {
-        const s = prev.subject;
-        const idx = prev.chapterIndex;
-        if (s?.chapList?.[idx]) {
-          s.chapList[idx].done = true;
-          syncSubjectPct(s);
-          debounceSave();
-        }
+      if (passed && prev.subject?.chapList?.[prev.chapterIndex]) {
+        subjectId = prev.subject.id;
+        chapterIdx = prev.chapterIndex;
       }
+      quizDone = passed;
       return { ...prev, quiz: { ...prev.quiz, submitted: true, score } };
     });
-  }, [syncSubjectPct, debounceSave]);
+    if (quizDone && subjectId) {
+      setSubjects(prev => prev.map(sub => {
+        if (sub.id !== subjectId) return sub;
+        const chapList = sub.chapList?.map((c, i) =>
+          i === chapterIdx ? { ...c, done: true } : c
+        );
+        return { ...sub, chapList };
+      }));
+      debounceSave();
+    }
+  }, [debounceSave]);
 
   const answerQuiz = useCallback((qi, oi) => {
     setAiGuide(prev => {
@@ -574,8 +617,14 @@ export default function App() {
   }, [navigate, debounceSave]);
   const confirmReset = useCallback((s) => { setResetTarget(resetTarget === s.id ? null : s.id); }, [resetTarget]);
   const doReset = useCallback((s) => {
-    s.chapList.forEach(ch => ch.done = false);
-    s.pct = 0;
+    setSubjects(prev => prev.map(sub => {
+      if (sub.id !== s.id) return sub;
+      return {
+        ...sub,
+        chapList: sub.chapList?.map(ch => ({ ...ch, done: false })),
+        pct: 0,
+      };
+    }));
     setResetTarget(null);
     debounceSave();
   }, [debounceSave]);
@@ -608,19 +657,25 @@ export default function App() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error');
+      if (isViewStale()) return;
       if (plan === 'free' && subjects.length >= 3) {
         setShowPlanGate('suggest');
       } else {
         const slots = plan === 'free' ? Math.max(0, 3 - subjects.length) : Infinity;
-        data.suggestions.slice(0, slots).forEach(s => setSubjects(prev => [...prev, s]));
+        const newSugs = data.suggestions.slice(0, slots);
+        if (newSugs.length) setSubjects(prev => {
+          const existing = new Set(prev.map(p => p.id));
+          return [...prev, ...newSugs.filter(s => !existing.has(s.id))];
+        });
         debounceSave();
       }
     } catch (e) {
       if (e.name === 'AbortError') return;
+      if (isViewStale()) return;
       setAiError(e.message);
     }
     finally { setAiLoading(false); }
-  }, [subjects, chapPct, debounceSave, plan]);
+  }, [subjects, chapPct, debounceSave, plan, isViewStale]);
 
   // ── Misc ──
   const todayStr = useMemo(() => {
@@ -741,9 +796,10 @@ export default function App() {
       case 'subjects':
         return <SubjectsView
           subjects={displaySubjects}
-          onNavigate={navigate}
+          onNavigate={(v) => { if (v.startsWith('subject-')) { const s = subjects.find(x => x.id === v.replace('subject-', '')); if (s?.locked) { setShowPlanGate('subjects'); return; } } navigate(v); }}
           chapPct={chapPct}
           overallPct={overallPct}
+          plan={plan}
         />;
       case 'settings':
         return <SettingsView
@@ -817,6 +873,8 @@ export default function App() {
             notesOpen={notesOpen}
             toggleNotes={toggleNotes}
             isNotesOpen={isNotesOpen}
+            onToggleChapter={onToggleChapter}
+            onUpdateNotes={onUpdateNotes}
             CHAP_MAP={CHAP_MAP}
             onGoChapter={(chapName, sId) => {
               const sectionId = CHAP_MAP[chapName];
@@ -854,6 +912,23 @@ export default function App() {
 
   if (isBootstrapping) {
     return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F172A', color: '#64748B', fontFamily: 'var(--mono)', fontSize: 14 }}>Loading...</div>;
+  }
+
+  if (reconnecting) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        height: '100vh', background: 'var(--bg)', color: 'var(--t2)', fontFamily: 'var(--mono)',
+        padding: 32, textAlign: 'center', gap: 20,
+      }}>
+        <i className="ph ph-wifi-slash" style={{ fontSize: 48, color: 'var(--amber2)' }}></i>
+        <h2 style={{ color: 'var(--t1)', margin: 0, fontSize: 20 }}>Connection lost</h2>
+        <p style={{ fontSize: 13, maxWidth: 400, lineHeight: 1.6, color: 'var(--t3)' }}>
+          Your data is safe in memory. We'll reconnect automatically once the network is back.
+        </p>
+        <div style={{ width: 24, height: 24, border: '2px solid var(--border)', borderTopColor: 'var(--purple2)', borderRadius: '50%', animation: 'spin .8s linear infinite' }}></div>
+      </div>
+    );
   }
 
   if (!user) {

@@ -14,9 +14,28 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Signature');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  if (req.method === 'POST' && req.path === '/api/analyze-cv') {
+    const cl = parseInt(req.headers['content-length'] || '0', 10);
+    if (cl > 5 * 1024 * 1024) {
+      res.status(413).json({ error: 'File too large. Maximum 4 MB.' });
+      return;
+    }
+  }
+
+  let destroyed = false;
   let data = '';
-  req.on('data', chunk => (data += chunk));
+  let size = 0;
+  req.on('data', chunk => {
+    size += chunk.length;
+    if (!destroyed && size > 6 * 1024 * 1024) {
+      destroyed = true;
+      if (!res.headersSent) res.status(413).json({ error: 'Payload too large' });
+      req.destroy();
+    }
+    if (!destroyed) data += chunk;
+  });
   req.on('end', () => {
+    if (destroyed) return;
     req.rawBody = data;
     if (data) {
       try { req.body = JSON.parse(data); } catch { req.body = {}; }
@@ -51,10 +70,17 @@ async function getUser(req) {
   return !error && user ? user : null;
 }
 
-function requireUser(req, res) {
+function requireUser(req, res, next) {
   if (!req.headers.authorization)
     return res.status(401).json({ error: 'Missing Authorization header' });
-  return null;
+  next();
+}
+
+function isTruncated(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  const last = trimmed[trimmed.length - 1];
+  return last !== '}' && last !== ']';
 }
 
 async function geminiFetch(prompt, config = {}, timeoutMs = 30000) {
@@ -75,9 +101,16 @@ async function geminiFetch(prompt, config = {}, timeoutMs = 30000) {
     });
     if (!res.ok) throw Object.assign(new Error('Gemini API error'), { code: 502, detail: await res.text() });
     const data = await res.json();
-    const parts = data.candidates?.[0]?.content?.parts || [];
+    const candidate = data.candidates?.[0];
+    if (candidate?.finishReason === 'MAX_TOKENS') {
+      throw Object.assign(new Error('Response truncated (max tokens exceeded). Try lowering the prompt complexity or splitting the request.'), { code: 502 });
+    }
+    const parts = candidate?.content?.parts || [];
     const text = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!text) throw Object.assign(new Error('Empty response from Gemini'), { code: 502 });
+    if (isTruncated(text)) {
+      throw Object.assign(new Error('Response truncated (incomplete JSON). Try again or split the request.'), { code: 502 });
+    }
     return text;
   } finally {
     clearTimeout(timer);
@@ -318,6 +351,9 @@ app.post('/api/analyze-cv', async (req, res) => {
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
   const { fileBase64, mimeType = 'application/pdf', currentSubjects = [] } = req.body || {};
   if (!fileBase64) return res.status(400).json({ error: 'fileBase64 required' });
+  if (fileBase64.length > 5.3e6) {
+    return res.status(413).json({ error: 'File too large. Maximum 4 MB.' });
+  }
 
   const alreadyHave = currentSubjects.map(s => s.name).join(', ');
 
@@ -394,9 +430,16 @@ Respond ONLY with valid JSON, no markdown, no extra text:
     }
 
     const data = await geminiRes.json();
-    const parts = data.candidates?.[0]?.content?.parts || [];
+    const candidate = data.candidates?.[0];
+    if (candidate?.finishReason === 'MAX_TOKENS') {
+      return res.status(502).json({ error: 'Response truncated (max tokens exceeded). Simplify the CV or remove content.' });
+    }
+    const parts = candidate?.content?.parts || [];
     const rawText = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
     if (!rawText) return res.status(502).json({ error: 'Empty response from Gemini' });
+    if (isTruncated(rawText)) {
+      return res.status(502).json({ error: 'Response truncated (incomplete JSON). Try again.' });
+    }
 
     const analysis = parseJSON(rawText);
     const used = new Set();
@@ -579,11 +622,13 @@ app.get('/api/analytics-hours', async (req, res) => {
   const user = await getUser(req);
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
+  const timezone = req.query.timezone || 'UTC';
+
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase
       .from('pomodoro_sessions')
-      .select('subject_id, duration_minutes')
+      .select('subject_id, duration_minutes, completed_at')
       .eq('user_id', user.id)
       .not('subject_id', 'is', null);
 
@@ -608,7 +653,7 @@ app.post('/api/pomodoro-log', async (req, res) => {
   const user = await getUser(req);
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
-  const { subjectId, chapterName, durationMinutes } = req.body || {};
+  const { subjectId, chapterName, durationMinutes, timezone } = req.body || {};
   if (!durationMinutes || typeof durationMinutes !== 'number')
     return res.status(400).json({ error: 'durationMinutes (number) is required' });
 
@@ -638,22 +683,34 @@ app.delete('/api/tasks', async (req, res) => {
 
   try {
     const supabase = getSupabase();
-    const { data: progress } = await supabase
-      .from('progress')
-      .select('tasks')
-      .eq('user_id', user.id)
-      .single();
+    const { error: rpcErr } = await supabase.rpc('delete_progress_task', {
+      p_user_id: user.id,
+      p_task_id: String(id),
+    });
 
-    let raw = progress?.tasks;
-    if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch { raw = []; } }
-    if (!Array.isArray(raw)) raw = [];
-    const updated = raw.filter(t => String(t?.id) !== String(id));
+    if (rpcErr) {
+      if ((rpcErr.message || '').includes('function') && (rpcErr.message || '').includes('exist')) {
+        const { data: progress } = await supabase
+          .from('progress')
+          .select('tasks')
+          .eq('user_id', user.id)
+          .single();
 
-    const { error } = await supabase
-      .from('progress')
-      .upsert({ user_id: user.id, tasks: updated, updated_at: new Date().toISOString() });
+        let raw = progress?.tasks;
+        if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch { raw = []; } }
+        if (!Array.isArray(raw)) raw = [];
+        const updated = raw.filter(t => String(t?.id) !== String(id));
 
-    if (error) return res.status(500).json({ error: error.message });
+        const { error: upsertError } = await supabase
+          .from('progress')
+          .upsert({ user_id: user.id, tasks: updated, updated_at: new Date().toISOString() });
+
+        if (upsertError) return res.status(500).json({ error: upsertError.message });
+      } else {
+        return res.status(500).json({ error: rpcErr.message });
+      }
+    }
+
     res.status(200).json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -730,56 +787,59 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
   }
 
   const payload = req.body || {};
-  try {
-    const event = payload.event || payload.status;
-    const userId = payload.metadata?.supabase_user_id;
-    const tier = payload.metadata?.tier;
 
-    if ((event === 'paid' || event === 'PAID' || event === 'SUCCESS') && userId && tier) {
-      const config = TIER_CONFIG[tier];
-      if (!config) return res.status(400).json({ error: `Unknown tier: ${tier}` });
+  res.status(200).json({ received: true });
 
-      const supabase = getSupabase();
-      const { error } = await supabase.from('subscriptions').upsert({
-        user_id: userId,
-        plan_type: config.plan_type,
-        subject_limit: config.subject_limit,
-        status: 'active',
-        payment_id: payload.id || payload.order_id,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
+  setImmediate(async () => {
+    try {
+      const paymentId = payload.id || payload.order_id;
 
-      if (error) devError('Supabase upsert error:', error);
+      const event = payload.event || payload.status;
+      const userId = payload.metadata?.supabase_user_id;
+      const tier = payload.metadata?.tier;
 
-    } else if (event === 'cancelled' || event === 'canceled') {
-      const orderId = payload.order_id;
-      if (!orderId) return res.status(400).json({ error: 'Missing order_id' });
+      if ((event === 'paid' || event === 'PAID' || event === 'SUCCESS') && userId && tier && paymentId) {
+        const config = TIER_CONFIG[tier];
+        if (!config) return;
 
-      const supabase = getSupabase();
-      const { data: existing, error: lookupError } = await supabase
-        .from('subscriptions')
-        .select('user_id')
-        .eq('payment_id', orderId)
-        .single();
+        const supabase = getSupabase();
 
-      if (!lookupError && existing) {
         const { error } = await supabase.from('subscriptions').upsert({
-          user_id: existing.user_id,
-          payment_id: orderId,
-          plan_type: 'free',
-          subject_limit: 3,
-          status: 'canceled',
+          user_id: userId,
+          plan_type: config.plan_type,
+          subject_limit: config.subject_limit,
+          status: 'active',
+          payment_id: paymentId,
           updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
-        if (error) devError('Supabase cancel error:', error);
-      }
-    }
+        }, { onConflict: 'payment_id', ignoreDuplicates: false });
 
-    res.status(200).json({ received: true });
-  } catch (err) {
-    devError('Webhook error:', err);
-    res.status(200).json({ received: true });
-  }
+        if (error?.code === '23505') return;
+        if (error) devError('Supabase upsert error:', error);
+
+      } else if ((event === 'cancelled' || event === 'canceled') && paymentId) {
+        const supabase = getSupabase();
+        const { data: existing, error: lookupError } = await supabase
+          .from('subscriptions')
+          .select('user_id')
+          .eq('payment_id', paymentId)
+          .single();
+
+        if (!lookupError && existing) {
+          const { error } = await supabase.from('subscriptions').upsert({
+            user_id: existing.user_id,
+            payment_id: paymentId,
+            plan_type: 'free',
+            subject_limit: 3,
+            status: 'canceled',
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'payment_id' });
+          if (error) devError('Supabase cancel error:', error);
+        }
+      }
+    } catch (err) {
+      devError('Webhook error:', err);
+    }
+  });
 });
 
 // Catch‑all removed – let Express default 404 handling

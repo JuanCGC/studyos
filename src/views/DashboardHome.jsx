@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useTimer } from '../hooks/TimerContext';
+import TimerCard from '../components/TimerCard';
 
-const CIRC = 2 * Math.PI * 60;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function getSubjectTag(pct) {
@@ -195,7 +195,8 @@ export default function DashboardHome({
           </div>
           <div className="subj-list stagger">
             {subjects.map(s => (
-              <div key={s.id} className="subj-item" style={{ cursor: 'pointer' }} onClick={() => onNavigate('subject-' + s.id)}>
+              <div key={s.id} className="subj-item" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => { if (s.locked) return; onNavigate('subject-' + s.id); }}>
+                {s.locked && <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,.7)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, zIndex: 2, borderRadius: 8 }}><i className="ph ph-lock" style={{ fontSize: 16, color: 'var(--amber2)' }}></i><span style={{ fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--t4)' }}>Upgrade</span></div>}
                 <div className="subj-top">
                   <div className="subj-name">
                     <i className={'ph ph-' + s.icon}></i>
@@ -255,56 +256,7 @@ export default function DashboardHome({
 
       {/* ── Bottom Grid ── */}
       <div className="bg3">
-        {/* Pomodoro Mini */}
-        <div className="card">
-          <div className="sh mb14">
-            <span className="st">Timer</span>
-            <span className={'chip ' + (pomodoro.phase === 'work' ? 'blue' : 'green')}>
-              {pomodoro.phase === 'work' ? 'Focus' : 'Break'}
-            </span>
-          </div>
-          <div className="pomo-wrap">
-            <div className="pomo-tabs">
-              <button className={'pomo-tab' + (pomodoro.phase === 'work' ? ' active' : '')} onClick={() => pomodoro.setPhase('work')}>25 min</button>
-              <button className={'pomo-tab' + (pomodoro.phase === 'short' ? ' active' : '')} onClick={() => pomodoro.setPhase('short')}>5 min</button>
-              <button className={'pomo-tab' + (pomodoro.phase === 'long' ? ' active' : '')} onClick={() => pomodoro.setPhase('long')}>15 min</button>
-            </div>
-            <div className="ring-wrap">
-              <svg className="rsvg" viewBox="0 0 140 140">
-                <circle className="rtrack" cx="70" cy="70" r="60" />
-                <circle className={'rfill ' + pomodoro.phase} cx="70" cy="70" r="60"
-                  strokeDasharray={CIRC} strokeDashoffset={pomodoro.dash} />
-              </svg>
-              <div className="rcenter">
-                <div className="rtime">{pomodoro.fmtTime}</div>
-                <div className="rphase">{pomodoro.phaseLabel}</div>
-              </div>
-            </div>
-            <div className="pomo-btns">
-              <button className="pbtn" onClick={pomodoro.resetTimer}>↺</button>
-              <button className={'pbtn' + (pomodoro.running ? ' stop' : ' go')} onClick={pomodoro.toggleTimer}>
-                {pomodoro.running ? '⏸ Pause' : '▶ Start'}
-              </button>
-            </div>
-            <div className="pomo-dots">
-              {[0, 1, 2, 3].map((x, i) => (
-                <div
-                  key={i}
-                  className={
-                    'pdot' +
-                    (i < pomodoro.donePomos ? ' done' : '') +
-                    (i === pomodoro.donePomos && pomodoro.running ? ' cur' : '')
-                  }
-                ></div>
-              ))}
-            </div>
-          </div>
-          <div className="div"></div>
-          <div className="flex aic jbs txt-sm">
-            <span className="c-t4">Completed sessions</span>
-            <span className="mono c-blue">{pomodoro.donePomos}/4</span>
-          </div>
-        </div>
+        <TimerCard />
 
         {/* Hours Chart */}
         <div className="card">

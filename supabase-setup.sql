@@ -131,3 +131,55 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function handle_new_user();
+
+-- 13. JSONB partial-merge function (race-condition-safe progress updates)
+--     Only overwrites the JSONB column(s) explicitly provided.
+--     Columns set to NULL are left unchanged in the row.
+create or replace function merge_progress(
+  p_user_id uuid,
+  p_subjects jsonb default null,
+  p_tasks    jsonb default null
+) returns void
+language plpgsql
+security definer
+as $$
+begin
+  insert into progress (user_id, subjects, tasks, updated_at)
+  values (
+    p_user_id,
+    coalesce(p_subjects, '[]'::jsonb),
+    coalesce(p_tasks, '[]'::jsonb),
+    now()
+  )
+  on conflict (user_id) do update set
+    subjects   = case when p_subjects is not null then p_subjects   else progress.subjects end,
+    tasks      = case when p_tasks    is not null then p_tasks      else progress.tasks    end,
+    updated_at = now();
+end;
+$$;
+
+-- 14. Atomic task deletion inside PostgreSQL (avoids read-modify-write race)
+create or replace function delete_progress_task(
+  p_user_id uuid,
+  p_task_id text
+) returns void
+language plpgsql
+security definer
+as $$
+begin
+  update progress set
+    tasks = (
+      select coalesce(jsonb_agg(elem), '[]'::jsonb)
+      from jsonb_array_elements(coalesce(progress.tasks, '[]'::jsonb)) as elem
+      where elem->>'id' != p_task_id
+    ),
+    updated_at = now()
+  where user_id = p_user_id;
+end;
+$$;
+
+-- Migration: ensure payment_id is unique to prevent duplicate webhook processing
+-- Run: alter table subscriptions add constraint subscriptions_payment_id_key unique (payment_id);
+-- Uncomment once, after cleaning any existing duplicates:
+-- delete from subscriptions a using subscriptions b where a.ctid < b.ctid and a.payment_id = b.payment_id and a.payment_id is not null;
+-- alter table subscriptions add constraint subscriptions_payment_id_key unique (payment_id);

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { SUBJECTS } from '../data/subjects';
 
@@ -32,6 +32,11 @@ export function useProgress(user) {
     }
   });
 
+  const subjectsRef = useRef(subjects);
+  subjectsRef.current = subjects;
+  const tasksRef = useRef(tasks);
+  tasksRef.current = tasks;
+
   const saveTimer = useRef(null);
 
   const chapPct = useCallback((s) => {
@@ -43,45 +48,74 @@ export function useProgress(user) {
     s.pct = chapPct(s);
   }, [chapPct]);
 
-  const overallPct = Math.round(subjects.reduce((a, s) => a + chapPct(s), 0) / subjects.length);
+  const overallPct = subjects.length ? Math.round(subjects.reduce((a, s) => a + chapPct(s), 0) / subjects.length) : 0;
 
   const saveProgress = useCallback(async () => {
+    const s = subjectsRef.current;
+    const t = tasksRef.current;
     try {
-      localStorage.setItem('studit_subjects', JSON.stringify(subjects));
-      localStorage.setItem('studit_tasks', JSON.stringify(tasks));
+      localStorage.setItem('studit_subjects', JSON.stringify(s));
+      localStorage.setItem('studit_tasks', JSON.stringify(t));
     } catch (e) { /* ignore */ }
     if (!supabase || !user) return;
     try {
-      await supabase.from('progress').upsert({
-        user_id: user.id,
-        subjects: JSON.stringify(subjects),
-        tasks: JSON.stringify(tasks),
-        updated_at: new Date().toISOString(),
+      const { error } = await supabase.rpc('merge_progress', {
+        p_user_id: user.id,
+        p_subjects: JSON.stringify(s),
+        p_tasks: JSON.stringify(t),
       });
+      if (error && (error.message || '').includes('function') && (error.message || '').includes('exist')) {
+        await supabase.from('progress').upsert({
+          user_id: user.id,
+          subjects: s,
+          tasks: t,
+          updated_at: new Date().toISOString(),
+        });
+      }
     } catch (e) { /* ignore */ }
-  }, [subjects, tasks, user]);
+  }, [user]);
 
   const debounceSave = useCallback(() => {
     clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => saveProgress(), 1500);
   }, [saveProgress]);
 
+  function parseJSONB(v) {
+    if (!v) return null;
+    if (typeof v === 'string') { try { return JSON.parse(v); } catch { return null; } }
+    return v;
+  }
+
   const loadProgress = useCallback(async () => {
     if (!supabase || !user) return;
     try {
       const { data } = await supabase.from('progress').select('*').eq('user_id', user.id).single();
-      if (data?.subjects) {
-        const parsed = JSON.parse(data.subjects);
-        setSubjects(parsed);
-        localStorage.setItem('studit_subjects', JSON.stringify(parsed));
+      const parsedSubjects = parseJSONB(data?.subjects);
+      if (parsedSubjects) {
+        setSubjects(parsedSubjects);
+        localStorage.setItem('studit_subjects', JSON.stringify(parsedSubjects));
       }
-      if (data?.tasks) {
-        const parsed = JSON.parse(data.tasks);
-        setTasks(parsed);
-        localStorage.setItem('studit_tasks', JSON.stringify(parsed));
+      const parsedTasks = parseJSONB(data?.tasks);
+      if (parsedTasks) {
+        setTasks(parsedTasks);
+        localStorage.setItem('studit_tasks', JSON.stringify(parsedTasks));
       }
     } catch (e) { /* ignore */ }
   }, [user]);
+
+  // Cross‑tab sync — storage event fires in other tabs when localStorage changes
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'studit_subjects' && e.newValue) {
+        try { setSubjects(JSON.parse(e.newValue)); } catch {}
+      }
+      if (e.key === 'studit_tasks' && e.newValue) {
+        try { setTasks(JSON.parse(e.newValue)); } catch {}
+      }
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
 
   return {
     subjects, setSubjects,

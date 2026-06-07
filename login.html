@@ -129,22 +129,32 @@ Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.r
 let _sb = null;
 let _sbReady = false;
 
+function authFetchWithTimeout(url, options, timeoutMs = 15000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+}
+
 async function initSupabase() {
   let cfg = {};
   try {
     cfg = await fetch('/api/config').then(r => r.json());
   } catch (e) {
-    console.warn('Config fetch failed, using fallback values', e);
+    console.warn('[login] Config fetch failed, using fallback values', e);
   }
   if (!cfg.supabaseUrl) cfg.supabaseUrl = 'https://jyasohtnqlracghsxdla.supabase.co';
   if (!cfg.supabaseAnonKey) cfg.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5YXNvaHRucWxyYWNnaHN4ZGxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODkxNjMsImV4cCI6MjA5NjM2NTE2M30.lE99l7i3Pxrl6F9EjJSBXvc0oxivRKTzulmvRmkejKY';
-  _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+  _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+    auth: { fetch: authFetchWithTimeout },
+  });
   _sbReady = true;
   const urlErr = new URLSearchParams(location.search).get('error');
   if (urlErr) showError('login-error', decodeURIComponent(urlErr));
-  const { data: { session } } = await _sb.auth.getSession();
-  if (session) {
-    window.location.href = '/app';
+  try {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) window.location.href = '/app';
+  } catch (e) {
+    console.warn('[login] getSession error:', e);
   }
 }
 initSupabase();
@@ -171,6 +181,7 @@ async function handleLogin() {
   if (!email || !password) return showError('login-error', 'Please fill in all fields');
   const btn = document.getElementById('login-btn');
   btn.disabled = true; btn.textContent = 'Signing in...';
+
   try {
     const { error } = await _sb.auth.signInWithPassword({ email, password });
     if (error) {
@@ -180,7 +191,10 @@ async function handleLogin() {
       window.location.href = '/app';
     }
   } catch (err) {
-    showError('login-error', err.message || 'Unexpected error during sign in');
+    const msg = err.name === 'AbortError'
+      ? 'Connection timed out. The Supabase project may be paused. Log in at supabase.com to unpause it.'
+      : (err.message || 'Unexpected error during sign in');
+    showError('login-error', msg);
     btn.disabled = false; btn.textContent = 'Sign In';
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 function extractUrlError() {
@@ -11,6 +11,14 @@ function extractUrlError() {
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reconnecting, setReconnecting] = useState(false);
+  const userRef = useRef(null);
+  const retryRef = useRef(null);
+
+  const clearReconnect = useCallback(() => {
+    setReconnecting(false);
+    if (retryRef.current) { clearInterval(retryRef.current); retryRef.current = null; }
+  }, []);
 
   useEffect(() => {
     if (!supabase) {
@@ -49,24 +57,52 @@ export function useAuth() {
     };
 
     trySetSession().then(session => {
-      setUser(session?.user ?? null);
+      const u = session?.user ?? null;
+      userRef.current = u;
+      setUser(u);
       setLoading(false);
       if (window.location.hash?.includes('access_token') || window.location.hash?.includes('code')) {
         window.location.hash = '';
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' && userRef.current && !session) {
+        // Network failure during token refresh — keep user in memory, enter reconnect mode
+        setReconnecting(true);
+        if (!retryRef.current) {
+          retryRef.current = setInterval(async () => {
+            try {
+              const { data: { session: s } } = await supabase.auth.getSession();
+              if (s?.user) {
+                userRef.current = s.user;
+                setUser(s.user);
+                clearReconnect();
+              }
+            } catch { /* keep retrying */ }
+          }, 5000);
+        }
+        return;
+      }
+      const u = session?.user ?? null;
+      userRef.current = u;
+      setUser(u);
+      if (u) clearReconnect();
     });
-    return () => subscription?.unsubscribe();
-  }, []);
+    return () => {
+      subscription?.unsubscribe();
+      if (retryRef.current) clearInterval(retryRef.current);
+    };
+  }, [clearReconnect]);
 
   const logout = async () => {
-    if (supabase) await supabase.auth.signOut({ scope: 'global' });
-    Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
+    clearReconnect();
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('sb-') || k.startsWith('studit_')) localStorage.removeItem(k);
+    });
+    if (supabase) supabase.auth.signOut({ scope: 'global' }).catch(() => {});
     window.location.href = '/login.html';
   };
 
-  return { user, loading, logout };
+  return { user, loading, reconnecting, logout };
 }

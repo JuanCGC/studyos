@@ -1,11 +1,8 @@
-import { useTimer } from '../hooks/TimerContext';
+import { useTimer, useTimerTick } from '../hooks/TimerContext';
 
 export default function PomodoroMini() {
-  const {
-    running, fmtTime, phase, phaseLabel,
-    timeLeft, toggleTimer, resetTimer, changePhase,
-    phaseDur, donePomos,
-  } = useTimer();
+  const { running, phase, toggleTimer, resetTimer, changePhase, phaseDur, donePomos } = useTimer();
+  const { timeLeft, fmtTime, phaseLabel } = useTimerTick();
 
   const isFocus = phase === 'work';
   const accent = isFocus ? 'var(--blue3)' : 'var(--green)';
