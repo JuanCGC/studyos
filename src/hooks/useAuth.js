@@ -25,10 +25,33 @@ export function useAuth() {
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const trySetSession = async () => {
+      const hash = window.location.hash || '';
+      const search = window.location.search || '';
+      const raw = hash || search;
+
+      if (raw.includes('access_token') || raw.includes('code')) {
+        const params = new URLSearchParams(raw.replace(/^[?#]/, ''));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        if (accessToken || raw.includes('code')) {
+          try {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken || '',
+              refresh_token: refreshToken || '',
+            });
+            if (!error && data?.session) return data.session;
+          } catch { /* fall through */ }
+        }
+      }
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    };
+
+    trySetSession().then(session => {
       setUser(session?.user ?? null);
       setLoading(false);
-      if (window.location.hash?.includes('access_token')) {
+      if (window.location.hash?.includes('access_token') || window.location.hash?.includes('code')) {
         window.location.hash = '';
       }
     });

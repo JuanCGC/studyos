@@ -20,10 +20,15 @@ import OnboardingWizard from './views/OnboardingWizard';
 
 export default function App() {
   const { user, loading: authLoading, logout } = useAuth();
-  const [onboardingDone, setOnboardingDone] = useState(() => {
-    return localStorage.getItem('studit_onboarding_done') === 'true';
-  });
+  const [onboardingDone, setOnboardingDone] = useState(false);
   const { plan, loading: planLoading } = usePlan(user);
+
+  useEffect(() => {
+    if (!user) return;
+    const flag = localStorage.getItem('studit_onboarding_done') === 'true';
+    const uid = localStorage.getItem('studit_onboarding_uid');
+    setOnboardingDone(flag && (!uid || uid === user.id));
+  }, [user]);
   const {
     subjects, setSubjects, tasks, setTasks,
     chapPct, syncSubjectPct, overallPct,
@@ -766,7 +771,11 @@ export default function App() {
     if (planLoading) {
       return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F172A', color: '#64748B', fontFamily: 'var(--mono)', fontSize: 14 }}>Loading...</div>;
     }
-    return <OnboardingWizard plan={plan} onComplete={() => setOnboardingDone(true)} />;
+    return <OnboardingWizard plan={plan} onComplete={() => {
+      localStorage.setItem('studit_onboarding_done', 'true');
+      if (user) localStorage.setItem('studit_onboarding_uid', user.id);
+      setOnboardingDone(true);
+    }} />;
   }
 
   return (

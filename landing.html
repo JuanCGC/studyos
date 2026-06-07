@@ -235,7 +235,7 @@
     var h = window.location.hash;
     if (h) {
       if (h.includes('access_token')) {
-        window.location.href = '/dashboard' + h;
+        window.location.href = '/app' + h;
       } else if (h.includes('error=')) {
         var p = new URLSearchParams(h.replace('#', ''));
         var d = p.get('error_description') || p.get('error') || 'Unknown error';
