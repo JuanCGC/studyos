@@ -38,20 +38,28 @@ export function useAuth() {
       const search = window.location.search || '';
       const raw = hash || search;
 
-      if (raw.includes('access_token') || raw.includes('code')) {
+      if (raw) {
         const params = new URLSearchParams(raw.replace(/^[?#]/, ''));
         const accessToken = params.get('access_token');
         const refreshToken = params.get('refresh_token');
-        if (accessToken || raw.includes('code')) {
+        const code = params.get('code');
+
+        if (accessToken && refreshToken) {
           try {
             const { data, error } = await supabase.auth.setSession({
-              access_token: accessToken || '',
-              refresh_token: refreshToken || '',
+              access_token: accessToken,
+              refresh_token: refreshToken,
             });
+            if (!error && data?.session) return data.session;
+          } catch { /* fall through */ }
+        } else if (code) {
+          try {
+            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
             if (!error && data?.session) return data.session;
           } catch { /* fall through */ }
         }
       }
+
       const { data: { session } } = await supabase.auth.getSession();
       return session;
     };

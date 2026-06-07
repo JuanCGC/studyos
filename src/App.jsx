@@ -682,6 +682,13 @@ export default function App() {
     return new Date().toLocaleDateString('en', { weekday: 'long', day: 'numeric', month: 'short' });
   }, []);
 
+  // ── Redirect unauthenticated users to login ──
+  useEffect(() => {
+    if (!authLoading && !user && !reconnecting) {
+      window.location.replace('/login.html');
+    }
+  }, [authLoading, user, reconnecting]);
+
   // ── Load Supabase progress on mount ──
   useEffect(() => {
     if (!authLoading && user) {
@@ -931,10 +938,7 @@ export default function App() {
     );
   }
 
-  if (!user) {
-    window.location.href = '/login.html';
-    return null;
-  }
+  if (!user) return null;
 
   if (!onboardingDone) {
     return <OnboardingWizard plan={plan} onComplete={() => {

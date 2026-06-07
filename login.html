@@ -123,9 +123,6 @@ document.addEventListener('securitypolicyviolation', e => {
   console.warn('[CSP] Blocked:', e.blockedURI, '| Directive:', e.violatedDirective);
 });
 
-// Purge stale auth fragments from aborted sessions
-Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
-
 let _sb = null;
 let _sbReady = false;
 
@@ -152,7 +149,7 @@ async function initSupabase() {
   if (urlErr) showError('login-error', decodeURIComponent(urlErr));
   try {
     const { data: { session } } = await _sb.auth.getSession();
-    if (session) window.location.href = '/app';
+    if (session) window.location.replace('/app');
   } catch (e) {
     console.warn('[login] getSession error:', e);
   }
@@ -183,12 +180,18 @@ async function handleLogin() {
   btn.disabled = true; btn.textContent = 'Signing in...';
 
   try {
-    const { error } = await _sb.auth.signInWithPassword({ email, password });
+    const { data, error } = await _sb.auth.signInWithPassword({ email, password });
     if (error) {
       showError('login-error', error.message);
       btn.disabled = false; btn.textContent = 'Sign In';
     } else {
-      window.location.href = '/app';
+      const session = data?.session || (await _sb.auth.getSession()).data?.session;
+      if (session) {
+        window.location.replace('/app');
+      } else {
+        showError('login-error', 'Sign-in succeeded but no session was created. Try again or confirm your email.');
+        btn.disabled = false; btn.textContent = 'Sign In';
+      }
     }
   } catch (err) {
     const msg = err.name === 'AbortError'
