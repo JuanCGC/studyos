@@ -181,25 +181,41 @@ async function handleLogin() {
 async function handleRegister() {
   hideError('register-error');
   if (!_sb || !_sbReady) return showError('register-error', 'Auth client not ready. Please wait or refresh.');
-  const name = document.getElementById('reg-name').value.trim();
+  const fullName = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-password').value;
-  if (!name || !email || !password) return showError('register-error', 'Please fill in all fields');
+  if (!fullName || !email || !password) return showError('register-error', 'Please fill in all fields');
   if (password.length < 6) return showError('register-error', 'Password must be at least 6 characters');
   const btn = document.getElementById('register-btn');
   btn.disabled = true; btn.textContent = 'Creating account...';
+
+  const payload = {
+    email,
+    password,
+    options: {
+      data: { full_name: fullName },
+    },
+  };
+
+  console.log('[signup] payload:', JSON.stringify(payload, null, 2));
+
   try {
-    const { error } = await _sb.auth.signUp({ email, password });
+    const { data, error } = await _sb.auth.signUp(payload);
+
     if (error) {
-      showError('register-error', error.message);
+      console.error('[signup] error:', { status: error.status, message: error.message, stack: error.stack });
+      showError('register-error', `${error.message}${error.status ? ' (HTTP ' + error.status + ')' : ''}`);
       btn.disabled = false; btn.textContent = 'Create Account';
-    } else {
-      const suc = document.getElementById('register-success');
-      suc.textContent = 'Account created! Check your email to confirm.';
-      suc.style.display = 'block';
-      btn.disabled = false; btn.textContent = 'Create Account';
+      return;
     }
+
+    console.log('[signup] success:', data);
+    const suc = document.getElementById('register-success');
+    suc.textContent = 'Account created! Check your email to confirm.';
+    suc.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Create Account';
   } catch (err) {
+    console.error('[signup] exception:', { message: err.message, stack: err.stack });
     showError('register-error', err.message || 'Unexpected error during registration');
     btn.disabled = false; btn.textContent = 'Create Account';
   }
