@@ -908,6 +908,20 @@ export default function App() {
           const sid = view.replace('subject-', '');
           const subject = subjects.find(s => s.id === sid);
           if (!subject) return <div className="view"><p className="c-t4">Subject not found.</p></div>;
+          // Access control: check if subject is locked for free plan users
+          if (subject.locked) {
+            openPlanGate();
+            return <div className="view" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16 }}>
+              <i className="ph ph-lock" style={{ fontSize: 48, color: 'var(--amber2)' }}></i>
+              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--t1)' }}>This Subject is Locked</div>
+              <div style={{ fontSize: 14, color: 'var(--t4)', textAlign: 'center', maxWidth: 400 }}>
+                Upgrade to Pro to unlock all subjects and premium features
+              </div>
+              <button className="btn-p" onClick={openPlanGate} style={{ marginTop: 12 }}>
+                Upgrade Now
+              </button>
+            </div>;
+          }
           return <SubjectDetail
             subject={subject}
             onNavigate={navigate}

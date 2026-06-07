@@ -27,15 +27,21 @@ export function Sidebar({ view, onNavigate, subjects, chapPct, todayStr, current
       {subjects.map(s => {
         const pct = chapPct(s);
         const hours = hoursPerSubject?.find(h => h.subject_id === s.id)?.total_hours;
+        const isLocked = s.locked;
         return (
           <div
             key={s.id}
-            className={'nav-item' + (view === 'subject-' + s.id ? ' active' : '')}
-            onClick={() => onNavigate('subject-' + s.id)}
+            className={'nav-item' + (isLocked ? ' locked' : '') + (view === 'subject-' + s.id ? ' active' : '')}
+            onClick={() => { if (!isLocked) onNavigate('subject-' + s.id); }}
+            style={{ cursor: isLocked ? 'not-allowed' : 'pointer', opacity: isLocked ? 0.5 : 1 }}
+            title={isLocked ? 'Upgrade to Pro to unlock' : ''}
           >
             <DynamicIcon subjectName={s.name} iconName={s.icon} />
             <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+              {isLocked && (
+                <i className="ph ph-lock" style={{ fontSize: 10, flexShrink: 0 }}></i>
+              )}
               {hours > 0 && (
                 <span style={{ fontSize: 9, fontFamily: 'var(--mono)', color: 'var(--t4)', opacity: 0.7 }}>{hours}h</span>
               )}
