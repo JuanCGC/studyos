@@ -120,26 +120,26 @@
 
 <script>
 let _sb = null;
+let _sbReady = false;
 
-  async function initSupabase() {
-    let cfg = {};
-    try {
-      cfg = await fetch('/api/config').then(r => r.json());
-    } catch (e) {
-      console.warn('Config fetch failed', e);
-    }
-    // Fallback to hard‑coded values when env vars are not available (e.g., Vercel static build)
-    if (!cfg.supabaseUrl) cfg.supabaseUrl = 'https://oksfpuzvghuizxubzrat.supabase.co';
-    if (!cfg.supabaseAnonKey) cfg.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rc2ZwdXp2Z2h1aXp4dWJ6cmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5Njg3MTIsImV4cCI6MjA5NTU0NDcxMn0.xlMdxOVaKe5K3_f6YHTHYcV8r2InzdQlnjg93hoW8W4';
-    _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
-    const urlErr = new URLSearchParams(location.search).get('error');
-    if (urlErr) showError('login-error', decodeURIComponent(urlErr));
-    const { data: { session } } = await _sb.auth.getSession();
-    if (session) {
-      await _sb.auth.signOut({ scope: 'global' });
-      Object.keys(localStorage).forEach(k => { if (k.startsWith('sb-')) localStorage.removeItem(k); });
-    }
+async function initSupabase() {
+  let cfg = {};
+  try {
+    cfg = await fetch('/api/config').then(r => r.json());
+  } catch (e) {
+    console.warn('Config fetch failed, using fallback values', e);
   }
+  if (!cfg.supabaseUrl) cfg.supabaseUrl = 'https://oksfpuzvghuizxubzrat.supabase.co';
+  if (!cfg.supabaseAnonKey) cfg.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rc2ZwdXp2Z2h1aXp4dWJ6cmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5Njg3MTIsImV4cCI6MjA5NTU0NDcxMn0.xlMdxOVaKe5K3_f6YHTHYcV8r2InzdQlnjg93hoW8W4';
+  _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+  _sbReady = true;
+  const urlErr = new URLSearchParams(location.search).get('error');
+  if (urlErr) showError('login-error', decodeURIComponent(urlErr));
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session) {
+    window.location.href = '/dashboard';
+  }
+}
 initSupabase();
 
 function showError(id, msg) {
@@ -158,22 +158,29 @@ function showLogin() {
 
 async function handleLogin() {
   hideError('login-error');
+  if (!_sb || !_sbReady) return showError('login-error', 'Auth client not ready. Please wait or refresh.');
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   if (!email || !password) return showError('login-error', 'Please fill in all fields');
   const btn = document.getElementById('login-btn');
   btn.disabled = true; btn.textContent = 'Signing in...';
-  const { error } = await _sb.auth.signInWithPassword({ email, password });
-  if (error) {
-    showError('login-error', error.message);
+  try {
+    const { error } = await _sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      showError('login-error', error.message);
+      btn.disabled = false; btn.textContent = 'Sign In';
+    } else {
+      window.location.href = '/dashboard';
+    }
+  } catch (err) {
+    showError('login-error', err.message || 'Unexpected error during sign in');
     btn.disabled = false; btn.textContent = 'Sign In';
-  } else {
-    window.location.href = '/dashboard';
   }
 }
 
 async function handleRegister() {
   hideError('register-error');
+  if (!_sb || !_sbReady) return showError('register-error', 'Auth client not ready. Please wait or refresh.');
   const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-password').value;
@@ -181,17 +188,19 @@ async function handleRegister() {
   if (password.length < 6) return showError('register-error', 'Password must be at least 6 characters');
   const btn = document.getElementById('register-btn');
   btn.disabled = true; btn.textContent = 'Creating account...';
-const { error } = await _sb.auth.signUp({
-      email,
-      password
-    });
-  if (error) {
-    showError('register-error', error.message);
-    btn.disabled = false; btn.textContent = 'Create Account';
-  } else {
-    const suc = document.getElementById('register-success');
-    suc.textContent = 'Account created! Check your email to confirm.';
-    suc.style.display = 'block';
+  try {
+    const { error } = await _sb.auth.signUp({ email, password });
+    if (error) {
+      showError('register-error', error.message);
+      btn.disabled = false; btn.textContent = 'Create Account';
+    } else {
+      const suc = document.getElementById('register-success');
+      suc.textContent = 'Account created! Check your email to confirm.';
+      suc.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Create Account';
+    }
+  } catch (err) {
+    showError('register-error', err.message || 'Unexpected error during registration');
     btn.disabled = false; btn.textContent = 'Create Account';
   }
 }
