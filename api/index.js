@@ -715,4 +715,9 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
 
 // Catch‑all removed – let Express default 404 handling
 
+const PORT = process.env.PORT || 4000;
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => console.log(`[api] running on http://localhost:${PORT}`));
+}
+
 export default app;
