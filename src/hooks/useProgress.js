@@ -60,12 +60,17 @@ export function useProgress(user) {
     } catch (e) { /* ignore */ }
     if (!supabase || !user) return;
     try {
-      const { error } = await supabase.rpc('merge_progress', {
-        p_user_id: user.id,
-        p_subjects: s,
-        p_tasks: t,
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      const res = await fetch('/api/save-progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ subjects: s, tasks: t }),
       });
-      if (error) {
+      if (!res.ok) {
         await supabase.from('progress').upsert({
           user_id: user.id,
           subjects: s,
@@ -90,12 +95,17 @@ export function useProgress(user) {
   const syncToRemote = useCallback(async (s, t) => {
     if (!supabase || !user) return;
     try {
-      const { error } = await supabase.rpc('merge_progress', {
-        p_user_id: user.id,
-        p_subjects: s,
-        p_tasks: t,
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      const res = await fetch('/api/save-progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ subjects: s, tasks: t }),
       });
-      if (error) {
+      if (!res.ok) {
         await supabase.from('progress').upsert({
           user_id: user.id,
           subjects: s,

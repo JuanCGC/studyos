@@ -796,6 +796,26 @@ app.get('/api/analytics/flashcards-summary', async (req, res) => {
   }
 });
 
+// ── POST /api/save-progress ──────────────────────────────────
+app.post('/api/save-progress', async (req, res) => {
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  const { subjects, tasks } = req.body || {};
+  try {
+    const supabase = getSupabaseAdmin();
+    const { error } = await supabase.from('progress').upsert({
+      user_id: user.id,
+      subjects: subjects || [],
+      tasks: tasks || [],
+      updated_at: new Date().toISOString(),
+    });
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ saved: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── POST /api/webhooks/dlocal ────────────────────────────────
 const TIER_CONFIG = {
   pro:  { plan_type: 'pro',  subject_limit: 20 },
