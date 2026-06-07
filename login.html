@@ -136,8 +136,8 @@ async function initSupabase() {
   } catch (e) {
     console.warn('Config fetch failed, using fallback values', e);
   }
-  if (!cfg.supabaseUrl) cfg.supabaseUrl = 'https://oksfpuzvghuizxubzrat.supabase.co';
-  if (!cfg.supabaseAnonKey) cfg.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rc2ZwdXp2Z2h1aXp4dWJ6cmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5Njg3MTIsImV4cCI6MjA5NTU0NDcxMn0.xlMdxOVaKe5K3_f6YHTHYcV8r2InzdQlnjg93hoW8W4';
+  if (!cfg.supabaseUrl) cfg.supabaseUrl = 'https://jyasohtnqlracghsxdla.supabase.co';
+  if (!cfg.supabaseAnonKey) cfg.supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5YXNvaHRucWxyYWNnaHN4ZGxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3ODkxNjMsImV4cCI6MjA5NjM2NTE2M30.lE99l7i3Pxrl6F9EjJSBXvc0oxivRKTzulmvRmkejKY';
   _sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
   _sbReady = true;
   const urlErr = new URLSearchParams(location.search).get('error');
