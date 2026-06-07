@@ -116,7 +116,7 @@ app.post('/api/checkout', async (req, res) => {
       },
       payment_method_id: 'CARD',
       notification_url: `${origin}/api/webhooks/dlocal`,
-      callback_url: `${origin}/dashboard?checkout=success`,
+      callback_url: `${origin}/app?checkout=success`,
       metadata: {
         supabase_user_id: user.id,
         tier,

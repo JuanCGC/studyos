@@ -144,7 +144,7 @@ async function initSupabase() {
   if (urlErr) showError('login-error', decodeURIComponent(urlErr));
   const { data: { session } } = await _sb.auth.getSession();
   if (session) {
-    window.location.href = '/dashboard';
+    window.location.href = '/app';
   }
 }
 initSupabase();
@@ -177,7 +177,7 @@ async function handleLogin() {
       showError('login-error', error.message);
       btn.disabled = false; btn.textContent = 'Sign In';
     } else {
-      window.location.href = '/dashboard';
+      window.location.href = '/app';
     }
   } catch (err) {
     showError('login-error', err.message || 'Unexpected error during sign in');
