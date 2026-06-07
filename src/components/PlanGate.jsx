@@ -26,7 +26,7 @@ export default function PlanGate({ onClose }) {
           </div>
         </div>
         <div className="plan-gate-price">
-          $9 <span>/mo</span>
+          $19 <span>/mo</span>
         </div>
         <div className="plan-gate-period">Cancel anytime</div>
         <div className="plan-gate-btn-row">
