@@ -1,3 +1,5 @@
+import MarkdownRenderer from '../components/MarkdownRenderer';
+
 export default function InterviewView({
   interviewTopic, setInterviewTopic, interviewMessages, interviewUserInput,
   setInterviewUserInput, interviewLoading, onStartInterview, onSendMessage,
@@ -43,7 +45,7 @@ export default function InterviewView({
                 {msg.role === 'assistant' && (
                   <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                     <div style={{ width: 30, height: 30, borderRadius: 8, background: 'linear-gradient(135deg,rgba(59,130,246,.18),rgba(99,102,241,.18))', border: '1px solid rgba(99,102,241,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, marginTop: 2 }}>🤖</div>
-                    <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: '4px 14px 14px 14px', padding: '14px 18px', fontSize: 14, color: 'var(--t1)', lineHeight: 1.75, maxWidth: '88%' }}>{msg.content}</div>
+                    <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', borderRadius: '4px 14px 14px 14px', padding: '14px 18px', fontSize: 14, color: 'var(--t1)', lineHeight: 1.75, maxWidth: '88%' }}><MarkdownRenderer>{msg.content}</MarkdownRenderer></div>
                   </div>
                 )}
                 {msg.role === 'user' && (

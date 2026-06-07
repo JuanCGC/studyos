@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Toggle from '../components/Toggle';
 import HttpCheatSheetSidebar from '../components/HttpCheatSheetSidebar';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, onAnswerQuiz, onNavigate, onChangeLanguage, showDeepDiveComments, onToggleDeepDive }) {
   const [isCheatSheetOpen, setCheatSheetOpen] = useState(false);
@@ -136,10 +137,10 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
               </button>
             </div>
             {aiGuide.content?.summary && (
-              <p className="text-slate-300 text-base leading-relaxed mb-4">{aiGuide.content?.summary}</p>
+              <MarkdownRenderer>{aiGuide.content?.summary}</MarkdownRenderer>
             )}
             <hr className="border-slate-800 my-3" />
-            <div style={{ fontSize: 14, color: 'var(--t2)', lineHeight: 1.7 }}>{aiGuide.keyConcept}</div>
+            <div style={{ fontSize: 14, color: 'var(--t2)', lineHeight: 1.7 }}><MarkdownRenderer>{aiGuide.keyConcept}</MarkdownRenderer></div>
           </div>
         )}
 
@@ -151,7 +152,7 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
                 <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Lab Express</span>
               </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--orange2)', marginBottom: 10 }}>{aiGuide.labExpress?.title}</div>
-              <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{aiGuide.labExpress?.body}</div>
+              <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}><MarkdownRenderer>{aiGuide.labExpress?.body}</MarkdownRenderer></div>
             </div>
             <div style={{ background: 'rgba(16,185,129,.06)', border: '1px solid rgba(16,185,129,.2)', borderRadius: 12, padding: '20px 22px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
@@ -159,7 +160,7 @@ export default function AIGuideView({ aiGuide, onRegenerateGuide, onSubmitQuiz, 
                 <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)', textTransform: 'uppercase', letterSpacing: '.06em', fontFamily: 'var(--mono)' }}>Project Evolution</span>
               </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--green2)', marginBottom: 10 }}>{aiGuide.projectEvolution?.title}</div>
-              <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{aiGuide.projectEvolution?.body}</div>
+              <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}><MarkdownRenderer>{aiGuide.projectEvolution?.body}</MarkdownRenderer></div>
             </div>
           </div>
         )}

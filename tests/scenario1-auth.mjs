@@ -8,7 +8,7 @@
  * CURRENT BUG: Endpoints lack auth checks → respond 200 and consume Gemini quota.
  */
 
-import { API_BASE } from './helpers/auth.mjs';
+const API_BASE = 'http://localhost:4000';
 
 const ENDPOINTS = [
   { path: '/api/analyze-cv', method: 'POST', body: { fileBase64: 'fake', currentSubjects: [] } },

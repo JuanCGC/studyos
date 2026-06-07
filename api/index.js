@@ -28,6 +28,13 @@ app.use((req, res, next) => {
 });
 
 // ── Shared helpers ──────────────────────────────────────────
+function devLog(...args) {
+  if (process.env.NODE_ENV === 'development') console.log(...args);
+}
+function devError(...args) {
+  if (process.env.NODE_ENV === 'development') console.error(...args);
+}
+
 function getSupabase() {
   return createClient(
     process.env.VITE_SUPABASE_URL,
@@ -50,24 +57,31 @@ function requireUser(req, res) {
   return null;
 }
 
-async function geminiFetch(prompt, config = {}) {
+async function geminiFetch(prompt, config = {}, timeoutMs = 30000) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw Object.assign(new Error('GEMINI_API_KEY not set'), { code: 500 });
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.3, maxOutputTokens: 8192, responseMimeType: 'application/json', ...config },
-    }),
-  });
-  if (!res.ok) throw Object.assign(new Error('Gemini API error'), { code: 502, detail: await res.text() });
-  const data = await res.json();
-  const parts = data.candidates?.[0]?.content?.parts || [];
-  const text = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
-  if (!text) throw Object.assign(new Error('Empty response from Gemini'), { code: 502 });
-  return text;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.3, maxOutputTokens: 8192, responseMimeType: 'application/json', ...config },
+      }),
+    });
+    if (!res.ok) throw Object.assign(new Error('Gemini API error'), { code: 502, detail: await res.text() });
+    const data = await res.json();
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const text = parts.filter(p => !p.thought).map(p => p.text).join('') || '';
+    if (!text) throw Object.assign(new Error('Empty response from Gemini'), { code: 502 });
+    return text;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // ── GET /api/config ──────────────────────────────────────────
@@ -147,19 +161,21 @@ app.post('/api/checkout', async (req, res) => {
 
     const data = await dlocalRes.json();
     if (!dlocalRes.ok) {
-      console.error('dLocal error:', data);
+      devError('dLocal error:', data);
       return res.status(dlocalRes.status).json({ error: data.message || 'dLocal payment creation failed' });
     }
 
     res.status(200).json({ url: data.redirect_url });
   } catch (err) {
-    console.error('Checkout error:', err);
+    devError('Checkout error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // ── POST /api/generate-guide ─────────────────────────────────
 app.post('/api/generate-guide', async (req, res) => {
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
   const { subjectName, chapterName, subjectReason = '', language, embeddedGuide, showDeepDiveComments } = req.body || {};
   if (!subjectName || !chapterName) return res.status(400).json({ error: 'subjectName and chapterName required' });
   if (!language) return res.status(400).json({ error: 'language is required' });
@@ -253,6 +269,8 @@ Do not comment on self-explanatory or basic code lines. Only inject inline comme
 
 // ── POST /api/quiz ───────────────────────────────────────────
 app.post('/api/quiz', async (req, res) => {
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
   const { subjectName = '', chapterName = '', chapterIndex = 0, totalChapters = 0 } = req.body || {};
 
   const position = totalChapters > 0 ? `chapter ${chapterIndex + 1} of ${totalChapters}` : `chapter ${chapterIndex + 1}`;
@@ -296,6 +314,8 @@ REMINDER: Questions and options above are just format examples. You must generat
 
 // ── POST /api/analyze-cv ─────────────────────────────────────
 app.post('/api/analyze-cv', async (req, res) => {
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
   const { fileBase64, mimeType = 'application/pdf', currentSubjects = [] } = req.body || {};
   if (!fileBase64) return res.status(400).json({ error: 'fileBase64 required' });
 
@@ -348,17 +368,25 @@ Respond ONLY with valid JSON, no markdown, no extra text:
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not set' });
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ inlineData: { mimeType, data: fileBase64 } }, { text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 8192, responseMimeType: 'application/json' },
-        }),
-      }
-    );
+    const cvController = new AbortController();
+    const cvTimer = setTimeout(() => cvController.abort(), 60000);
+    let geminiRes;
+    try {
+      geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: cvController.signal,
+          body: JSON.stringify({
+            contents: [{ parts: [{ inlineData: { mimeType, data: fileBase64 } }, { text: prompt }] }],
+            generationConfig: { temperature: 0.4, maxOutputTokens: 8192, responseMimeType: 'application/json' },
+          }),
+        }
+      );
+    } finally {
+      clearTimeout(cvTimer);
+    }
 
     if (!geminiRes.ok) {
       const err = await geminiRes.text();
@@ -399,6 +427,8 @@ Respond ONLY with valid JSON, no markdown, no extra text:
 
 // ── POST /api/suggest ────────────────────────────────────────
 app.post('/api/suggest', async (req, res) => {
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
   const { subjects = [] } = req.body || {};
 
   const alreadyHave = subjects.map(s => s.name).join(', ');
@@ -479,6 +509,8 @@ Available colors: blue, green, orange, purple. Vary them across the 3 suggestion
 
 // ── POST /api/interview ──────────────────────────────────────
 app.post('/api/interview', async (req, res) => {
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
   const { messages = [], cvSummary = '', topic = '', userName = '' } = req.body || {};
 
   try {
@@ -511,14 +543,22 @@ Start the session by greeting the candidate by name and asking a direct technica
       }
     }
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents, generationConfig: { temperature: 0.7, maxOutputTokens: 1024 } }),
-      }
-    );
+    const intController = new AbortController();
+    const intTimer = setTimeout(() => intController.abort(), 30000);
+    let geminiRes;
+    try {
+      geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: intController.signal,
+          body: JSON.stringify({ contents, generationConfig: { temperature: 0.7, maxOutputTokens: 1024 } }),
+        }
+      );
+    } finally {
+      clearTimeout(intTimer);
+    }
 
     if (!geminiRes.ok) {
       const err = await geminiRes.text();
@@ -620,6 +660,31 @@ app.delete('/api/tasks', async (req, res) => {
   }
 });
 
+// ── DELETE /api/subjects ──────────────────────────────────────
+app.delete('/api/subjects', async (req, res) => {
+  const user = await getUser(req);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
+  const { id } = req.query;
+  if (!id) return res.status(400).json({ error: 'Missing subject id' });
+
+  try {
+    const supabase = getSupabase();
+
+    await supabase.from('pomodoro_sessions').delete()
+      .eq('user_id', user.id)
+      .eq('subject_id', id);
+
+    await supabase.from('interview_flashcards').delete()
+      .eq('user_id', user.id)
+      .eq('subject_id', id);
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── GET /api/analytics/flashcards-summary ────────────────────
 app.get('/api/analytics/flashcards-summary', async (req, res) => {
   const user = await getUser(req);
@@ -651,15 +716,17 @@ const TIER_CONFIG = {
 };
 
 app.post('/api/webhooks/dlocal', async (req, res) => {
-  const secret = process.env.DLOCAL_TRANS_KEY;
+  const secret = process.env.DLOCAL_SECRET_KEY;
   const signature = req.headers['x-signature'];
 
   const bodyStr = req.rawBody || '';
-  if (secret && signature) {
-    const expected = crypto.createHmac('sha256', secret).update(bodyStr).digest('hex');
-    if (expected !== signature) {
-      return res.status(401).json({ error: 'Invalid signature' });
-    }
+  if (!secret || !signature) {
+    return res.status(401).json({ error: 'Missing signature or secret' });
+  }
+  const expected = crypto.createHmac('sha256', secret).update(bodyStr).digest('hex');
+  if (expected.length !== signature.length ||
+      !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))) {
+    return res.status(401).json({ error: 'Invalid signature' });
   }
 
   const payload = req.body || {};
@@ -682,7 +749,7 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' });
 
-      if (error) console.error('Supabase upsert error:', error);
+      if (error) devError('Supabase upsert error:', error);
 
     } else if (event === 'cancelled' || event === 'canceled') {
       const orderId = payload.order_id;
@@ -704,13 +771,13 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
           status: 'canceled',
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id' });
-        if (error) console.error('Supabase cancel error:', error);
+        if (error) devError('Supabase cancel error:', error);
       }
     }
 
     res.status(200).json({ received: true });
   } catch (err) {
-    console.error('Webhook error:', err);
+    devError('Webhook error:', err);
     res.status(200).json({ received: true });
   }
 });
@@ -719,7 +786,7 @@ app.post('/api/webhooks/dlocal', async (req, res) => {
 
 const PORT = process.env.PORT || 4000;
 if (process.env.VERCEL !== '1') {
-  app.listen(PORT, () => console.log(`[api] running on http://localhost:${PORT}`));
+  app.listen(PORT, () => devLog(`[api] running on http://localhost:${PORT}`));
 }
 
 export default app;

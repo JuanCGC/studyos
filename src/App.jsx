@@ -17,23 +17,42 @@ import InterviewView from './views/InterviewView';
 
 import AIGuideView from './views/AIGuideView';
 import OnboardingWizard from './views/OnboardingWizard';
+import PlanGate from './components/PlanGate';
 
 export default function App() {
   const { user, loading: authLoading, logout } = useAuth();
   const [onboardingDone, setOnboardingDone] = useState(false);
+  const [onboardingChecking, setOnboardingChecking] = useState(true);
   const { plan, loading: planLoading } = usePlan(user);
+  const [showPlanGate, setShowPlanGate] = useState(null);
+  const isBootstrapping = authLoading || (user && (planLoading || onboardingChecking));
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) { setOnboardingChecking(false); return; }
     const flag = localStorage.getItem('studit_onboarding_done') === 'true';
     const uid = localStorage.getItem('studit_onboarding_uid');
-    setOnboardingDone(flag && (!uid || uid === user.id));
+    if (flag && uid === user.id) {
+      setOnboardingDone(true);
+      setOnboardingChecking(false);
+      return;
+    }
+    supabase?.from('profiles').select('preferences').eq('id', user.id).single()
+      .then(({ data }) => {
+        if (data?.preferences?.onboarding_completed) {
+          localStorage.setItem('studit_onboarding_done', 'true');
+          localStorage.setItem('studit_onboarding_uid', user.id);
+          setOnboardingDone(true);
+        }
+        setOnboardingChecking(false);
+      })
+      .catch(() => setOnboardingChecking(false));
   }, [user]);
   const {
     subjects, setSubjects, tasks, setTasks,
     chapPct, syncSubjectPct, overallPct,
     saveProgress, debounceSave, loadProgress,
   } = useProgress(user);
+  const displaySubjects = plan === 'free' ? (subjects || []).slice(0, 3) : subjects;
 
   // ── Routing ──
   const [view, setView] = useState(() => {
@@ -41,10 +60,34 @@ export default function App() {
     return v ? v : 'dashboard';
   });
   const navigate = useCallback((v) => {
+    window.history.pushState({ view }, '', '/' + v);
     setView(v);
     localStorage.setItem('studit_view', v);
     if (v !== 'ai-guide') localStorage.removeItem('studit_ai_guide');
+  }, [view]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      const prev = e.state?.view;
+      if (prev) {
+        setView(prev);
+        localStorage.setItem('studit_view', prev);
+      }
+    };
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
   }, []);
+
+  const fetchControllerRef = useRef(null);
+  const getFetchSignal = useCallback(() => {
+    if (fetchControllerRef.current) fetchControllerRef.current.abort();
+    fetchControllerRef.current = new AbortController();
+    return fetchControllerRef.current.signal;
+  }, []);
+
+  useEffect(() => {
+    return () => { if (fetchControllerRef.current) fetchControllerRef.current.abort(); };
+  }, [view]);
 
   // ── Profile ──
   const [profileName, setProfileName] = useState(() => localStorage.getItem('studit_profileName') || '');
@@ -297,18 +340,30 @@ export default function App() {
       let binary = '';
       bytes.forEach(b => binary += String.fromCharCode(b));
       const fileBase64 = btoa(binary);
+      const signal = getFetchSignal();
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch('/api/analyze-cv', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+        signal,
         body: JSON.stringify({ fileBase64, mimeType: 'application/pdf', currentSubjects: subjects.map(s => ({ name: s.name })) }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error');
       setCvAnalysis(data.analysis);
-      (data.analysis.recommended_subjects || []).forEach(s => setSubjects(prev => [...prev, s]));
-      debounceSave();
-    } catch (e) { setCvError(e.message); }
+      if (plan === 'free' && subjects.length >= 3) {
+        setShowPlanGate('cv');
+      } else {
+        const slots = plan === 'free' ? Math.max(0, 3 - subjects.length) : Infinity;
+        (data.analysis.recommended_subjects || []).slice(0, slots).forEach(s => setSubjects(prev => [...prev, s]));
+        debounceSave();
+      }
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+      setCvError(e.message);
+    }
     finally { setCvAnalyzing(false); }
-  }, [cvFile, subjects, debounceSave]);
+  }, [cvFile, subjects, debounceSave, plan]);
 
   const clearCv = useCallback(() => {
     setCvFile(null);
@@ -353,9 +408,13 @@ export default function App() {
     setInterviewUserInput('');
     setInterviewLoading(true);
     try {
+      const signal = getFetchSignal();
       const cvSummary = cvAnalysis ? `${cvAnalysis.experience_summary} Skills: ${(cvAnalysis.skills || []).join(', ')}` : '';
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch('/api/interview', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+        signal,
         body: JSON.stringify({
           messages: (text ? [...interviewMessages, { role: 'user', content: text }] : interviewMessages).slice(-10),
           cvSummary, topic: interviewTopic, userName: profileName || userName,
@@ -365,6 +424,7 @@ export default function App() {
       if (!res.ok) throw new Error(data.error);
       setInterviewMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (e) {
+      if (e.name === 'AbortError') return;
       setInterviewMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Error: ' + e.message }]);
     }
     setInterviewLoading(false);
@@ -452,37 +512,46 @@ export default function App() {
     setAiGuide(prev => ({ ...prev, content: null, loading: true, error: '',
       quiz: { questions: [], answers: [null, null, null], loading: true, submitted: false, score: 0, error: false },
     }));
-    const session = ++guideSessionRef.current;
+    const sessionId = ++guideSessionRef.current;
     const lang = aiGuide.language;
-    const promises = [
-      fetch('/api/generate-guide', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subjectName: subject.name, chapterName: chapter.name, language: lang,
-          embeddedGuide: labExpress ? { keyConcept, labExpress, projectEvolution } : null,
-          showDeepDiveComments,
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const authHeader = session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+      const signal = getFetchSignal();
+      const promises = [
+        fetch('/api/generate-guide', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeader },
+          signal,
+          body: JSON.stringify({
+            subjectName: subject.name, chapterName: chapter.name, language: lang,
+            embeddedGuide: labExpress ? { keyConcept, labExpress, projectEvolution } : null,
+            showDeepDiveComments,
+          }),
         }),
-      }),
-      fetch('/api/quiz', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0,
+        fetch('/api/quiz', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeader },
+          signal,
+          body: JSON.stringify({
+            subjectName: subject.name, chapterName: chapter.name, chapterIndex, totalChapters: subject.chapList?.length || 0,
+          }),
         }),
-      }),
-    ];
-    Promise.all(promises)
-      .then(async ([guideRes, quizRes]) => {
-        if (guideSessionRef.current !== session) return;
-        if (!guideRes.ok || !quizRes.ok) throw new Error('Regeneration failed');
-        const [guideData, quizData] = await Promise.all([guideRes.json(), quizRes.json()]);
-        if (guideSessionRef.current !== session) return;
-        setAiGuide(prev => ({ ...prev, content: guideData.guide, loading: false,
-          quiz: { questions: quizData.questions, answers: [null, null, null], loading: false, submitted: false, score: 0, error: false },
-        }));
-        try { localStorage.setItem(cacheKey, JSON.stringify(guideData.guide)); } catch (e) { /* ignore */ }
-        try { localStorage.setItem(quizKey, JSON.stringify(quizData.questions)); } catch (e) { /* ignore */ }
-      })
-      .catch(e => { if (guideSessionRef.current === session) setAiGuide(prev => ({ ...prev, error: e.message, loading: false })); });
+      ];
+      Promise.all(promises)
+        .then(async ([guideRes, quizRes]) => {
+          if (guideSessionRef.current !== sessionId) return;
+          if (!guideRes.ok || !quizRes.ok) throw new Error('Regeneration failed');
+          const [guideData, quizData] = await Promise.all([guideRes.json(), quizRes.json()]);
+          if (guideSessionRef.current !== sessionId) return;
+          setAiGuide(prev => ({ ...prev, content: guideData.guide, loading: false,
+            quiz: { questions: quizData.questions, answers: [null, null, null], loading: false, submitted: false, score: 0, error: false },
+          }));
+          try { localStorage.setItem(cacheKey, JSON.stringify(guideData.guide)); } catch (e) { /* ignore */ }
+          try { localStorage.setItem(quizKey, JSON.stringify(quizData.questions)); } catch (e) { /* ignore */ }
+        })
+        .catch(e => {
+          if (e.name === 'AbortError') return;
+          if (guideSessionRef.current === sessionId) setAiGuide(prev => ({ ...prev, error: e.message, loading: false }));
+        });
+    });
   }, [aiGuide, showDeepDiveComments]);
 
   // ── Subject helpers ──
@@ -494,6 +563,14 @@ export default function App() {
     setDeleteTarget(null);
     navigate('subjects');
     debounceSave();
+    supabase?.auth.getSession().then(({ data: { session } }) => {
+      if (session?.access_token) {
+        fetch(`/api/subjects?id=${s.id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        }).catch(() => {});
+      }
+    });
   }, [navigate, debounceSave]);
   const confirmReset = useCallback((s) => { setResetTarget(resetTarget === s.id ? null : s.id); }, [resetTarget]);
   const doReset = useCallback((s) => {
@@ -520,18 +597,30 @@ export default function App() {
     setAiLoading(true);
     setAiError('');
     try {
+      const signal = getFetchSignal();
       const payload = subjects.map(s => ({ name: s.name, pct: chapPct(s) }));
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch('/api/suggest', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
+        signal,
         body: JSON.stringify({ subjects: payload }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error');
-      data.suggestions.forEach(s => setSubjects(prev => [...prev, s]));
-      debounceSave();
-    } catch (e) { setAiError(e.message); }
+      if (plan === 'free' && subjects.length >= 3) {
+        setShowPlanGate('suggest');
+      } else {
+        const slots = plan === 'free' ? Math.max(0, 3 - subjects.length) : Infinity;
+        data.suggestions.slice(0, slots).forEach(s => setSubjects(prev => [...prev, s]));
+        debounceSave();
+      }
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+      setAiError(e.message);
+    }
     finally { setAiLoading(false); }
-  }, [subjects, chapPct, debounceSave]);
+  }, [subjects, chapPct, debounceSave, plan]);
 
   // ── Misc ──
   const todayStr = useMemo(() => {
@@ -598,7 +687,7 @@ export default function App() {
     switch (view) {
       case 'dashboard':
         return <DashboardHome
-          subjects={subjects}
+          subjects={displaySubjects}
           tasks={tasks}
           onNavigate={navigate}
           onToggleTask={toggleTask}
@@ -626,7 +715,7 @@ export default function App() {
         />;
       case 'pomodoro':
         return <PomodoroView
-          subjects={subjects}
+          subjects={displaySubjects}
         />;
       case 'tasks':
         return <TasksView
@@ -640,7 +729,7 @@ export default function App() {
           setTaskFilter={setTaskFilter}
           newTask={newTask}
           setNewTask={setNewTask}
-          subjects={subjects}
+          subjects={displaySubjects}
         />;
       case 'calendar':
         return <CalendarView
@@ -651,7 +740,7 @@ export default function App() {
         />;
       case 'subjects':
         return <SubjectsView
-          subjects={subjects}
+          subjects={displaySubjects}
           onNavigate={navigate}
           chapPct={chapPct}
           overallPct={overallPct}
@@ -684,7 +773,7 @@ export default function App() {
         />;
       case 'interview':
         return <InterviewView
-          subjects={subjects}
+          subjects={displaySubjects}
           interviewTopic={interviewTopic}
           setInterviewTopic={setInterviewTopic}
           interviewMessages={interviewMessages}
@@ -713,7 +802,7 @@ export default function App() {
           onToggleDeepDive={() => setShowDeepDiveComments(v => !v)}
         />;
       default:
-        if (view.startsWith('subject-')) {
+          if (view.startsWith('subject-')) {
           const sid = view.replace('subject-', '');
           const subject = subjects.find(s => s.id === sid);
           if (!subject) return <div className="view"><p className="c-t4">Subject not found.</p></div>;
@@ -722,7 +811,7 @@ export default function App() {
             onNavigate={navigate}
             chapPct={chapPct}
             syncSubjectPct={syncSubjectPct}
-            subjects={subjects}
+            subjects={displaySubjects}
             onDeleteSubject={doDelete}
             onResetSubject={doReset}
             notesOpen={notesOpen}
@@ -739,7 +828,7 @@ export default function App() {
           />;
         }
         return <DashboardHome
-          subjects={subjects}
+          subjects={displaySubjects}
           tasks={tasks}
           onNavigate={navigate}
           onToggleTask={toggleTask}
@@ -763,7 +852,7 @@ export default function App() {
     }
   };
 
-  if (authLoading) {
+  if (isBootstrapping) {
     return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F172A', color: '#64748B', fontFamily: 'var(--mono)', fontSize: 14 }}>Loading...</div>;
   }
 
@@ -773,22 +862,22 @@ export default function App() {
   }
 
   if (!onboardingDone) {
-    if (planLoading) {
-      return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F172A', color: '#64748B', fontFamily: 'var(--mono)', fontSize: 14 }}>Loading...</div>;
-    }
     return <OnboardingWizard plan={plan} onComplete={() => {
       localStorage.setItem('studit_onboarding_done', 'true');
       if (user) localStorage.setItem('studit_onboarding_uid', user.id);
+      const savedSubjects = JSON.parse(localStorage.getItem('studit_subjects'));
+      if (savedSubjects) setSubjects(savedSubjects);
       setOnboardingDone(true);
     }} />;
   }
 
   return (
     <TimerProvider>
+      {showPlanGate && <PlanGate onClose={() => setShowPlanGate(null)} />}
       <Layout
         view={view}
         onNavigate={navigate}
-        subjects={subjects}
+        subjects={displaySubjects}
         chapPct={chapPct}
         todayStr={todayStr}
         currentWeek={currentWeek}
