@@ -767,7 +767,12 @@ export default function App() {
     return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F172A', color: '#64748B', fontFamily: 'var(--mono)', fontSize: 14 }}>Loading...</div>;
   }
 
-  if (user && !onboardingDone) {
+  if (!user) {
+    window.location.href = '/login.html';
+    return null;
+  }
+
+  if (!onboardingDone) {
     if (planLoading) {
       return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F172A', color: '#64748B', fontFamily: 'var(--mono)', fontSize: 14 }}>Loading...</div>;
     }
