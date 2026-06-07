@@ -190,11 +190,17 @@ async function handleLogin() {
   }
 }
 
+function clearRegisterForm() {
+  document.getElementById('reg-name').value = '';
+  document.getElementById('reg-email').value = '';
+  document.getElementById('reg-password').value = '';
+}
+
 async function handleRegister() {
   hideError('register-error');
   if (!_sb || !_sbReady) return showError('register-error', 'Auth client not ready. Please wait or refresh.');
-  const fullName = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
+  const fullName = String(document.getElementById('reg-name').value.trim() || '');
+  const email    = String(document.getElementById('reg-email').value.trim() || '');
   const password = document.getElementById('reg-password').value;
   if (!fullName || !email || !password) return showError('register-error', 'Please fill in all fields');
   if (password.length < 6) return showError('register-error', 'Password must be at least 6 characters');
@@ -221,10 +227,17 @@ async function handleRegister() {
       return;
     }
 
-    console.log('[signup] success:', data);
+    if (!data || !data.user) {
+      showError('register-error', 'Registration failed. No user was created. Please try again.');
+      btn.disabled = false; btn.textContent = 'Create Account';
+      return;
+    }
+
+    console.log('[signup] success — user created, confirmation pending');
     const suc = document.getElementById('register-success');
     suc.textContent = 'Account created! Please check your inbox to confirm your email address before logging in.';
     suc.style.display = 'block';
+    clearRegisterForm();
     btn.disabled = false; btn.textContent = 'Create Account';
   } catch (err) {
     console.error('[signup] exception:', { message: err.message, stack: err.stack });
