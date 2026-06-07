@@ -223,7 +223,7 @@ async function handleRegister() {
 
     console.log('[signup] success:', data);
     const suc = document.getElementById('register-success');
-    suc.textContent = 'Account created! Check your email to confirm.';
+    suc.textContent = 'Account created! Please check your inbox to confirm your email address before logging in.';
     suc.style.display = 'block';
     btn.disabled = false; btn.textContent = 'Create Account';
   } catch (err) {
