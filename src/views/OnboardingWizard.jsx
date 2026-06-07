@@ -99,7 +99,7 @@ export default function OnboardingWizard({ plan, onComplete }) {
         {step === 'welcome' && (
           <div className="ow-welcome">
             <h1 className="ow-brand">
-              Study<span>OS</span>
+              Stud<span>It</span>
             </h1>
             <p className="ow-sub">
               Your personal learning operating system — track subjects, generate AI study guides, and ace your exams.
