@@ -1,4 +1,21 @@
-export default function PlanGate({ onClose }) {
+import { useState } from 'react';
+
+export default function PlanGate({ onClose, onCheckout }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleCheckout = async () => {
+    if (!onCheckout) return;
+    setError('');
+    setLoading(true);
+    try {
+      await onCheckout('pro');
+    } catch (e) {
+      setError(e.message || 'Could not start checkout. Please try again.');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="plan-gate-overlay" onClick={onClose}>
       <div className="plan-gate-modal" onClick={e => e.stopPropagation()}>
@@ -29,12 +46,17 @@ export default function PlanGate({ onClose }) {
           $19 <span>/mo</span>
         </div>
         <div className="plan-gate-period">Cancel anytime</div>
+        {error && (
+          <p style={{ color: '#f87171', fontSize: 13, fontFamily: 'var(--mono)', marginBottom: 12 }}>
+            {error}
+          </p>
+        )}
         <div className="plan-gate-btn-row">
-          <button className="ow-btn premium" onClick={() => alert('🚧 Payment flow coming soon')}>
+          <button className="ow-btn premium" onClick={handleCheckout} disabled={loading}>
             <i className="ph ph-crown"></i>
-            Go Premium
+            {loading ? 'Redirecting…' : 'Go Premium'}
           </button>
-          <button className="plan-gate-skip" onClick={onClose}>Maybe later</button>
+          <button className="plan-gate-skip" onClick={onClose} disabled={loading}>Maybe later</button>
         </div>
       </div>
     </div>

@@ -3,8 +3,9 @@ import { SUBJECTS } from '../data/subjects';
 import PlanGate from '../components/PlanGate';
 
 const STEPS = { welcome: 0, upload_cv: 1, manual_selection: 2 };
+const isPaidPlan = (plan) => plan === 'pro' || plan === 'enterprise';
 
-export default function OnboardingWizard({ plan, onComplete }) {
+export default function OnboardingWizard({ plan, onComplete, onCheckout }) {
   const [step, setStep] = useState('welcome');
   const [selected, setSelected] = useState([]);
   const [cvFile, setCvFile] = useState(null);
@@ -12,10 +13,11 @@ export default function OnboardingWizard({ plan, onComplete }) {
   const [showGate, setShowGate] = useState(false);
   const fileRef = useRef(null);
 
+  const paid = isPaidPlan(plan);
   const stepIndex = STEPS[step];
-  const totalSteps = plan === 'premium' ? 3 : 2;
+  const totalSteps = paid ? 3 : 2;
 
-  const steps = plan === 'premium'
+  const steps = paid
     ? ['welcome', 'upload_cv', 'manual_selection']
     : ['welcome', 'manual_selection'];
 
@@ -43,13 +45,15 @@ export default function OnboardingWizard({ plan, onComplete }) {
   }, [plan]);
 
   const finish = useCallback(() => {
-    const subjects = selected.length > 0
-      ? SUBJECTS.filter(s => selected.includes(s.id))
-      : SUBJECTS;
+    if (!paid && (selected.length === 0 || selected.length > 3)) return;
+
+    const subjects = paid && selected.length === 0
+      ? SUBJECTS
+      : SUBJECTS.filter(s => selected.includes(s.id));
+
     localStorage.setItem('studit_subjects', JSON.stringify(subjects));
-    localStorage.setItem('studit_onboarding_done', 'true');
-    onComplete?.();
-  }, [selected, onComplete]);
+    onComplete?.(subjects);
+  }, [selected, onComplete, paid]);
 
   const handleCvDrop = useCallback((e) => {
     e.preventDefault();
@@ -71,12 +75,14 @@ export default function OnboardingWizard({ plan, onComplete }) {
   };
 
   const handleUploadCv = useCallback(() => {
-    if (plan !== 'premium') {
+    if (!paid) {
       setShowGate(true);
       return;
     }
     nextStep();
-  }, [plan, nextStep]);
+  }, [paid, nextStep]);
+
+  const canFinish = paid ? true : selected.length >= 1 && selected.length <= 3;
 
   const renderDot = (s, i) => {
     const idx = steps.indexOf(s);
@@ -88,7 +94,7 @@ export default function OnboardingWizard({ plan, onComplete }) {
 
   return (
     <div className="onboarding-wizard">
-      {showGate && <PlanGate onClose={() => setShowGate(false)} />}
+      {showGate && <PlanGate onClose={() => setShowGate(false)} onCheckout={onCheckout} />}
       <div className="ow-container">
         {totalSteps > 1 && (
           <div className="ow-step-dots">
@@ -220,8 +226,10 @@ export default function OnboardingWizard({ plan, onComplete }) {
                 <i className="ph ph-arrow-left"></i>
                 Back
               </button>
-              <button className="ow-btn primary" onClick={finish}>
-                {selected.length > 0 ? `Start with ${selected.length} subjects` : 'Skip — use all subjects'}
+              <button className="ow-btn primary" onClick={finish} disabled={!canFinish}>
+                {paid && selected.length === 0
+                  ? 'Use all subjects'
+                  : `Start with ${selected.length} subject${selected.length === 1 ? '' : 's'}`}
                 <i className="ph ph-arrow-right"></i>
               </button>
             </div>

@@ -27,6 +27,20 @@ export default function App() {
   const [showPlanGate, setShowPlanGate] = useState(null);
   const isBootstrapping = authLoading || (user && (planLoading || onboardingChecking));
 
+  const markOnboardingComplete = useCallback(async (uid) => {
+    localStorage.setItem('studit_onboarding_done', 'true');
+    localStorage.setItem('studit_onboarding_uid', uid);
+    if (!supabase) return;
+    try {
+      const { data } = await supabase.from('profiles').select('preferences').eq('id', uid).single();
+      await supabase.from('profiles').upsert({
+        id: uid,
+        preferences: { ...(data?.preferences || {}), onboarding_completed: true },
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'id' });
+    } catch { /* ignore */ }
+  }, []);
+
   useEffect(() => {
     if (!user) { setOnboardingChecking(false); return; }
     const flag = localStorage.getItem('studit_onboarding_done') === 'true';
@@ -36,24 +50,56 @@ export default function App() {
       setOnboardingChecking(false);
       return;
     }
-    supabase?.from('profiles').select('preferences').eq('id', user.id).single()
-      .then(({ data }) => {
-        if (data?.preferences?.onboarding_completed) {
-          localStorage.setItem('studit_onboarding_done', 'true');
-          localStorage.setItem('studit_onboarding_uid', user.id);
+    if (!supabase) { setOnboardingChecking(false); return; }
+
+    Promise.all([
+      supabase.from('profiles').select('preferences').eq('id', user.id).single(),
+      supabase.from('progress').select('subjects').eq('user_id', user.id).single(),
+    ])
+      .then(async ([profileRes, progressRes]) => {
+        const prefsDone = profileRes.data?.preferences?.onboarding_completed === true;
+        let progressSubjects = progressRes.data?.subjects;
+        if (typeof progressSubjects === 'string') {
+          try { progressSubjects = JSON.parse(progressSubjects); } catch { progressSubjects = null; }
+        }
+        const hasProgress = Array.isArray(progressSubjects) && progressSubjects.length > 0;
+
+        if (prefsDone || hasProgress) {
+          await markOnboardingComplete(user.id);
           setOnboardingDone(true);
         }
         setOnboardingChecking(false);
       })
       .catch(() => setOnboardingChecking(false));
-  }, [user]);
+  }, [user, markOnboardingComplete]);
   const {
     subjects, setSubjects, tasks, setTasks,
     chapPct, syncSubjectPct, overallPct,
-    saveProgress, debounceSave, loadProgress,
+    saveProgress, debounceSave,
   } = useProgress(user);
   const lockedCount = plan === 'free' ? Math.max(0, (subjects?.length || 0) - 3) : 0;
   const displaySubjects = (subjects || []).map((s, i) => ({ ...s, locked: plan === 'free' && i >= 3 }));
+
+  const openPlanGate = useCallback(() => setShowPlanGate('upgrade'), []);
+
+  const startCheckout = useCallback(async (tier = 'pro') => {
+    if (!supabase) throw new Error('Auth not available');
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) throw new Error('Please sign in again to upgrade');
+
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ tier }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Checkout failed');
+    if (data.url) window.location.href = data.url;
+    else throw new Error('No payment URL returned');
+  }, []);
 
   // ── Routing ──
   const [view, setView] = useState(() => {
@@ -689,13 +735,6 @@ export default function App() {
     }
   }, [authLoading, user, reconnecting]);
 
-  // ── Load Supabase progress on mount ──
-  useEffect(() => {
-    if (!authLoading && user) {
-      loadProgress();
-    }
-  }, [authLoading, user, loadProgress]);
-
   // ── Save on unmount ──
   useEffect(() => {
     const handle = () => { if (user) saveProgress(); };
@@ -703,16 +742,14 @@ export default function App() {
     return () => window.removeEventListener('beforeunload', handle);
   }, [user, saveProgress]);
 
-  // ── Watchers ──
-  useEffect(() => { debounceSave(); }, [subjects, tasks]);
-
   // ── Sync deep-dive preference to Supabase ──
   const syncDeepDivePref = useCallback(async () => {
     if (!supabase || !user) return;
     try {
+      const { data } = await supabase.from('profiles').select('preferences').eq('id', user.id).single();
       await supabase.from('profiles').upsert({
         id: user.id,
-        preferences: { showDeepDiveComments },
+        preferences: { ...(data?.preferences || {}), showDeepDiveComments },
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
     } catch (e) { /* ignore */ }
@@ -752,6 +789,7 @@ export default function App() {
           subjects={displaySubjects}
           tasks={tasks}
           onNavigate={navigate}
+          onUpgrade={openPlanGate}
           onToggleTask={toggleTask}
           chapPct={chapPct}
           overallPct={overallPct}
@@ -803,7 +841,8 @@ export default function App() {
       case 'subjects':
         return <SubjectsView
           subjects={displaySubjects}
-          onNavigate={(v) => { if (v.startsWith('subject-')) { const s = subjects.find(x => x.id === v.replace('subject-', '')); if (s?.locked) { setShowPlanGate('subjects'); return; } } navigate(v); }}
+          onNavigate={(v) => { if (v.startsWith('subject-')) { const s = subjects.find(x => x.id === v.replace('subject-', '')); if (s?.locked) { openPlanGate(); return; } } navigate(v); }}
+          onUpgrade={openPlanGate}
           chapPct={chapPct}
           overallPct={overallPct}
           plan={plan}
@@ -896,6 +935,7 @@ export default function App() {
           subjects={displaySubjects}
           tasks={tasks}
           onNavigate={navigate}
+          onUpgrade={openPlanGate}
           onToggleTask={toggleTask}
           chapPct={chapPct}
           overallPct={overallPct}
@@ -941,18 +981,25 @@ export default function App() {
   if (!user) return null;
 
   if (!onboardingDone) {
-    return <OnboardingWizard plan={plan} onComplete={() => {
-      localStorage.setItem('studit_onboarding_done', 'true');
-      if (user) localStorage.setItem('studit_onboarding_uid', user.id);
-      const savedSubjects = JSON.parse(localStorage.getItem('studit_subjects'));
-      if (savedSubjects) setSubjects(savedSubjects);
-      setOnboardingDone(true);
-    }} />;
+    return <OnboardingWizard
+      plan={plan}
+      onCheckout={startCheckout}
+      onComplete={async (chosenSubjects) => {
+        if (chosenSubjects) setSubjects(chosenSubjects);
+        if (user) await markOnboardingComplete(user.id);
+        setOnboardingDone(true);
+      }}
+    />;
   }
 
   return (
     <TimerProvider>
-      {showPlanGate && <PlanGate onClose={() => setShowPlanGate(null)} />}
+      {showPlanGate && (
+        <PlanGate
+          onClose={() => setShowPlanGate(null)}
+          onCheckout={startCheckout}
+        />
+      )}
       <Layout
         view={view}
         onNavigate={navigate}

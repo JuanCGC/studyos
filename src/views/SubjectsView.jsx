@@ -1,4 +1,4 @@
-export default function SubjectsView({ subjects, onNavigate, chapPct, overallPct, plan }) {
+export default function SubjectsView({ subjects, onNavigate, onUpgrade, chapPct, overallPct, plan }) {
   return (
     <div className="view">
       <div className="sh mb20">
@@ -9,7 +9,7 @@ export default function SubjectsView({ subjects, onNavigate, chapPct, overallPct
       {subjects.length > 0 ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 14 }}>
           {subjects.map(s => (
-            <div key={s.id} className={'card' + (s.locked ? ' opacity-50' : '')} style={{ cursor: s.locked ? 'default' : 'pointer', position: 'relative', overflow: 'hidden' }} onClick={() => { if (!s.locked) onNavigate('subject-' + s.id); }}>
+            <div key={s.id} className={'card' + (s.locked ? ' opacity-50' : '')} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }} onClick={() => { if (s.locked) { onUpgrade?.(); return; } onNavigate('subject-' + s.id); }}>
               {s.locked && (
                 <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,.7)', backdropFilter: 'blur(2px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, zIndex: 2, borderRadius: 'inherit' }}>
                   <i className="ph ph-lock" style={{ fontSize: 24, color: 'var(--amber2)' }}></i>

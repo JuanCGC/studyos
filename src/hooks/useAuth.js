@@ -106,7 +106,10 @@ export function useAuth() {
   const logout = async () => {
     clearReconnect();
     Object.keys(localStorage).forEach(k => {
-      if (k.startsWith('sb-') || k.startsWith('studit_')) localStorage.removeItem(k);
+      if (k.startsWith('sb-')) localStorage.removeItem(k);
+      else if (k.startsWith('studit_') && k !== 'studit_onboarding_done' && k !== 'studit_onboarding_uid') {
+        localStorage.removeItem(k);
+      }
     });
     if (supabase) supabase.auth.signOut({ scope: 'global' }).catch(() => {});
     window.location.href = '/login.html';

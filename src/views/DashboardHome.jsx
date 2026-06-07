@@ -65,7 +65,7 @@ function computeCalCells(year, month) {
 
 export default function DashboardHome({
   subjects, tasks,
-  onNavigate, onToggleTask, chapPct, overallPct,
+  onNavigate, onUpgrade, onToggleTask, chapPct, overallPct,
   weekHours, totalHours, maxH, weekGoal, hoursPerSubject,
   flashcardSummary,
 }) {
@@ -195,8 +195,8 @@ export default function DashboardHome({
           </div>
           <div className="subj-list stagger">
             {subjects.map(s => (
-              <div key={s.id} className="subj-item" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => { if (s.locked) return; onNavigate('subject-' + s.id); }}>
-                {s.locked && <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,.7)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, zIndex: 2, borderRadius: 8 }}><i className="ph ph-lock" style={{ fontSize: 16, color: 'var(--amber2)' }}></i><span style={{ fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--t4)' }}>Upgrade</span></div>}
+              <div key={s.id} className="subj-item" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => { if (s.locked) { onUpgrade?.(); return; } onNavigate('subject-' + s.id); }}>
+                {s.locked && <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,42,.7)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, zIndex: 2, borderRadius: 8, cursor: 'pointer' }}><i className="ph ph-lock" style={{ fontSize: 16, color: 'var(--amber2)' }}></i><span style={{ fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--t4)' }}>Upgrade</span></div>}
                 <div className="subj-top">
                   <div className="subj-name">
                     <i className={'ph ph-' + s.icon}></i>

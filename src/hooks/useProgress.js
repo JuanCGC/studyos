@@ -38,6 +38,7 @@ export function useProgress(user) {
   tasksRef.current = tasks;
 
   const saveTimer = useRef(null);
+  const initialLoadDone = useRef(false);
 
   const chapPct = useCallback((s) => {
     if (!s.chapList || !s.chapList.length) return 0;
@@ -86,22 +87,93 @@ export function useProgress(user) {
     return v;
   }
 
-  const loadProgress = useCallback(async () => {
+  const syncToRemote = useCallback(async (s, t) => {
     if (!supabase || !user) return;
     try {
-      const { data } = await supabase.from('progress').select('*').eq('user_id', user.id).single();
-      const parsedSubjects = parseJSONB(data?.subjects);
-      if (parsedSubjects) {
-        setSubjects(parsedSubjects);
-        localStorage.setItem('studit_subjects', JSON.stringify(parsedSubjects));
+      const { error } = await supabase.rpc('merge_progress', {
+        p_user_id: user.id,
+        p_subjects: s,
+        p_tasks: t,
+      });
+      if (error) {
+        await supabase.from('progress').upsert({
+          user_id: user.id,
+          subjects: s,
+          tasks: t,
+          updated_at: new Date().toISOString(),
+        });
       }
-      const parsedTasks = parseJSONB(data?.tasks);
-      if (parsedTasks) {
-        setTasks(parsedTasks);
-        localStorage.setItem('studit_tasks', JSON.stringify(parsedTasks));
-      }
-    } catch (e) { /* ignore */ }
+    } catch { /* ignore */ }
   }, [user]);
+
+  const loadProgress = useCallback(async () => {
+    if (!supabase || !user) {
+      initialLoadDone.current = true;
+      return;
+    }
+
+    let localSubjects = null;
+    let localTasks = null;
+    try {
+      localSubjects = parseJSONB(localStorage.getItem('studit_subjects'));
+      localTasks = parseJSONB(localStorage.getItem('studit_tasks'));
+    } catch { /* ignore */ }
+
+    try {
+      const { data, error } = await supabase
+        .from('progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      const remoteSubjects = parseJSONB(data?.subjects);
+      const remoteTasks = parseJSONB(data?.tasks);
+      const hasRemoteSubjects = Array.isArray(remoteSubjects) && remoteSubjects.length > 0;
+      const hasRemoteTasks = Array.isArray(remoteTasks) && remoteTasks.length > 0;
+      const hasLocalSubjects = Array.isArray(localSubjects) && localSubjects.length > 0;
+      const hasLocalTasks = Array.isArray(localTasks) && localTasks.length > 0;
+
+      const finalSubjects = hasRemoteSubjects ? remoteSubjects : (hasLocalSubjects ? localSubjects : null);
+      const finalTasks = hasRemoteTasks ? remoteTasks : (hasLocalTasks ? localTasks : null);
+
+      if (finalSubjects) {
+        setSubjects(finalSubjects);
+        localStorage.setItem('studit_subjects', JSON.stringify(finalSubjects));
+      }
+      if (finalTasks) {
+        setTasks(finalTasks);
+        localStorage.setItem('studit_tasks', JSON.stringify(finalTasks));
+      }
+
+      if ((hasLocalSubjects && !hasRemoteSubjects) || (hasLocalTasks && !hasRemoteTasks)) {
+        await syncToRemote(
+          finalSubjects || subjectsRef.current,
+          finalTasks || tasksRef.current,
+        );
+      }
+    } catch { /* keep local state */ }
+    finally {
+      initialLoadDone.current = true;
+    }
+  }, [user, syncToRemote]);
+
+  // Load from Supabase when user is available
+  useEffect(() => {
+    initialLoadDone.current = false;
+    if (!user) {
+      initialLoadDone.current = true;
+      return;
+    }
+    loadProgress();
+  }, [user, loadProgress]);
+
+  // Debounced save — only after initial load to avoid overwriting DB with stale/empty state
+  useEffect(() => {
+    if (!initialLoadDone.current || !user) return;
+    debounceSave();
+  }, [subjects, tasks, user, debounceSave]);
 
   // Cross‑tab sync — storage event fires in other tabs when localStorage changes
   useEffect(() => {
