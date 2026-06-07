@@ -19,11 +19,11 @@ import AIGuideView from './views/AIGuideView';
 import OnboardingWizard from './views/OnboardingWizard';
 
 export default function App() {
+  const { user, loading: authLoading, logout } = useAuth();
   const [onboardingDone, setOnboardingDone] = useState(() => {
     return localStorage.getItem('studit_onboarding_done') === 'true';
   });
   const { plan, loading: planLoading } = usePlan(user);
-  const { user, loading: authLoading, logout } = useAuth();
   const {
     subjects, setSubjects, tasks, setTasks,
     chapPct, syncSubjectPct, overallPct,
